@@ -33,6 +33,29 @@ function Method() {
         ))}
       </ol>
 
+      <section className="mt-8">
+        <h2 className="text-3xl">Cara Pomodoro</h2>
+        <p className="mt-3 text-muted">
+          Satu putaran adalah 25 menit kerja, lalu 5 menit berdiri. Setelah empat putaran, istirahat 15 menit. Timer dan musik lofi ada di kartu bawah, di semua halaman.
+        </p>
+        <ol className="mt-4 grid gap-3">
+          {[
+            ["Tulis satu tugas", "Satu kalimat: materi apa, selesai kalau apa. Kalau tugasnya dua, tulis yang kedua di kertas 'nanti'."],
+            ["Mulai 25 menit", "Tekan Mulai. Lofi boleh dihidupkan. Tab lain ditutup. Kalau pikiran lari, catat satu kata lalu kembali."],
+            ["Berhenti saat bel", "Lima menit: air, bahu, jendela. Jangan membuka pesan. Bel bukan saran."],
+            ["Putaran keempat", "Istirahat 15 menit. Baru boleh ganti materi. Kalau 25 menit terasa terlalu panjang, pakai blok 12 menit di atas. Itu juga sah."],
+          ].map(([title, body], index) => (
+            <li key={title} className="card flex gap-4 p-4">
+              <span className="font-mono text-sm text-copper">{index + 1}</span>
+              <span>
+                <span className="block font-medium">{title}</span>
+                <span className="mt-1 block text-sm text-muted">{body}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
+      </section>
+
       <section className="card mt-8 p-5">
         <h2 className="text-3xl">Kerangka catatan</h2>
         <pre className="mt-3 overflow-x-auto font-mono text-sm leading-6 whitespace-pre-wrap">{NOTE_FRAME}</pre>

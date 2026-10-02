@@ -85,6 +85,13 @@ function Lesson() {
             <p className="text-sm font-semibold text-copper">Janji layar ini</p>
             <h2 className="mt-2 text-3xl">{topic.promise}</h2>
             <p className="mt-4 text-xl">{topic.oneIdea}</p>
+            <figure className="mt-4">
+              <img className="analogy-photo" src={`/analogi/${topic.id}.jpg`} alt="" />
+              <figcaption className="mt-3 border-l-2 border-copper pl-3 text-sm leading-relaxed md:text-base">
+                <span className="font-semibold text-copper">Bayangkan. </span>
+                {topic.analogy}
+              </figcaption>
+            </figure>
           </article>
         )}
         {step === 1 && (

@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Compass, House, Route, Sigma, Timer } from "lucide-react";
 import { createContext, useContext, useState, type ReactNode } from "react";
+import { StudyDock } from "@/components/study-dock";
 
 const NAV = [
   { to: "/", label: "Beranda", icon: House },
@@ -51,7 +52,8 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
             )}
           </div>
         </header>
-        <main className={`mx-auto px-4 py-6 ${focus ? "pb-10" : "pb-28 md:pb-12"} ${width}`}>{children}</main>
+        <main className={`mx-auto px-4 py-6 ${focus ? "pb-36" : "pb-52 md:pb-36"} ${width}`}>{children}</main>
+        <StudyDock focus={focus} />
         {!focus && (
           <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-paper/75 backdrop-blur-md md:hidden">
             <ul className="grid grid-cols-5">

@@ -178,15 +178,15 @@ function Home() {
 }
 
 const PLANETS = [
-  { id: "merkurius", name: "Merkurius", orbit: "18%", size: "7px", dur: "7s", start: "24deg" },
-  { id: "venus", name: "Venus", orbit: "27%", size: "10px", dur: "11s", start: "150deg" },
-  { id: "bumi", name: "Bumi", orbit: "36%", size: "11px", dur: "15s", start: "70deg" },
-  { id: "mars", name: "Mars", orbit: "45%", size: "9px", dur: "19s", start: "210deg" },
-  { id: "yupiter", name: "Yupiter", orbit: "56%", size: "22px", dur: "26s", start: "310deg" },
-  { id: "saturnus", name: "Saturnus", orbit: "68%", size: "18px", dur: "32s", start: "48deg" },
-  { id: "uranus", name: "Uranus", orbit: "78%", size: "13px", dur: "38s", start: "180deg" },
-  { id: "neptunus", name: "Neptunus", orbit: "87%", size: "13px", dur: "46s", start: "260deg" },
-  { id: "pluto", name: "Pluto", orbit: "96%", size: "5px", dur: "54s", start: "120deg" },
+  { id: "merkurius", name: "Merkurius", orbit: "18%", size: "6.5cqw", dur: "7s", start: "24deg" },
+  { id: "venus", name: "Venus", orbit: "30%", size: "8cqw", dur: "11s", start: "150deg" },
+  { id: "bumi", name: "Bumi", orbit: "42%", size: "8.4cqw", dur: "15s", start: "70deg" },
+  { id: "mars", name: "Mars", orbit: "54%", size: "7cqw", dur: "19s", start: "210deg" },
+  { id: "yupiter", name: "Yupiter", orbit: "68%", size: "13cqw", dur: "26s", start: "310deg" },
+  { id: "saturnus", name: "Saturnus", orbit: "84%", size: "7.5cqw", dur: "32s", start: "48deg" },
+  { id: "uranus", name: "Uranus", orbit: "90%", size: "6.5cqw", dur: "38s", start: "180deg" },
+  { id: "neptunus", name: "Neptunus", orbit: "96%", size: "6.5cqw", dur: "46s", start: "40deg" },
+  { id: "pluto", name: "Pluto", orbit: "96%", size: "4.2cqw", dur: "54s", start: "220deg" },
 ] as const;
 
 function SolarSystem() {
@@ -200,7 +200,9 @@ function SolarSystem() {
             className="orbit"
             style={{ ["--orbit" as string]: planet.orbit, ["--dur" as string]: planet.dur, ["--start" as string]: planet.start }}
           >
-            <span className={`planet planet-${planet.id}`} style={{ ["--size" as string]: planet.size }} title={planet.name} />
+            <span className={`planet planet-${planet.id}`} style={{ ["--size" as string]: planet.size }}>
+              <img src={`/planets/${planet.id}.${planet.id === "saturnus" ? "png" : "jpg"}`} alt="" />
+            </span>
           </span>
         ))}
       </div>

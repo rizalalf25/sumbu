@@ -50,6 +50,7 @@ export type Topic = {
   level: "dasar" | "menengah" | "lanjut";
   promise: string;
   oneIdea: string;
+  analogy: string;
   ideas: { t: string; d: string }[];
   formulas: { name: string; tex: string; when: string }[];
   visual: VisualKind;
@@ -74,6 +75,7 @@ const topics: Topic[] = [
     level: "dasar",
     promise: "Kamu bisa menghitung harga akhir tanpa menebak.",
     oneIdea: "Persen artinya per seratus. Ubah dulu jadi desimal, baru dikali.",
+    analogy: "Bayangkan satu kue dipotong rata menjadi 100 potong. Mengambil 20% berarti mengambil 20 potong itu, baru kemudian dihitung harganya. Angka 20 tidak menempel begitu saja di label harga.",
     ideas: [
       { t: "Dari persen ke desimal", d: "20% = 0,20. Geser koma dua langkah ke kiri." },
       { t: "Rasio adalah bagian", d: "2:3 berarti 2 bagian dan 3 bagian. Total ada 5 bagian." },
@@ -119,6 +121,7 @@ const topics: Topic[] = [
     level: "dasar",
     promise: "Kamu bisa membuka x tanpa mencoba-coba selamanya.",
     oneIdea: "Apa yang kamu lakukan di ruas kiri, lakukan juga di ruas kanan.",
+    analogy: "Bayangkan timbangan dua piring yang sedang seimbang. Jika kamu mengambil 3 kelereng dari piring kiri, jarum bergeser, kecuali kamu mengambil 3 kelereng yang sama dari piring kanan. Persamaan tetap benar hanya jika kedua ruas diperlakukan sama.",
     ideas: [
       { t: "x adalah angka yang belum dibuka", d: "Bukan benda ajaib. Satu kotak, satu isi, di persamaan linear sederhana." },
       { t: "Pindah ruas = operasi lawan", d: "Yang ditambah, dikurangi. Yang dikali, dibagi." },
@@ -164,6 +167,7 @@ const topics: Topic[] = [
     level: "dasar",
     promise: "Kamu bisa membaca grafik seperti membaca tarif.",
     oneIdea: "Fungsi adalah mesin: satu masukan, tepat satu keluaran. Grafik adalah semua pasangan itu.",
+    analogy: "Bayangkan mesin kopi dengan satu tombol. Tombol yang sama selalu mengeluarkan satu gelas yang sama, tidak pernah dua gelas berbeda. Grafik hanyalah daftar semua tombol dan gelas yang pernah keluar.",
     ideas: [
       { t: "Masukkan, keluarkan", d: "f(3) artinya ganti x dengan 3, lalu hitung." },
       { t: "Gradien", d: "Naik dibanding maju. Positif menanjak ke kanan." },
@@ -209,6 +213,7 @@ const topics: Topic[] = [
     level: "menengah",
     promise: "Kamu bisa membedakan kali, tambah, dan pangkat.",
     oneIdea: "Pangkat menghitung pengulangan kali. Logaritma bertanya: diulang berapa kali?",
+    analogy: "Bayangkan selembar kertas yang dilipat berulang. Setiap lipatan membuat tebalnya menjadi dua kali. Logaritma tidak bertanya seberapa tebal kertas itu. Ia bertanya: sudah dilipat berapa kali sampai setebal ini?",
     ideas: [
       { t: "Bukan perkalian biasa", d: "2^5 = 32, sedangkan 2×5 = 10." },
       { t: "Sifat perkalian pangkat", d: "Basis sama: pangkat ditambah saat dikali." },
@@ -254,6 +259,7 @@ const topics: Topic[] = [
     level: "menengah",
     promise: "Kamu bisa mengukur tinggi tanpa memanjatnya.",
     oneIdea: "Sinus dan kosinus adalah koordinat titik yang berjalan di lingkaran satuan.",
+    analogy: "Bayangkan ujung jarum jam yang berjalan mengelilingi pusat. Sinus adalah seberapa tinggi ujung jarum dari pusat. Kosinus adalah seberapa jauh ia ke kanan. Saat jarum berputar, tinggi dan kanan itu saling bergantian.",
     ideas: [
       { t: "Segitiga siku", d: "sin = depan/miring, cos = samping/miring, tan = depan/samping." },
       { t: "Lingkaran", d: "Pada lingkaran jari-jari 1, x = cos, y = sin." },
@@ -299,6 +305,7 @@ const topics: Topic[] = [
     level: "dasar",
     promise: "Kamu berhenti menukar luas dengan keliling.",
     oneIdea: "Luas mengukur tutupan. Keliling mengukur pinggir. Keduanya tidak saling mengganti.",
+    analogy: "Karpet menutupi lantai, itu luas. Pita mengukur pinggir ruangan, itu keliling. Ruangan bisa lebih luas tanpa pinggirnya bertambah dengan cara yang sama, misalnya karena bentuknya berubah.",
     ideas: [
       { t: "Satuan memberitahu", d: "m² adalah luas. m adalah panjang." },
       { t: "Segitiga", d: "Setengah jajargenjang dengan alas dan tinggi yang sama." },
@@ -344,6 +351,7 @@ const topics: Topic[] = [
     level: "menengah",
     promise: "Kamu bisa melihat cicilan dan pertumbuhan sebagai pola.",
     oneIdea: "Aritmetika menambah angka yang sama. Geometri mengalikan angka yang sama.",
+    analogy: "Menabung uang yang sama tiap minggu adalah barisan yang menambah. Bakteri yang membelah menjadi dua tiap jam adalah barisan yang mengalikan. Yang pertama naik rata. Yang kedua mula-mula pelan, lalu meledak.",
     ideas: [
       { t: "Suku vs jumlah", d: "U_n satu angka dalam barisan. S_n jumlah sampai suku itu." },
       { t: "Beda dan rasio", d: "Beda ditambah. Rasio dikali." },
@@ -389,6 +397,7 @@ const topics: Topic[] = [
     level: "menengah",
     promise: "Kamu tidak panik ketika melihat 0/0.",
     oneIdea: "Limit adalah angka yang didekati, bukan selalu angka yang bisa langsung dipasang.",
+    analogy: "Bayangkan berjalan menuju sebuah pintu dengan langkah yang makin kecil. Kamu makin dekat, dan kamu sudah tahu di mana pintunya, tanpa harus menabrak daun pintunya. Limit adalah tempat yang didekati, bukan selalu tempat yang diinjak.",
     ideas: [
       { t: "Substitusi dulu", d: "Polinom jinak: masukkan angkanya." },
       { t: "0/0 bukan jawaban", d: "Itu tanda bentuk belum sederhana." },
@@ -434,6 +443,7 @@ const topics: Topic[] = [
     level: "menengah",
     promise: "Kamu bisa mengubah posisi menjadi kecepatan.",
     oneIdea: "Turunan adalah kemiringan pada satu titik, yaitu laju perubahan sesaat.",
+    analogy: "Speedometer menunjukkan laju mobil di detik ini, bukan rata-rata dari rumah sampai kantor. Itu sama dengan kemiringan tanjakan tepat di bawah kakimu, bukan kemiringan seluruh bukit sekaligus.",
     ideas: [
       { t: "Aturan pangkat", d: "Bawa pangkat jadi koefisien, lalu turunkan pangkat satu." },
       { t: "Jumlah", d: "Turunan jumlah adalah jumlah turunan. Kerjakan suku per suku." },
@@ -479,6 +489,7 @@ const topics: Topic[] = [
     level: "menengah",
     promise: "Kamu bisa menjumlahkan perubahan yang terus-menerus.",
     oneIdea: "Integral menjumlahkan irisan sangat tipis. Luas di bawah grafik adalah jumlah itu.",
+    analogy: "Roti diiris sangat tipis, lalu semua irisan ditumpuk kembali. Jumlah irisan itu adalah roti utuhnya. Makin tipis irisannya, makin dekat jumlahnya ke bentuk asli. Luas di bawah grafik dijumlahkan dengan cara yang sama.",
     ideas: [
       { t: "Kebalikan turunan", d: "Cari fungsi yang turunannya kembali ke soal. Tambahkan +C jika batas tidak ada." },
       { t: "Batas", d: "Integral tentu = antiturunan di batas atas dikurangi batas bawah." },
@@ -524,6 +535,7 @@ const topics: Topic[] = [
     level: "menengah",
     promise: "Kamu bisa menghitung peluang tanpa firasat.",
     oneIdea: "Peluang klasik = banyak cara yang kamu mau, dibagi banyak cara yang sama mungkin.",
+    analogy: "Di sebuah kantong ada 10 kelereng yang bentuknya sama, 3 di antaranya merah. Peluang menarik merah adalah 3 dari 10, bukan perasaan bahwa merah sering keluar. Yang dihitung adalah banyak cara, bukan firasat.",
     ideas: [
       { t: "Ruang sampel dulu", d: "Daftar atau hitung semua hasil sebelum memilih yang diinginkan." },
       { t: "Saling lepas", d: "Tidak bisa bersamaan: peluang dijumlah." },
@@ -569,6 +581,7 @@ const topics: Topic[] = [
     level: "menengah",
     promise: "Kamu bisa menggabungkan dua perpindahan tanpa tersesat.",
     oneIdea: "Vektor punya besar dan arah. Menjumlahkannya seperti berjalan berurutan.",
+    analogy: "Jalan 3 langkah ke timur, lalu 4 langkah ke utara. Kamu tidak berakhir 7 langkah di satu garis lurus. Posisi akhirmu adalah satu diagonal, dan panjang diagonal itu lebih pendek daripada 3 ditambah 4.",
     ideas: [
       { t: "Komponen", d: "Urai ke x dan y. Jumlahkan tiap sumbu sendiri." },
       { t: "Panjang", d: "Pythagoras pada komponen." },
@@ -614,6 +627,7 @@ const topics: Topic[] = [
     level: "dasar",
     promise: "Kamu berhenti mencampur km/jam dengan m/s.",
     oneIdea: "Ubah dulu ke satu sistem, baru dihitung. Satuan adalah bagian dari jawaban.",
+    analogy: "Menjumlahkan 2 meter dengan 50 sentimeter mentah-mentah sama kacaunya dengan menjumlahkan 2 jam dan 50 menit tanpa diubah dulu. Satuan harus menjadi satu bahasa sebelum angkanya boleh dihitung.",
     ideas: [
       { t: "SI dulu", d: "meter, kilogram, sekon, ampere. Awalan kilo = 1000, mili = 0,001." },
       { t: "Kecepatan", d: "m/s ke km/jam kali 3,6. Sebaliknya bagi 3,6." },
@@ -659,6 +673,7 @@ const topics: Topic[] = [
     level: "dasar",
     promise: "Kamu bisa menghitung kapan mobil berhenti.",
     oneIdea: "Percepatan tetap membuat kecepatan berubah secara merata. Posisi berubah semakin lama semakin banyak.",
+    analogy: "Mobil yang gasnya tetap membuat jarum kecepatan naik secara rata. Detik pertama hanya menambah sedikit jarak. Detik terakhir, karena mobil sudah lebih cepat, jarak yang tertempuh menjadi lebih panjang.",
     ideas: [
       { t: "Tiga rumus saudara", d: "Pilih yang tidak memuat besaran yang tidak diketahui." },
       { t: "Tanda", d: "Sepakat dulu arah positif. Perlambatan bisa berarti a negatif." },
@@ -704,6 +719,7 @@ const topics: Topic[] = [
     level: "menengah",
     promise: "Kamu bisa menebak di mana bola mendarat.",
     oneIdea: "Pecah gerak jadi dua: horizontal kecepatan tetap, vertikal seperti jatuh bebas. Waktu adalah jembatannya.",
+    analogy: "Bola yang dilempar tetap melaju ke samping, seolah tidak ada yang mengerem. Ke atas, ia naik lalu jatuh seperti benda yang dilepas. Dua gerak itu berbeda, tetapi berlangsung dalam waktu yang sama.",
     ideas: [
       { t: "Komponen", d: "vx = v cos θ tetap. vy berubah karena g." },
       { t: "Waktu dari vertikal", d: "Mendarat setinggi lempar: vy kembali kebalikannya." },
@@ -749,6 +765,7 @@ const topics: Topic[] = [
     level: "dasar",
     promise: "Kamu bisa menggambar gaya tanpa panah yang hilang.",
     oneIdea: "Percepatan sama dengan gaya total dibagi massa. Gaya yang saling mengalahkan, bukan yang sendiri paling besar, yang menentukan.",
+    analogy: "Dorongan yang sama pada gerobak kosong dan gerobak penuh. Yang kosong langsung berubah cepat. Yang penuh lebih berat, jadi kecepatannya berubah lebih pelan. Yang menentukan bukan satu gaya yang paling besar, melainkan gaya yang menang setelah saling melawan.",
     ideas: [
       { t: "Gambar dulu", d: "Setiap panah gaya yang menyentuh benda. Berat, normal, gesek, tarikan." },
       { t: "Berat bukan massa", d: "w = mg. Massa kilogram, berat newton." },
@@ -794,6 +811,7 @@ const topics: Topic[] = [
     level: "menengah",
     promise: "Kamu bisa dapat kelajuan tanpa menghitung waktu.",
     oneIdea: "Usaha memindahkan energi. Pada gaya konservatif, jumlah kinetik dan potensial tetap.",
+    analogy: "Mendorong lemari memindahkan tenaga dari ototmu ke lemari. Di ayunan, saat kamu tinggi, laju kecil. Saat kamu di titik terbawah, laju besar. Tinggi dan laju saling meminjam, jumlahnya tetap.",
     ideas: [
       { t: "Usaha", d: "Gaya searah perpindahan. Gaya tegak lurus tidak usaha." },
       { t: "Kinetik", d: "Bergantung kelajuan kuadrat. Dua kali lebih cepat, empat kali energinya." },
@@ -839,6 +857,7 @@ const topics: Topic[] = [
     level: "menengah",
     promise: "Kamu paham kenapa airbag memperlama waktu.",
     oneIdea: "Momentum adalah massa kali kecepatan. Tanpa gaya luar, jumlah momentum sebelum dan sesudah sama.",
+    analogy: "Dua orang di skateboard saling mendorong lalu melepas. Yang lebih ringan meluncur lebih cepat. Yang lebih berat lebih pelan. Dorongan total mereka tetap saling mengimbangi jika tidak ada yang mendorong dari luar.",
     ideas: [
       { t: "Arah", d: "Pilih positif. Yang berlawanan dapat tanda minus." },
       { t: "Menempel", d: "Massanya digabung, kecepatan jadi satu." },
@@ -884,6 +903,7 @@ const topics: Topic[] = [
     level: "menengah",
     promise: "Kamu bisa menghubungkan nada, tali, dan bandul.",
     oneIdea: "Gelombang memindahkan energi dan pola, bukan memindahkan mediumnya ke ujung.",
+    analogy: "Suporter di stadion berdiri lalu duduk bergantian. Orang-orangnya tetap di kursi masing-masing. Yang pindah mengelilingi stadion adalah pola berdirinya, bukan orangnya.",
     ideas: [
       { t: "Tiga besaran", d: "Cepat rambat, frekuensi, panjang gelombang. Tahu dua, dapat yang ketiga." },
       { t: "Bandul kecil", d: "Periodenya bergantung panjang dan g, bukan massa dan bukan simpangan kecil." },
@@ -929,6 +949,7 @@ const topics: Topic[] = [
     level: "menengah",
     promise: "Kamu paham kenapa bendungan tebal di bawah.",
     oneIdea: "Makin dalam, tekanan makin besar. Benda terdesak mendapat gaya ke atas sebesar berat fluida yang dipindahkan.",
+    analogy: "Makin dalam kamu menyelam, telinga makin tertekan karena air di atasmu makin berat. Bola yang ditahan di dalam air terdorong ke atas. Besar dorongan itu sama dengan berat air yang tersingkir oleh bola.",
     ideas: [
       { t: "Tekanan gauge", d: "Tambahan karena kedalaman: ρgh. Tekanan udara bisa ditambah terpisah." },
       { t: "Archimedes", d: "V yang dipakai adalah volume terdesak, belum tentu seluruh volume benda." },
@@ -974,6 +995,7 @@ const topics: Topic[] = [
     level: "menengah",
     promise: "Kamu bisa membaca rangkaian sederhana sebelum menyalakannya.",
     oneIdea: "Tegangan mendorong, hambatan menahan, arus adalah muatan yang lewat tiap detik.",
+    analogy: "Air mengalir di selang. Pompa yang menekan adalah tegangan. Selang yang sempit menahan aliran, itu hambatan. Air yang lewat tiap detik adalah arus. Pompa yang kuat dengan selang yang sempit tidak otomatis mengalir deras.",
     ideas: [
       { t: "Ohm", d: "V = IR untuk resistor ohmik. Naikkan V, arus naik, jika R tetap." },
       { t: "Seri dan paralel", d: "Seri: hambatan bertambah. Paralel: ada jalan lain, hambatan pengganti turun." },
@@ -1019,6 +1041,7 @@ const topics: Topic[] = [
     level: "menengah",
     promise: "Kamu bisa menempatkan bayangan lensa tipis.",
     oneIdea: "Lensa tipis mengumpulkan atau menyebarkan sinar karena tiap bagian membelokkan sedikit. Jarak benda, bayangan, dan fokus terikat satu rumus.",
+    analogy: "Kaca pembesar di bawah matahari mengumpulkan sinar yang tadinya sejajar. Tiap bagian kaca membelokkan sinar sedikit, sampai semuanya bertemu di satu titik yang panas. Jarak benda, bayangan, dan titik api itu saling terikat.",
     ideas: [
       { t: "Fokus", d: "Sinar sejajar sumbu dikumpulkan di titik fokus, untuk lensa cembung tipis ideal." },
       { t: "Rumus lensa", d: "Kebalikan jarak dijumlah. Satuan ketiga jarak harus sama." },
@@ -1064,6 +1087,7 @@ const topics: Topic[] = [
     level: "menengah",
     promise: "Kamu bisa menghubungkan warna dengan energi elektron.",
     oneIdea: "Satu foton membawa energi yang ditentukan frekuensinya. Elektron lepas hanya jika paket itu cukup besar, bukan jika lampunya sekadar lebih terang.",
+    analogy: "Permen dibungkus satu-satu. Satu bungkus harus cukup besar untuk membuka kunci. Menumpuk banyak bungkus kecil tidak sama dengan satu bungkus besar. Lampu yang lebih terang hanya menambah jumlah bungkus, bukan ukuran tiap bungkus.",
     ideas: [
       { t: "Warna dan energi", d: "Gelombang lebih pendek, energi foton lebih besar. Ungu lebih besar daripada merah." },
       { t: "Fungsi kerja", d: "Ongkos minimum agar elektron lepas dari logam." },
@@ -1110,6 +1134,7 @@ const topics: Topic[] = [
     level: "lanjut",
     promise: "Kamu melihat i sebagai putaran, bukan sebagai siluman.",
     oneIdea: "Bilangan kompleks adalah titik di bidang. Mengalikan dengan i memutar 90°. Modulus adalah jarak ke asal.",
+    analogy: "Angka biasa hanya bisa jalan maju dan mundur di satu garis. Bilangan kompleks adalah titik di peta: ada langkah ke depan dan langkah ke samping. Mengalikan dengan i seperti berbelok kiri sebesar 90 derajat.",
     ideas: [
       { t: "Bentuk", d: "z = x + iy. x yang biasa, y yang di arah i." },
       { t: "Kalikan", d: "Modulus dikali, argumen dijumlah. i² = −1 memunculkan tanda minus di bagian real." },
@@ -1156,6 +1181,7 @@ const topics: Topic[] = [
     level: "lanjut",
     promise: "Kamu tahu kapan boleh memotong ekor deret.",
     oneIdea: "Deret adalah jumlah yang panjang. Sering cukup beberapa suku pertama, asal kamu tahu sisanya mengecil.",
+    analogy: "Cat dituang, dan tiap tuangan berikutnya hanya setengah dari sisa sebelumnya. Kamu tidak perlu menuang selamanya. Setelah beberapa kali, tambahan catnya sudah sangat kecil, dan kamu tahu isinya berhenti di dekat angka tertentu.",
     ideas: [
       { t: "Geometri", d: "Pengali tetap. Ada rumus jumlah tertutup." },
       { t: "Syarat tak hingga", d: "|r| < 1 atau jumlahnya lari." },
@@ -1202,6 +1228,7 @@ const topics: Topic[] = [
     level: "lanjut",
     promise: "Kamu bisa membaca kemiringan sebuah bukit pada peta.",
     oneIdea: "Turunan parsial mengubah satu variabel dan membekukan yang lain. Itu kemiringan permukaan di satu arah.",
+    analogy: "Di sebuah bukit, jalan ke utara menanjak curam, sedangkan jalan ke timur hampir datar. Kemiringan bukan satu angka untuk seluruh bukit. Ia tergantung arah mana yang kamu kunci, dan arah mana yang kamu biarkan diam.",
     ideas: [
       { t: "Yang dibekukan adalah konstanta", d: "y tetap saat ∂/∂x, sekalipun y nanti diganti angka." },
       { t: "Gradien", d: "Vektor semua turunan parsial. Arahnya paling curam naik." },
@@ -1248,6 +1275,7 @@ const topics: Topic[] = [
     level: "lanjut",
     promise: "Kamu bisa menghitung massa benda yang tidak seragam.",
     oneIdea: "Integral lipat menjumlahkan nilai di seluruh daerah. Kerjakan integral paling dalam dulu, sambil menganggap variabel luar tetap.",
+    analogy: "Lantai penuh ubin berharga. Untuk menghitung semuanya, jumlahkan dulu satu baris sampai selesai. Setelah baris itu utuh, baru jumlahkan semua baris. Variabel yang belum kamu sentuh tetap diam.",
     ideas: [
       { t: "Dalam lalu luar", d: "Seperti mengiris daerah jadi strip, menjumlah strip, lalu menjumlah strip-strip itu." },
       { t: "Konstanta", d: "Integral konstanta di persegi panjang = konstanta × luas." },
@@ -1294,6 +1322,7 @@ const topics: Topic[] = [
     level: "lanjut",
     promise: "Kamu bisa membaca matriks sebagai pemutar dan peregang.",
     oneIdea: "Matriks 2×2 meregangkan bidang. Determinan adalah faktor luas, lengkap dengan tanda orientasi. Perkalian silang di 3D menghasilkan vektor tegak lurus.",
+    analogy: "Sebuah foto bisa diregangkan, diputar, atau dicerminkan. Determinan memberitahu apakah foto itu menjadi lebih luas, atau malah terbalik seperti bayangan di cermin. Di ruang tiga dimensi, perkalian silang menunjuk tegak lurus terhadap dua arah yang kamu pegang.",
     ideas: [
       { t: "Urutan", d: "AB tidak selalu sama dengan BA." },
       { t: "Determinan 2×2", d: "ad − bc. Nol berarti luas hancur, informasi hilang." },
@@ -1340,6 +1369,7 @@ const topics: Topic[] = [
     level: "lanjut",
     promise: "Tiga kata ini cukup untuk membaca sebuah medan.",
     oneIdea: "Gradien naik, divergensi menyebar, curl berputar.",
+    analogy: "Gradien adalah arah paling curam untuk naik sebuah bukit. Divergensi seperti keran yang memancar ke segala arah. Curl seperti pusaran air di bak: airnya berputar di tempat, tidak menyebar keluar.",
     ideas: [
       { t: "Grad pada skalar", d: "Masukan angka, keluaran vektor." },
       { t: "Div pada vektor", d: "Masukan vektor, keluaran angka. Positif seperti sumber." },
@@ -1386,6 +1416,7 @@ const topics: Topic[] = [
     level: "lanjut",
     promise: "Kamu tidak perlu menghitung enam muka jika divergensinya konstan.",
     oneIdea: "Fluks mengukur seberapa banyak medan menusuk sebuah permukaan. Pada permukaan tertutup, ia sama dengan isi divergensi di dalam.",
+    analogy: "Hujan deras belum tentu membasahi banyak jika payungnya miring. Fluks adalah air yang benar-benar menembus kain, bukan seberapa deras hujan di udara. Pada permukaan yang tertutup, air yang tembus sama dengan apa yang dihasilkan di dalamnya.",
     ideas: [
       { t: "Menusuk", d: "Medan yang hanya menyentuh sejajar permukaan tidak menyumbang fluks." },
       { t: "Gauss", d: "Fluks keluar = integral volume dari divergensi." },
@@ -1432,6 +1463,7 @@ const topics: Topic[] = [
     level: "lanjut",
     promise: "Kamu bisa mendengar sebuah grafik.",
     oneIdea: "Banyak sinyal berulang adalah jumlah gelombang sinus yang frekuensinya kelipatan. Koefisien memberitahu seberapa keras tiap kelipatan.",
+    analogy: "Satu akor gitar terdengar sebagai satu nada, padahal beberapa senar berbunyi bersama. Masing-masing senar punya kerasnya sendiri. Mengurai sinyal berarti menemukan senar mana yang ikut berbunyi, dan seberapa keras.",
     ideas: [
       { t: "Fungsi ganjil", d: "f(−x) = −f(x) sering hanya butuh sinus, kosinusnya nol." },
       { t: "bn untuk f(x)=x", d: "Pada (−π, π), bn = 2 (−1)^{n+1} / n." },
@@ -1478,6 +1510,7 @@ const topics: Topic[] = [
     level: "lanjut",
     promise: "Kamu punya jalan pintas untuk rangkaian yang baru dinyalakan.",
     oneIdea: "Laplace mengubah turunan menjadi perkalian dengan s. Kamu menyelesaikan aljabar, lalu kembali jika perlu.",
+    analogy: "Resep yang berbunyi 'aduk terus sambil suhu berubah' diterjemahkan menjadi 'kalikan bahan'. Di bahasa yang baru itu, pekerjaan menjadi aljabar biasa. Setelah selesai, hasilnya diterjemahkan kembali ke piring.",
     ideas: [
       { t: "Kamus kecil", d: "1 → 1/s, t → 1/s², e^{at} → 1/(s−a), sin ωt → ω/(s²+ω²)." },
       { t: "Syarat awal", d: "L{y'} = s Y − y(0). Kondisi awal tidak menempel di akhir, ia masuk di sini." },
@@ -1524,6 +1557,7 @@ const topics: Topic[] = [
     level: "lanjut",
     promise: "Kamu mengenali peluruhan, pertumbuhan, dan ayunan dari bentuknya.",
     oneIdea: "Jawaban persamaan diferensial adalah fungsi. Syarat awal memilih satu fungsi dari keluarga yang tak hingga.",
+    analogy: "Kopi di meja mendingin dari menit ke menit. Yang dicari bukan satu angka suhu, melainkan seluruh kurva pendinginannya. Suhu kopi pada saat ini yang memilih kurva mana dari banyak kurva yang mungkin.",
     ideas: [
       { t: "y' = k y", d: "Solusi eksponen. k negatif meluruh, positif meledak." },
       { t: "Waktu paruh", d: "Selang sampai tinggal setengah. Tidak bergantung jumlah awal." },
@@ -1570,6 +1604,7 @@ const topics: Topic[] = [
     level: "lanjut",
     promise: "Kamu tahu kenapa syarat batas mengubah nada.",
     oneIdea: "PDB mengikat perubahan terhadap lebih dari satu variabel. Syarat batas memilih jawaban yang benar-benar terjadi, bukan hanya rumus umum.",
+    analogy: "Suhu wajan tidak sama di setiap titik, dan juga berubah dari waktu ke waktu. Bagian tengah dan pinggir bisa berbeda. Tangan yang memegang pinggir wajan menentukan panas yang boleh ada di tengah.",
     ideas: [
       { t: "Gelombang", d: "∂²u/∂t² = c² ∂²u/∂x². c cepat rambat." },
       { t: "Panas", d: "∂u/∂t = α ∂²u/∂x². Panas menyebar, tidak berayun seperti gelombang ideal." },
@@ -1616,6 +1651,7 @@ const topics: Topic[] = [
     level: "lanjut",
     promise: "Kamu melihat hukum Newton sebagai lintasan yang dipilih.",
     oneIdea: "Kalkulus variasi mencari fungsi yang membuat sebuah integral ekstrem. Cahaya, sabun, dan mekanika sering memilih yang paling hemat.",
+    analogy: "Cahaya tidak selalu memilih garis yang kelihatan lurus di peta. Ia memilih jalan yang paling hemat waktu, seperti orang yang berjalan lebih jauh di pasir supaya lebih cepat saat masuk ke air. Yang dicari adalah seluruh bentuk jalan, bukan satu titik.",
     ideas: [
       { t: "Bukan turunan biasa", d: "Yang berubah adalah seluruh bentuk kurva, sedikit." },
       { t: "Euler–Lagrange", d: "Syarat untuk Lagrangian L(t, x, ẋ)." },
@@ -1662,6 +1698,7 @@ const topics: Topic[] = [
     level: "lanjut",
     promise: "Kamu bisa memutuskan integral tanpa mengintegralkan sepanjang jalan.",
     oneIdea: "Untuk fungsi yang mulus kecuali di kutub, integral keliling sama dengan 2πi kali jumlah residu di dalam kontur.",
+    analogy: "Kamu mengelilingi sebuah taman sekali putaran. Bagian rumput yang mulus tidak menambah hitungan. Yang perlu dihitung hanya lubang di dalam taman. Integral keliling hanya peduli pada lubang-lubang itu.",
     ideas: [
       { t: "Residu", d: "Koefisien 1/(z−a) pada kutub sederhana. Bukan nilai fungsi." },
       { t: "Di luar tidak dihitung", d: "Kutub di luar kontur menyumbang nol." },
@@ -1708,6 +1745,7 @@ const topics: Topic[] = [
     level: "lanjut",
     promise: "Kamu bisa melangkah sekali dan tahu seberapa jauh salahnya.",
     oneIdea: "Metode numerik mengganti rumus tertutup dengan langkah berulang. Jawaban tanpa taksiran galat belum selesai.",
+    analogy: "Mendaki dalam kabut dengan langkah yang pendek. Tidak ada peta yang utuh, jadi tiap langkah kamu cek apakah masih menanjak. Jawaban belum selesai sebelum kamu juga mencatat seberapa mungkin langkah itu meleset.",
     ideas: [
       { t: "Newton", d: "Garis singgung memotong sumbu, itu tebakan berikutnya." },
       { t: "Trapesium", d: "Luasan dihampiri trapesium. Makin halus potongannya, biasanya makin dekat." },
@@ -1754,6 +1792,7 @@ const topics: Topic[] = [
     level: "lanjut",
     promise: "Nama-nama ini berhenti menjadi hiasan di buku fisika.",
     oneIdea: "Fungsi khusus adalah solusi baku yang terlalu sering muncul sampai diberi nama. Legendre muncul saat bola, Bessel saat silinder.",
+    analogy: "Baut yang bentuknya aneh membutuhkan kunci yang bentuknya juga aneh. Legendre adalah kunci untuk soal yang berbentuk bola. Bessel adalah kunci untuk soal yang berbentuk pipa. Kamu tidak menempa kunci baru pada setiap soal.",
     ideas: [
       { t: "Tiga pertama", d: "P0=1, P1=x, P2=(3x²−1)/2." },
       { t: "Di x=1", d: "Semua Pn(1)=1. Cek cepat kalau rumusmu benar." },
@@ -1800,6 +1839,7 @@ const topics: Topic[] = [
     level: "lanjut",
     promise: "Kamu bisa berbicara tentang ketidaktahuan dengan angka.",
     oneIdea: "Di fisika, peluang menggambarkan cacahan acak atau ketidaktahuan. Yang dilaporkan biasanya rata-rata dan sebaran, bukan satu nasib.",
+    analogy: "Bus tidak datang pada menit yang sama setiap hari. Kamu tidak meramal satu bus tertentu. Kamu meramal rata-rata waktu tunggu, dan seberapa lebar penyebaran keterlambatan itu.",
     ideas: [
       { t: "Rata-rata", d: "Jumlah bagi banyaknya, untuk data seragam bobotnya." },
       { t: "Varians populasi", d: "Rata-rata kuadrat simpangan. Bagi n jika seluruh populasi ada di tangan." },

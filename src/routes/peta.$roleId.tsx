@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect } from "react";
 import { Shell } from "@/components/shell";
 import { useSave } from "@/lib/progress";
 import {
@@ -26,12 +25,7 @@ const TRACK: Record<TrackId, string> = {
 function RoadPage() {
   const { roleId } = Route.useParams();
   const road = getRoadmap(roleId);
-  const { save, ready, setRoad } = useSave();
-
-  useEffect(() => {
-    if (!ready || !road) return;
-    if (save.road !== road.id) setRoad(road.id);
-  }, [ready, road, save.road, setRoad]);
+  const { save, setRoad } = useSave();
 
   if (!road) {
     return (
@@ -83,9 +77,14 @@ function RoadPage() {
             />
           </span>
           <p className="mt-4">{road.outcome}</p>
-          <p className="mt-3 text-sm text-muted">
-            {DONE_AT} jawaban benar = cukup untuk peta ini, bukan mahir. Peta ini aktif di beranda.
-          </p>
+          <p className="mt-3 text-sm text-muted">{DONE_AT} jawaban benar = cukup untuk peta ini, bukan mahir.</p>
+          {save.road === road.id ? (
+            <p className="mt-3 text-sm font-semibold text-copper">Peta ini yang dipakai tombol lanjut di beranda.</p>
+          ) : (
+            <button type="button" className="btn mt-4" onClick={() => setRoad(road.id)}>
+              Pakai peta ini di beranda
+            </button>
+          )}
         </div>
         <div className="card flex flex-col justify-between gap-4 p-5 md:col-span-5">
           {upcomingTopic ? (

@@ -24,6 +24,8 @@ function Practice() {
   const [showBreak, setShowBreak] = useState(false);
   const [seconds, setSeconds] = useState(12 * 60);
   const [timerOn, setTimerOn] = useState(true);
+  const [need, setNeed] = useState(false);
+  const [graded, setGraded] = useState<string | null>(null);
 
   const problem = useMemo(() => makeProblem(topicId, seed + level * 1009, level), [topicId, seed, level]);
 
@@ -59,17 +61,30 @@ function Practice() {
     setHint(false);
     setSolved("idle");
     setMisses(0);
+    setNeed(false);
+    setGraded(null);
   };
 
   const check = () => {
+    const text = raw.trim();
+    if (!text) {
+      setNeed(true);
+      setSolved("idle");
+      setHint(false);
+      return;
+    }
+    setNeed(false);
     const ok = checkAnswer(problem, raw);
     setSolved(ok ? "ok" : "no");
     if (!ok) {
       setHint(true);
-      setMisses((count) => count + 1);
+      setMisses((count) => (graded === text ? count : count + 1));
     }
-    markAttempt(topic.id, ok);
-    if (ok) setSession((value) => value + 1);
+    if (graded !== text) {
+      markAttempt(topic.id, ok);
+      setGraded(text);
+      if (ok) setSession((value) => value + 1);
+    }
   };
 
   const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
@@ -102,6 +117,8 @@ function Practice() {
               setHint(false);
               setRaw("");
               setMisses(0);
+              setNeed(false);
+              setGraded(null);
             }}
           >
             {item === 1 ? "Mudah" : item === 2 ? "Sedang" : "Tantangan"}
@@ -158,7 +175,7 @@ function Practice() {
         >
           <label className="grid gap-1">
             <span className="text-sm">Jawaban</span>
-            <input className="field" inputMode="decimal" value={raw} onChange={(event) => setRaw(event.target.value)} />
+            <input className="field" inputMode="decimal" value={raw} onChange={(event) => { setRaw(event.target.value); setNeed(false); }} />
           </label>
           <div className="flex flex-wrap gap-2">
             <button type="submit" className="btn">
@@ -176,6 +193,7 @@ function Practice() {
             </button>
           </div>
         </form>
+        {need ? <p className="mt-4 text-sm">Isi angkanya dulu, baru cek. Koma atau titik sama-sama diterima.</p> : null}
         {hint && solved !== "ok" ? <p className="mt-4 text-sm">{problem.hint}</p> : null}
         {solved === "ok" && (
           <div className="mt-4">

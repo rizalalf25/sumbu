@@ -64,7 +64,7 @@ function Lesson() {
         <FocusToggle />
       </div>
       <p className="mt-3 text-sm text-muted">
-        Langkah {step + 1} dari {STEPS.length} · sekitar {topic.minutes} menit · {bankOf(topic.id).toLocaleString("id-ID")}+ variasi soal
+        Langkah {step + 1} dari {STEPS.length}: {STEPS[step]} · sekitar {topic.minutes} menit · {bankOf(topic.id).toLocaleString("id-ID")}+ variasi soal
       </p>
       <div className="mt-4 flex gap-1">
         {STEPS.map((label, index) => (

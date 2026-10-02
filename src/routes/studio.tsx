@@ -3,6 +3,7 @@ import { useState } from "react";
 import { LabView } from "@/components/lab-view";
 import { Shell } from "@/components/shell";
 import type { SceneKind } from "@/components/scenes";
+import { getTopic } from "@/lib/topics";
 
 export const Route = createFileRoute("/studio")({ component: Studio });
 
@@ -43,7 +44,7 @@ function Studio() {
         <div className="md:col-span-8">
           <LabView key={current.id} kind={current.id} />
           <Link to="/belajar/$topicId" params={{ topicId: current.topic }} className="btn mt-4">
-            Buka materi {current.title.toLowerCase()}
+            Buka materi {getTopic(current.topic)?.title ?? current.title}
           </Link>
         </div>
       </div>

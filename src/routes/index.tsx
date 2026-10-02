@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Shell } from "@/components/shell";
 import { useSave } from "@/lib/progress";
-import { doneCount, flatSteps, getRoadmap, nextStep, ROADMAPS } from "@/lib/roadmaps";
+import { doneCount, flatSteps, getRoadmap, isEnough, nextStep, ROADMAPS } from "@/lib/roadmaps";
 import { TRACKS, allTopics, bankTotal, getTopic } from "@/lib/topics";
 
 export const Route = createFileRoute("/")({ component: Home });
@@ -14,15 +14,15 @@ function Home() {
   const total = bankTotal();
   const solved = Object.values(save.correct).reduce((sum, n) => sum + n, 0);
   const road = save.road ? getRoadmap(save.road) : undefined;
-  const roadNext = road ? nextStep(road, save.correct) : undefined;
+  const roadNext = road ? nextStep(road, save) : undefined;
   const next = useMemo(() => {
     if (roadNext) {
       const topic = getTopic(roadNext.topicId);
       if (topic) return topic;
     }
     if (save.lastTopic && getTopic(save.lastTopic)) return getTopic(save.lastTopic)!;
-    return topics.find((topic) => (save.correct[topic.id] ?? 0) < 5) ?? topics[0];
-  }, [roadNext, save.lastTopic, save.correct, topics]);
+    return topics.find((topic) => !isEnough(save, topic.id)) ?? topics[0];
+  }, [roadNext, save, topics]);
 
   const filtered = topics.filter((topic) => {
     const blob = `${topic.title} ${topic.blurb} ${topic.chapter ?? ""}`.toLowerCase();
@@ -32,9 +32,8 @@ function Home() {
   return (
     <Shell wide>
       <section className="orbit-hero">
-        <SolarSystem />
         <div className="orbit-copy">
-          <p className="font-mono text-xs font-semibold tracking-[0.22em] text-copper">ORBIT BELAJAR</p>
+          <p className="font-mono text-xs font-semibold tracking-[0.22em] text-copper">BELAJAR TERFOKUS</p>
           <h1 className="mt-2 font-display text-3xl text-ink md:text-4xl">Satu napas. Satu konsep.</h1>
           <p className="mt-3 text-sm leading-relaxed text-muted md:text-base">
             Matematika dan fisika untuk perhatian yang mudah loncat. Rumus, gambar, kasus nyata, lalu soal — tidak semuanya sekaligus.
@@ -85,16 +84,16 @@ function Home() {
             <h2 className="text-3xl">Ambil yang penting saja</h2>
           </div>
           <Link to="/peta" className="text-sm font-semibold text-copper">
-            Semua peta
+            Semua {ROADMAPS.length} peta
           </Link>
         </div>
         <p className="mb-4 max-w-2xl text-sm text-muted">
           Bukan seluruh katalog untuk setiap orang. Inti di depan, cabang di bawah, dan materi di luar bidang tertulis di halaman petanya.
         </p>
         <div className="grid items-stretch gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {ROADMAPS.map((item) => {
+          {homeRoads(save.road).map((item) => {
             const required = flatSteps(item, false);
-            const done = doneCount(item, save.correct, false);
+            const done = doneCount(item, save, false);
             const ratio = required.length ? done / required.length : 0;
             return (
               <Link
@@ -145,7 +144,7 @@ function Home() {
             <p className="mb-4 max-w-2xl text-sm text-muted">{track.note}</p>
             <ol className="card divide-y divide-line">
               {rows.map((topic, index) => {
-                const done = save.correct[topic.id] ?? 0;
+                const done = Math.min(3, save.correct[topic.id] ?? 0) + (isEnough(save, topic.id) ? 1 : 0);
                 return (
                   <li key={topic.id}>
                     <Link
@@ -161,7 +160,7 @@ function Home() {
                       <span className="hidden w-16 shrink-0 text-right text-xs text-muted sm:block">
                         {topic.minutes} mnt
                         <span className="mt-1 block h-1 overflow-hidden rounded-full bg-line">
-                          <span className="block h-full bg-copper" style={{ width: `${Math.min(100, done * 20)}%` }} />
+                          <span className="block h-full bg-copper" style={{ width: `${done * 25}%` }} />
                         </span>
                       </span>
                     </Link>
@@ -177,37 +176,11 @@ function Home() {
   );
 }
 
-const PLANETS = [
-  { id: "merkurius", name: "Merkurius", orbit: "18%", size: "6.5cqw", dur: "7s", start: "24deg" },
-  { id: "venus", name: "Venus", orbit: "30%", size: "8cqw", dur: "11s", start: "150deg" },
-  { id: "bumi", name: "Bumi", orbit: "42%", size: "8.4cqw", dur: "15s", start: "70deg" },
-  { id: "mars", name: "Mars", orbit: "54%", size: "7cqw", dur: "19s", start: "210deg" },
-  { id: "yupiter", name: "Yupiter", orbit: "68%", size: "13cqw", dur: "26s", start: "310deg" },
-  { id: "saturnus", name: "Saturnus", orbit: "84%", size: "7.5cqw", dur: "32s", start: "48deg" },
-  { id: "uranus", name: "Uranus", orbit: "90%", size: "6.5cqw", dur: "38s", start: "180deg" },
-  { id: "neptunus", name: "Neptunus", orbit: "96%", size: "6.5cqw", dur: "46s", start: "40deg" },
-  { id: "pluto", name: "Pluto", orbit: "96%", size: "4.2cqw", dur: "54s", start: "220deg" },
-] as const;
+const FEATURED = ["analis", "ilmuwan", "ai", "robotika", "energi", "siber"];
 
-function SolarSystem() {
-  return (
-    <div className="solar" aria-hidden="true">
-      <div className="solar-stage">
-        <span className="sun" />
-        {PLANETS.map((planet) => (
-          <span
-            key={planet.id}
-            className="orbit"
-            style={{ ["--orbit" as string]: planet.orbit, ["--dur" as string]: planet.dur, ["--start" as string]: planet.start }}
-          >
-            <span className={`planet planet-${planet.id}`} style={{ ["--size" as string]: planet.size }}>
-              <img src={`/planets/${planet.id}.${planet.id === "saturnus" ? "png" : "jpg"}`} alt="" />
-            </span>
-          </span>
-        ))}
-      </div>
-    </div>
-  );
+function homeRoads(active: string | null) {
+  const ids = active && !FEATURED.includes(active) ? [active, ...FEATURED.slice(0, 5)] : FEATURED;
+  return ids.map((id) => getRoadmap(id)).filter((road) => road !== undefined);
 }
 
 function Stat({ label, value }: { label: string; value: string }) {

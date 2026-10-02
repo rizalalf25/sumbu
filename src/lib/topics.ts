@@ -1,4 +1,5 @@
-import { BANK } from "./problems";
+import { BANK } from "./bank.ts";
+import { EXTRA_TOPICS } from "./topics-extra.ts";
 
 export type TrackId = "math" | "physics" | "advanced";
 
@@ -38,7 +39,25 @@ export type VisualKind =
   | "variation"
   | "newtonplot"
   | "legendre"
-  | "poisson";
+  | "poisson"
+  | "descent"
+  | "pv"
+  | "normal"
+  | "ci"
+  | "scatter"
+  | "bayes"
+  | "logic"
+  | "rotation"
+  | "heat"
+  | "induction"
+  | "stress"
+  | "transform"
+  | "clock"
+  | "entropy"
+  | "walk"
+  | "pid"
+  | "sampling"
+  | "qubit";
 
 export type Topic = {
   id: string;
@@ -200,7 +219,7 @@ const topics: Topic[] = [
     check: {
       q: "f(x)=2x+1. f(4) berapa?",
       a: "9.",
-      why: "2×4 + 1 = 9. Bukan 2×4+1 yang dibiarkan menggantung.",
+      why: "Ganti x dengan 4: 2×4 + 1 = 9. Rumus belum jawaban sebelum angkanya dimasukkan.",
     },
     related: "turunan",
   },
@@ -218,11 +237,14 @@ const topics: Topic[] = [
       { t: "Bukan perkalian biasa", d: "2^5 = 32, sedangkan 2×5 = 10." },
       { t: "Sifat perkalian pangkat", d: "Basis sama: pangkat ditambah saat dikali." },
       { t: "Log adalah kebalikan", d: "log₂ 32 = 5 karena 2^5 = 32." },
+      { t: "Log mengubah kali jadi tambah", d: "log(ab) = log a + log b. Itulah alasan log-loss dan skala log dipakai." },
+      { t: "Bilangan e", d: "e ≈ 2,718 adalah basis pertumbuhan yang terus-menerus. ln adalah log berbasis e." },
     ],
     formulas: [
       { name: "Perkalian", tex: "a^m a^n = a^{m+n}", when: "Basis sama." },
       { name: "Definisi log", tex: "\\log_b (b^k)=k", when: "Basis positif, bukan 1." },
       { name: "Lipat ganda", tex: "N(t)=N_0\\,2^{t/T}", when: "Populasi atau bunga yang menggandakan." },
+      { name: "Log hasil kali", tex: "\\log(ab)=\\log a+\\log b", when: "Mengubah perkalian panjang menjadi penjumlahan." },
     ],
     visual: "expplot",
     caseTitle: "Bakteri di suhu dapur",
@@ -338,7 +360,7 @@ const topics: Topic[] = [
     check: {
       q: "Lingkaran jari-jari 1. Kelilingnya 2π atau π?",
       a: "2π.",
-      why: "Keliling = 2πr. πr² adalah luas, di sini juga π, kebetulan angka mirip.",
+      why: "Keliling = 2πr = 2π. Luasnya πr² = π. Untuk r = 1 angkanya mirip, tetapi rumusnya beda.",
     },
     related: "trig",
   },
@@ -402,6 +424,7 @@ const topics: Topic[] = [
       { t: "Substitusi dulu", d: "Polinom jinak: masukkan angkanya." },
       { t: "0/0 bukan jawaban", d: "Itu tanda bentuk belum sederhana." },
       { t: "Arti fisis", d: "Kecepatan sesaat adalah limit kecepatan rata-rata pada selang yang mengecil." },
+      { t: "Lahirnya e", d: "(1 + 1/n)^n mendekati e ≈ 2,718 saat n membesar. Itulah bunga yang dihitung makin sering sampai kontinu." },
     ],
     formulas: [
       { name: "Polinom", tex: "\\lim_{x\\to a} p(x)=p(a)", when: "p polinom." },
@@ -450,23 +473,23 @@ const topics: Topic[] = [
       { t: "Puncak", d: "Di banyak bukit mulus, kemiringan nol di puncak dan di lembah." },
     ],
     formulas: [
-      { name: "Pangkat", tex: "\\dfrac{d}{dx} x^n = n x^{n-1}", when: "n bukan nol. Konstanta turunannya 0." },
+      { name: "Pangkat", tex: "\\dfrac{d}{dx} x^n = n x^{n-1}", when: "n bilangan real apa saja. Turunan konstanta 0." },
       { name: "Kelipatan", tex: "(cf)'=c f'", when: "Angka konstanta keluar." },
       { name: "Posisi ke kecepatan", tex: "v=\\dfrac{ds}{dt}", when: "s posisi, t waktu." },
     ],
     visual: "tangent",
     caseTitle: "Biaya satu porsi tambahan",
     casePlace: "Warung makan",
-    caseStory: "Biaya harian sebuah warung tidak linear: ada kompor yang makin boros saat porsi bertambah. Turunan biaya terhadap jumlah porsi adalah biaya marginal — ongkos satu porsi tambahan di tingkat produksi itu.",
+    caseStory: "Biaya harian sebuah warung tidak linear: makin banyak porsi, makin boros gas dan lembur. Turunan biaya terhadap jumlah porsi adalah biaya marginal — ongkos satu porsi tambahan di tingkat produksi itu.",
     caseMove: [
-      "Misalkan C(q) = 2 q² + 30, dalam ribu rupiah, q puluhan porsi.",
-      "C'(q) = 4q.",
-      "Saat q = 5, porsi tambahan menelan kira-kira 20 satuan biaya, bukan C(5) itu sendiri.",
+      "Misalkan C(q) = 0,02 q² + 5q + 300, dalam ribu rupiah, q jumlah porsi.",
+      "C'(q) = 0,04q + 5.",
+      "Saat q = 100, porsi ke-101 menelan kira-kira C'(100) = 9 ribu rupiah. Itu bukan C(100), yang merupakan biaya total.",
     ],
     caseTake: "Turunan memberitahu tambahan, bukan nilai total.",
     traps: [
       { bad: "Turunan x² adalah x.", fix: "Adalah 2x." },
-      { bad: "Mengalikan turunan saat fungsinya dijumlah.", fix: "Itu aturan kali, nanti. Untuk jumlah, jumlahkan saja." },
+      { bad: "Mengalikan turunan saat fungsinya dijumlah.", fix: "Untuk jumlah, jumlahkan turunannya. Perkalian dan fungsi bersusun punya aturan sendiri di materi Aturan rantai." },
     ],
     howTo: [
       "Turunkan semua suku di kertas terpisah, baru gabung.",
@@ -478,7 +501,7 @@ const topics: Topic[] = [
       a: "15 x².",
       why: "Pangkat 3 turun ke depan, jadi 5×3 x².",
     },
-    related: "integral",
+    related: "rantai",
   },
   {
     id: "integral",
@@ -545,6 +568,7 @@ const topics: Topic[] = [
       { name: "Klasik", tex: "P(A)=\\dfrac{n(A)}{n(S)}", when: "Hasil sama mungkin." },
       { name: "Tambah", tex: "P(A\\cup B)=P(A)+P(B)", when: "A dan B tidak tumpang tindih." },
       { name: "Kombinasi", tex: "C(n,k)=\\dfrac{n!}{k!(n-k)!}", when: "Memilih, urutan tidak penting." },
+      { name: "Bersyarat", tex: "P(A\\mid B)=\\dfrac{P(A\\cap B)}{P(B)}", when: "Peluang A setelah tahu B terjadi. Kasus tes di bawah memakainya; lanjut di materi Bayes." },
     ],
     visual: "dice",
     caseTitle: "Tes cepat dan kabar yang menakutkan",
@@ -570,7 +594,7 @@ const topics: Topic[] = [
       a: "1/2.",
       why: "3 muka dari 6.",
     },
-    related: "statistik",
+    related: "bayes",
   },
   {
     id: "vektor",
@@ -586,11 +610,13 @@ const topics: Topic[] = [
       { t: "Komponen", d: "Urai ke x dan y. Jumlahkan tiap sumbu sendiri." },
       { t: "Panjang", d: "Pythagoras pada komponen." },
       { t: "Dot", d: "Seberapa searah dua vektor. Nol jika tegak lurus." },
+      { t: "Cosine similarity", d: "Dot dibagi kedua panjang: 1 searah, 0 tegak lurus, −1 berlawanan. Cara mesin pencari dan AI membandingkan embedding." },
     ],
     formulas: [
       { name: "Panjang", tex: "|\\mathbf a|=\\sqrt{x^2+y^2}", when: "Dari komponen." },
       { name: "Dot", tex: "\\mathbf a\\cdot\\mathbf b=x_1 x_2+y_1 y_2", when: "Proyeksi, usaha, sudut." },
       { name: "Jumlah", tex: "(x_1+x_2,\\ y_1+y_2)", when: "Perpindahan berurutan." },
+      { name: "Sudut", tex: "\\cos\\theta=\\dfrac{\\mathbf a\\cdot\\mathbf b}{|\\mathbf a|\\,|\\mathbf b|}", when: "Seberapa mirip arah dua vektor." },
     ],
     visual: "vector",
     caseTitle: "Perahu menyeberang sungai",
@@ -769,7 +795,7 @@ const topics: Topic[] = [
     ideas: [
       { t: "Gambar dulu", d: "Setiap panah gaya yang menyentuh benda. Berat, normal, gesek, tarikan." },
       { t: "Berat bukan massa", d: "w = mg. Massa kilogram, berat newton." },
-      { t: "Gesek", d: "Pada lantai datar, N = mg, gesek = μN, arah melawan kecenderungan gerak." },
+      { t: "Gesek", d: "Pada lantai datar, N = mg. Gesek statis menahan sampai μₛN; begitu bergeser, gesek kinetik μₖN yang biasanya lebih kecil." },
     ],
     formulas: [
       { name: "Newton II", tex: "\\sum F = ma", when: "Massa tetap, dari kerangka inersial." },
@@ -779,10 +805,10 @@ const topics: Topic[] = [
     visual: "forces",
     caseTitle: "Mendorong lemari",
     casePlace: "Kamar",
-    caseStory: "Lemari 40 kg, μ = 0,4, g = 10. Berat 400 N, gesek maksimum kira-kira 160 N. Dorongan 100 N tidak mempercepat apa pun.",
+    caseStory: "Lemari 40 kg, μₛ = 0,4, μₖ = 0,3, g = 10. Berat 400 N, gesek statis maksimum 160 N. Dorongan 100 N tidak mempercepat apa pun.",
     caseMove: [
       "N = 400 N pada lantai datar.",
-      "Ambang gesek ≈ 0,4 × 400 = 160 N.",
+      "Ambang gesek statis = 0,4 × 400 = 160 N. Setelah lemari bergeser, gesek turun ke 0,3 × 400 = 120 N.",
       "Dorongan di bawah itu: gaya total nol, lemari tetap diam. Bukan karena 'massa menang', karena total gaya nol.",
     ],
     caseTake: "Diam itu juga jawaban fisika: ΣF = 0.",
@@ -813,7 +839,7 @@ const topics: Topic[] = [
     oneIdea: "Usaha memindahkan energi. Pada gaya konservatif, jumlah kinetik dan potensial tetap.",
     analogy: "Mendorong lemari memindahkan tenaga dari ototmu ke lemari. Di ayunan, saat kamu tinggi, laju kecil. Saat kamu di titik terbawah, laju besar. Tinggi dan laju saling meminjam, jumlahnya tetap.",
     ideas: [
-      { t: "Usaha", d: "Gaya searah perpindahan. Gaya tegak lurus tidak usaha." },
+      { t: "Usaha", d: "Gaya searah perpindahan. Gaya tegak lurus tidak melakukan usaha." },
       { t: "Kinetik", d: "Bergantung kelajuan kuadrat. Dua kali lebih cepat, empat kali energinya." },
       { t: "Potensial", d: "Butuh acuan. Sering tanah = 0." },
     ],
@@ -915,9 +941,9 @@ const topics: Topic[] = [
       { name: "Dawai", tex: "v=\\sqrt{T/\\mu}", when: "T tegangan, μ massa per panjang." },
     ],
     visual: "wave",
-    caseTitle: "Stem nada gitar",
+    caseTitle: "Menyetem gitar",
     casePlace: "Senar",
-    caseStory: "Senar yang sama, dipetik lebih kencang tegangannya, nadanya naik. Bukan karena senarnya memendek, tetapi karena gelombangnya lebih cepat sehingga frekuensi nada dasar naik.",
+    caseStory: "Senar yang sama, dikencangkan tegangannya, nadanya naik. Bukan karena senarnya memendek, tetapi karena gelombangnya lebih cepat sehingga frekuensi nada dasar naik.",
     caseMove: [
       "v = √(T/μ). T naik, v naik.",
       "Panjang gelombang nada dasar tetap 2L jika panjang senar tetap.",
@@ -1094,13 +1120,13 @@ const topics: Topic[] = [
       { t: "Terang", d: "Menambah terang menambah jumlah foton, bukan energi tiap foton." },
     ],
     formulas: [
-      { name: "Perkiraan handy", tex: "E(\\mathrm{eV})\\approx \\dfrac{1240}{\\lambda(\\mathrm{nm})}", when: "Menghitung cepat." },
+      { name: "Perkiraan cepat", tex: "E(\\mathrm{eV})\\approx \\dfrac{1240}{\\lambda(\\mathrm{nm})}", when: "Menghitung cepat." },
       { name: "Efek fotolistrik", tex: "K_{\\max}=E-\\phi", when: "Hanya jika E > φ, selain itu nol." },
       { name: "Frekuensi ambang", tex: "\\phi = h f_0", when: "Di bawah f0 tidak ada elektron, seberapa pun terangnya." },
     ],
     visual: "photon",
-    caseTitle: "Sensor pintu dan lampu merah",
-    casePlace: "Lift",
+    caseTitle: "Lampu merah terang yang tidak berguna",
+    casePlace: "Sel surya dan sensor cahaya",
     caseStory: "Sebuah logam tidak memancarkan elektron saat disinari lampu merah yang sangat terang, tetapi memancarkan saat disinari ungu yang redup.",
     caseMove: [
       "Hitung E merah, misalnya 700 nm → sekitar 1,8 eV.",
@@ -1332,6 +1358,7 @@ const topics: Topic[] = [
       { name: "Determinan", tex: "\\det\\begin{pmatrix}a&b\\\\c&d\\end{pmatrix}=ad-bc", when: "Orientasi dan luas." },
       { name: "Komponen z silang", tex: "(a\\times b)_z=a_x b_y-a_y b_x", when: "Hanya butuh komponen xy." },
       { name: "Momen gaya", tex: "\\boldsymbol\\tau=\\mathbf r\\times\\mathbf F", when: "Kunci inggris, engsel, orbit." },
+      { name: "Matriks kali vektor", tex: "\\begin{pmatrix}a&b\\\\c&d\\end{pmatrix}\\begin{pmatrix}x\\\\y\\end{pmatrix}=\\begin{pmatrix}ax+by\\\\cx+dy\\end{pmatrix}", when: "Baris kali kolom. Lanjut di materi Aljabar linear." },
     ],
     visual: "vector",
     caseTitle: "Kunci yang selip",
@@ -1486,7 +1513,7 @@ const topics: Topic[] = [
     caseTake: "Detail tajam butuh frekuensi tinggi. Itulah sebabnya memotong frekuensi membuat sinyal tumpul.",
     traps: [
       { bad: "a0 dihitung seperti an biasa tanpa faktor.", fix: "Perhatikan konvensi a0/2 di rumus. Di soal latihan ini yang ditanya bn." },
-      { bad: "Tanda bn ditebak semua positif.", fix: " (−1)^{n+1} berganti." },
+      { bad: "Tanda bn ditebak semua positif.", fix: "(−1)^{n+1} berganti tanda." },
     ],
     howTo: [
       "Gambar fungsi pada −π sampai π sebelum rumus.",
@@ -1524,7 +1551,7 @@ const topics: Topic[] = [
     visual: "laplace",
     caseTitle: "Saklar yang baru ditutup",
     casePlace: "Rangkaian RC",
-    caseStory: "Sebelum saklar ditutup, kapasitor kosong. Sesudahnya tegangan naik seperti 1 − e^{−t/RC}. Laplace menyukai soal 'mendadak menyala' karena syarat awal explicit.",
+    caseStory: "Sebelum saklar ditutup, kapasitor kosong. Sesudahnya tegangan naik seperti 1 − e^{−t/RC}. Laplace menyukai soal 'mendadak menyala' karena syarat awal masuk secara eksplisit.",
     caseMove: [
       "Persamaan diferensial di t diubah jadi aljabar di s.",
       "Syarat V(0)=0 masuk lewat rumus turunan.",
@@ -1603,12 +1630,12 @@ const topics: Topic[] = [
     minutes: 14,
     level: "lanjut",
     promise: "Kamu tahu kenapa syarat batas mengubah nada.",
-    oneIdea: "PDB mengikat perubahan terhadap lebih dari satu variabel. Syarat batas memilih jawaban yang benar-benar terjadi, bukan hanya rumus umum.",
+    oneIdea: "PDP (persamaan diferensial parsial) mengikat perubahan terhadap lebih dari satu variabel. Syarat batas memilih jawaban yang benar-benar terjadi, bukan hanya rumus umum.",
     analogy: "Suhu wajan tidak sama di setiap titik, dan juga berubah dari waktu ke waktu. Bagian tengah dan pinggir bisa berbeda. Tangan yang memegang pinggir wajan menentukan panas yang boleh ada di tengah.",
     ideas: [
       { t: "Gelombang", d: "∂²u/∂t² = c² ∂²u/∂x². c cepat rambat." },
       { t: "Panas", d: "∂u/∂t = α ∂²u/∂x². Panas menyebar, tidak berayun seperti gelombang ideal." },
-      { t: "Ujung tetap", d: "Dawai yang diikat memaksa kelipatan setengah gelombang. λ_n = (nπ/L)² pada pemisahan variabel." },
+      { t: "Ujung tetap", d: "Dawai yang diikat memaksa kelipatan setengah gelombang. Nilai eigen pemisahan variabel (nπ/L)² — jangan tertukar dengan panjang gelombang λ." },
     ],
     formulas: [
       { name: "Cepat dawai", tex: "c=\\sqrt{T/\\mu}", when: "Masuk ke persamaan gelombang." },
@@ -1616,15 +1643,15 @@ const topics: Topic[] = [
       { name: "Frekuensi dasar", tex: "f_1=c/(2L)", when: "Setengah gelombang pas sepanjang dawai." },
     ],
     visual: "wave",
-    caseTitle: "Nada dasar gitar, sekali lagi secara PDB",
+    caseTitle: "Nada dasar gitar, sekali lagi secara PDP",
     casePlace: "Fret",
     caseStory: "Menekan fret memperpendek L. Frekuensi dasar c/(2L) naik. Itulah tangga nada, muncul dari syarat batas, bukan dari selera.",
     caseMove: [
       "Ujung jembatan dan fret adalah u = 0.",
-      "Bentuk yang muat: setengah gelombang, gelombang penuh, tiga setengah, …",
-      "Perpendek L, f1 naik. Harmonic ke-n adalah kelipatan n.",
+      "Bentuk yang muat: setengah gelombang, satu gelombang penuh, satu setengah gelombang, …",
+      "Perpendek L, f1 naik. Harmonik ke-n adalah n kali f1.",
     ],
-    caseTake: "Soal PDB tanpa syarat batas belum selesai. Batas adalah bagian dari fisika.",
+    caseTake: "Soal PDP tanpa syarat batas belum selesai. Batas adalah bagian dari fisika.",
     traps: [
       { bad: "f1 = c/L.", fix: "Untuk ujung tetap, panjang gelombang dasar 2L, jadi f = c/(2L)." },
       { bad: "Memakai persamaan panas untuk dawai ideal.", fix: "Dawai ideal: persamaan gelombang, turunan waktu orde dua." },
@@ -1796,7 +1823,7 @@ const topics: Topic[] = [
     ideas: [
       { t: "Tiga pertama", d: "P0=1, P1=x, P2=(3x²−1)/2." },
       { t: "Di x=1", d: "Semua Pn(1)=1. Cek cepat kalau rumusmu benar." },
-      { t: "Kapan dipakai", d: "Bagian sudut atom hidrogen dan potensi di luar bola memakai Legendre." },
+      { t: "Kapan dipakai", d: "Bagian sudut atom hidrogen dan potensial di luar bola memakai Legendre." },
     ],
     formulas: [
       { name: "P0 dan P1", tex: "P_0=1,\\quad P_1=x", when: "Derajat rendah." },
@@ -1832,7 +1859,7 @@ const topics: Topic[] = [
   {
     id: "statistik",
     track: "advanced",
-    title: "Peluang untuk fisika",
+    title: "Rata-rata, varians, Poisson",
     blurb: "Rata-rata, sebaran, Poisson. Riley bab 30.",
     chapter: "Riley, Hobson & Bence — bab 30",
     minutes: 12,
@@ -1847,7 +1874,7 @@ const topics: Topic[] = [
     ],
     formulas: [
       { name: "Rata-rata", tex: "\\langle x\\rangle=\\dfrac{1}{n}\\sum x_i", when: "Data berbobot sama." },
-      { name: "Varians populasi", tex: "\\sigma^2=\\dfrac{1}{n}\\sum (x_i-\\langle x\\rangle)^2", when: "Bagi n, bukan n−1." },
+      { name: "Varians populasi", tex: "\\sigma^2=\\dfrac{1}{n}\\sum (x_i-\\langle x\\rangle)^2", when: "Bagi n jika seluruh populasi di tangan. Untuk sampel, bagi n−1 (materi Statistik sampel)." },
       { name: "Poisson nol", tex: "P(0)=e^{-\\lambda}", when: "Tidak ada kejadian." },
     ],
     visual: "poisson",
@@ -1861,7 +1888,7 @@ const topics: Topic[] = [
     ],
     caseTake: "Keacakan punya pola pada jumlah besar. Satu pengukuran sepi belum menyanggah rata-rata.",
     traps: [
-      { bad: "Bagi n−1 padahal soal meminta populasi.", fix: "Baca pembaginya. Di sini n." },
+      { bad: "Mencampur rumus populasi dan sampel.", fix: "Populasi lengkap: bagi n. Sampel untuk menebak populasi: bagi n−1." },
       { bad: "P(0) = λ.", fix: "P(0) = e^{−λ}. λ adalah rata-rata, bukan peluang nol." },
     ],
     howTo: [
@@ -1874,8 +1901,9 @@ const topics: Topic[] = [
       a: "4.",
       why: "12/3.",
     },
-    related: "peluang",
+    related: "sampel",
   },
+  ...EXTRA_TOPICS,
 ];
 
 const byId = new Map(topics.map((t) => [t.id, t]));
@@ -1901,18 +1929,18 @@ export const TRACKS: { id: TrackId; title: string; kicker: string; note: string 
     id: "math",
     title: "Dasar matematika",
     kicker: "Fondasi",
-    note: "Dari persen sampai integral. Satu ide tiap layar.",
+    note: "Dari persen sampai integral, statistik, dan logika. Satu ide tiap layar.",
   },
   {
     id: "physics",
     title: "Dasar fisika",
     kicker: "Dunia nyata",
-    note: "Gerak, gaya, gelombang, listrik, cahaya, foton.",
+    note: "Gerak, rotasi, gaya, panas, gelombang, listrik, magnet, cahaya, foton.",
   },
   {
     id: "advanced",
     title: "Lanjutan",
-    kicker: "Riley, Hobson & Bence",
-    note: "Alur bab Mathematical Methods for Physics and Engineering. Penjelasan ditulis ulang supaya singkat, bukan kutipan buku.",
+    kicker: "Metode matematis",
+    note: "Alur bab Mathematical Methods for Physics and Engineering, ditambah materi industri: aljabar linear, kendali, sinyal digital, informasi, kuantum. Penjelasan ditulis ulang supaya singkat, bukan kutipan buku.",
   },
 ];

@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 
 export type Save = {
   correct: Record<string, number>;
+  /** Jawaban benar di level Sedang atau Tantangan. */
+  hard: Record<string, number>;
   attempts: Record<string, number>;
   notes: Record<string, string>;
   steps: Record<string, number>;
@@ -16,6 +18,7 @@ const KEY = "sumbu-v1";
 
 export const emptySave: Save = {
   correct: {},
+  hard: {},
   attempts: {},
   notes: {},
   steps: {},
@@ -42,14 +45,23 @@ export function loadSave(): Save {
     const raw = localStorage.getItem(KEY);
     if (!raw) return emptySave;
     const parsed = JSON.parse(raw) as Partial<Save>;
-    return { ...emptySave, ...parsed };
+    const save = { ...emptySave, ...parsed };
+    if (!parsed.hard) {
+      // Simpanan lama belum mencatat level. Jangan cabut status "cukup" yang sudah diraih.
+      save.hard = Object.fromEntries(Object.entries(save.correct).filter(([, n]) => n >= 3).map(([id]) => [id, 1]));
+    }
+    return save;
   } catch {
     return emptySave;
   }
 }
 
 function writeSave(save: Save) {
-  localStorage.setItem(KEY, JSON.stringify(save));
+  try {
+    localStorage.setItem(KEY, JSON.stringify(save));
+  } catch {
+    // Penyimpanan penuh atau diblokir: progres tetap jalan di memori sesi ini.
+  }
 }
 
 export function useSave() {
@@ -70,7 +82,7 @@ export function useSave() {
   }, []);
 
   const markAttempt = useCallback(
-    (topicId: string, ok: boolean) => {
+    (topicId: string, ok: boolean, level = 1) => {
       update((s) => {
         const today = dayStamp(0);
         let dayStreak = s.dayStreak;
@@ -84,6 +96,7 @@ export function useSave() {
           ...s,
           attempts: { ...s.attempts, [topicId]: (s.attempts[topicId] ?? 0) + 1 },
           correct: { ...s.correct, [topicId]: (s.correct[topicId] ?? 0) + (ok ? 1 : 0) },
+          hard: { ...s.hard, [topicId]: (s.hard[topicId] ?? 0) + (ok && level >= 2 ? 1 : 0) },
           lastTopic: topicId,
           dayStreak,
           lastDay,
@@ -104,7 +117,7 @@ export function useSave() {
     (topicId: string, step: number) => {
       update((s) => ({
         ...s,
-        steps: { ...s.steps, [topicId]: Math.max(s.steps[topicId] ?? 0, step) },
+        steps: { ...s.steps, [topicId]: step },
         lastTopic: topicId,
       }));
     },

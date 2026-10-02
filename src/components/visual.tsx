@@ -1,97 +1,9 @@
-import { useEffect, useRef, useState } from "react";
-import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import { useEffect, useState } from "react";
+import { idn } from "@/lib/mathx";
 import type { VisualKind } from "@/lib/topics";
 import { isSceneKind, LabView } from "./lab-view";
-
-function Big({ label, value, unit }: { label: string; value: string; unit?: string }) {
-  return (
-    <div>
-      <p className="text-sm text-muted">{label}</p>
-      <p className="font-display text-4xl tabular-nums">
-        {value} {unit ? <span className="text-lg text-muted">{unit}</span> : null}
-      </p>
-    </div>
-  );
-}
-
-function Range({
-  label,
-  value,
-  min,
-  max,
-  step,
-  onChange,
-}: {
-  label: string;
-  value: number;
-  min: number;
-  max: number;
-  step: number;
-  onChange: (n: number) => void;
-}) {
-  return (
-    <label className="grid gap-1 text-sm">
-      <span className="flex justify-between gap-3">
-        <span>{label}</span>
-        <span className="font-mono tabular-nums">{Number.isInteger(step) ? value : value.toFixed(step < 0.1 ? 2 : 1)}</span>
-      </span>
-      <input type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))} />
-    </label>
-  );
-}
-
-function Plot({ data, y2 = false }: { data: { x: number; y: number; z?: number }[]; y2?: boolean }) {
-  return (
-    <div className="h-52">
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-          <XAxis dataKey="x" stroke="var(--color-muted)" tick={{ fontSize: 12 }} />
-          <YAxis stroke="var(--color-muted)" width={36} tick={{ fontSize: 12 }} />
-          <Line type="monotone" dataKey="y" stroke="var(--color-copper)" dot={false} strokeWidth={2} isAnimationActive={false} />
-          {y2 ? (
-            <Line type="monotone" dataKey="z" stroke="var(--color-ink)" dot={false} strokeWidth={2} isAnimationActive={false} />
-          ) : null}
-        </LineChart>
-      </ResponsiveContainer>
-    </div>
-  );
-}
-
-function color(name: string, fallback: string) {
-  if (typeof document === "undefined") return fallback;
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
-}
-
-function Sketch({
-  draw,
-}: {
-  draw: (ctx: CanvasRenderingContext2D, w: number, h: number) => void;
-}) {
-  const ref = useRef<HTMLCanvasElement>(null);
-  const drawRef = useRef(draw);
-  drawRef.current = draw;
-  useEffect(() => {
-    const canvas = ref.current;
-    if (!canvas) return;
-    const paint = () => {
-      const rect = canvas.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const w = Math.max(1, rect.width);
-      const h = Math.max(1, rect.height);
-      canvas.width = Math.floor(w * dpr);
-      canvas.height = Math.floor(h * dpr);
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      drawRef.current(ctx, w, h);
-    };
-    paint();
-    const ro = new ResizeObserver(paint);
-    ro.observe(canvas);
-    return () => ro.disconnect();
-  }, [draw]);
-  return <canvas ref={ref} className="h-56 w-full" />;
-}
+import { ExtraWidget } from "./visual-extra";
+import { Big, color, Plot, Range, Sketch } from "./visual-kit";
 
 function PercentPlay() {
   const [price, setPrice] = useState(200);
@@ -190,8 +102,8 @@ function UnitPlay() {
     ctx.fill();
     ctx.fillStyle = ink;
     ctx.font = "14px sans-serif";
-    ctx.fillText(`sin ${deg}° = ${Math.sin(rad).toFixed(3)}`, w * 0.62, 36);
-    ctx.fillText(`cos ${deg}° = ${Math.cos(rad).toFixed(3)}`, w * 0.62, 58);
+    ctx.fillText(idn(`sin ${deg}° = ${Math.sin(rad).toFixed(3)}`), w * 0.62, 36);
+    ctx.fillText(idn(`cos ${deg}° = ${Math.cos(rad).toFixed(3)}`), w * 0.62, 58);
   };
   return (
     <div className="grid gap-3">
@@ -437,7 +349,7 @@ function PhotonPlay() {
       <Big label="Energi foton" value={e.toFixed(2)} unit="eV" />
       <Range label="Panjang gelombang (nm)" value={lam} min={300} max={800} step={10} onChange={setLam} />
       <p className="text-sm text-muted">
-        Fungsi kerja 2 eV. {e > phi ? `Elektron lepas, K maks ≈ ${(e - phi).toFixed(2)} eV.` : "Belum cukup untuk melepas elektron."}
+        Fungsi kerja 2 eV. {e > phi ? `Elektron lepas, K maks ≈ ${idn((e - phi).toFixed(2))} eV.` : "Belum cukup untuk melepas elektron."}
       </p>
     </div>
   );
@@ -607,7 +519,7 @@ function PoissonPlay() {
         ))}
       </div>
       <Range label="λ rata-rata kejadian" value={lam} min={0.5} max={5} step={0.5} onChange={setLam} />
-      <p className="text-sm text-muted">Peluang tidak ada kejadian ≈ {Math.exp(-lam).toFixed(2)}. Batang adalah peluang tiap cacahan.</p>
+      <p className="text-sm text-muted">Peluang tidak ada kejadian ≈ {idn(Math.exp(-lam).toFixed(2))}. Batang adalah peluang tiap cacahan.</p>
     </div>
   );
 }
@@ -673,7 +585,7 @@ function Widget({ kind }: { kind: VisualKind }) {
     case "poisson":
       return <PoissonPlay />;
     default:
-      return null;
+      return <ExtraWidget kind={kind} />;
   }
 }
 

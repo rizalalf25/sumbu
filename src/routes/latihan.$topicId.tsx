@@ -13,36 +13,27 @@ const GOAL = 5;
 function Practice() {
   const { topicId } = Route.useParams();
   const topic = getTopic(topicId);
-  const { markAttempt, addSession } = useSave();
+  const { markAttempt } = useSave();
   const [level, setLevel] = useState<Level>(1);
-  const [seed, setSeed] = useState(1);
+  const [seed, setSeed] = useState<number | null>(null);
   const [raw, setRaw] = useState("");
   const [hint, setHint] = useState(false);
   const [solved, setSolved] = useState<"idle" | "ok" | "no">("idle");
   const [misses, setMisses] = useState(0);
   const [session, setSession] = useState(0);
-  const [showBreak, setShowBreak] = useState(false);
-  const [seconds, setSeconds] = useState(12 * 60);
-  const [timerOn, setTimerOn] = useState(true);
   const [need, setNeed] = useState(false);
   const [graded, setGraded] = useState<string | null>(null);
 
-  const problem = useMemo(() => makeProblem(topicId, seed + level * 1009, level), [topicId, seed, level]);
-
+  // Seed acak hanya di peramban, supaya tiap sesi tidak mulai dari soal yang sama
+  // dan render server tetap cocok dengan render pertama di klien.
   useEffect(() => {
-    if (!timerOn || showBreak) return;
-    const id = window.setInterval(() => {
-      setSeconds((value) => (value <= 1 ? 0 : value - 1));
-    }, 1000);
-    return () => window.clearInterval(id);
-  }, [timerOn, showBreak]);
+    setSeed(Math.floor(Math.random() * 1_000_000));
+  }, [topicId]);
 
-  useEffect(() => {
-    if (seconds !== 0 || !timerOn) return;
-    setTimerOn(false);
-    setShowBreak(true);
-    addSession();
-  }, [seconds, timerOn, addSession]);
+  const problem = useMemo(
+    () => (seed === null ? null : makeProblem(topicId, seed + level * 1009, level)),
+    [topicId, seed, level],
+  );
 
   if (!topic) {
     return (
@@ -56,7 +47,7 @@ function Practice() {
   }
 
   const next = () => {
-    setSeed((value) => value + 1);
+    setSeed((value) => (value ?? 0) + 1);
     setRaw("");
     setHint(false);
     setSolved("idle");
@@ -66,6 +57,7 @@ function Practice() {
   };
 
   const check = () => {
+    if (!problem) return;
     const text = raw.trim();
     if (!text) {
       setNeed(true);
@@ -81,14 +73,12 @@ function Practice() {
       setMisses((count) => (graded === text ? count : count + 1));
     }
     if (graded !== text) {
-      markAttempt(topic.id, ok);
+      markAttempt(topic.id, ok, level);
       setGraded(text);
       if (ok) setSession((value) => value + 1);
     }
   };
 
-  const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
-  const ss = String(seconds % 60).padStart(2, "0");
 
   return (
     <Shell>
@@ -102,7 +92,7 @@ function Practice() {
         <FocusToggle />
       </div>
       <p className="mt-2 text-sm text-muted">
-        Target sesi: {Math.min(session, GOAL)}/{GOAL} benar · bank {bankOf(topic.id).toLocaleString("id-ID")}+ variasi · pakai titik desimal
+        Target sesi: {Math.min(session, GOAL)}/{GOAL} benar · bank {bankOf(topic.id).toLocaleString("id-ID")}+ variasi · koma atau titik desimal sama-sama diterima
       </p>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -124,28 +114,10 @@ function Practice() {
             {item === 1 ? "Mudah" : item === 2 ? "Sedang" : "Tantangan"}
           </button>
         ))}
-        <button type="button" className="btn-quiet ml-auto tabular-nums" onClick={() => setTimerOn((value) => !value)}>
-          {timerOn ? `${mm}:${ss}` : "Timer mati"}
-        </button>
       </div>
-
-      {showBreak && (
-        <article className="card mt-4 p-4">
-          <h2 className="text-2xl">Waktunya berdiri</h2>
-          <p className="mt-2 text-muted">Dua belas menit sudah cukup untuk satu blok. Minum air. Berhenti juga benar.</p>
-          <button
-            type="button"
-            className="btn mt-3"
-            onClick={() => {
-              setSeconds(12 * 60);
-              setShowBreak(false);
-              setTimerOn(true);
-            }}
-          >
-            Blok 12 menit lagi
-          </button>
-        </article>
-      )}
+      <p className="mt-2 text-sm text-muted">
+        {level === 1 ? "Level Mudah melatih rumus. Untuk status “cukup” di peta, selesaikan minimal satu soal Sedang atau Tantangan." : "Soal level ini dihitung untuk status “cukup” di peta."}
+      </p>
 
       {session >= GOAL && solved !== "idle" && (
         <article className="card mt-4 p-4">
@@ -162,6 +134,7 @@ function Practice() {
         </article>
       )}
 
+      {problem ? (
       <article className="card mt-4 p-5">
         <p className="text-lg">{problem.prompt}</p>
         <p className="mt-2 text-sm text-muted">{problem.given}</p>
@@ -225,6 +198,9 @@ function Practice() {
           </div>
         )}
       </article>
+      ) : (
+        <article className="card mt-4 p-5 text-muted">Menyiapkan soal…</article>
+      )}
     </Shell>
   );
 }

@@ -32,55 +32,51 @@ function Home() {
   return (
     <Shell wide>
       <section className="orbit-hero">
-        <img className="orbit-photo" src="/hero-space.jpg" alt="" />
+        <SolarSystem />
         <div className="orbit-copy">
           <p className="font-mono text-xs font-semibold tracking-[0.22em] text-copper">ORBIT BELAJAR</p>
-          <h1 className="mt-3 font-display text-4xl text-ink md:text-5xl">Satu napas. Satu konsep.</h1>
-          <p className="mt-3 text-base text-ink md:text-lg">
-            Matematika dan fisika untuk perhatian yang mudah loncat. Rumus cepat, gambar yang bisa digerakkan, kasus nyata, lalu soal — tidak semuanya sekaligus.
+          <h1 className="mt-2 font-display text-3xl text-ink md:text-4xl">Satu napas. Satu konsep.</h1>
+          <p className="mt-3 text-sm leading-relaxed text-muted md:text-base">
+            Matematika dan fisika untuk perhatian yang mudah loncat. Rumus, gambar, kasus nyata, lalu soal — tidak semuanya sekaligus.
           </p>
-          <div className="mt-5 flex flex-wrap gap-3">
-            <Link to="/belajar/$topicId" params={{ topicId: next.id }} className="btn">
+          {road ? (
+            <p className="mt-3 text-sm text-muted">
+              {roadNext ? `Peta aktif: ${road.title}.` : `Inti peta ${road.title} sudah cukup.`}
+            </p>
+          ) : null}
+          <div className="mt-5 grid grid-cols-2 gap-2">
+            <Link to="/belajar/$topicId" params={{ topicId: next.id }} className="btn col-span-2 w-full">
               Lanjut: {next.title}
             </Link>
-            <Link to="/metode" className="btn-ghost">
-              Cara belajar 12 menit
+            <Link to="/metode" className="btn-ghost w-full">
+              12 menit
             </Link>
-            <Link to="/peta" className="btn-ghost">
+            <Link to="/peta" className="btn-ghost w-full">
               Peta profesi
             </Link>
           </div>
-          {road ? (
-            <p className="mt-3 text-sm text-muted">
-              {roadNext
-                ? `Peta aktif: ${road.title}. Tombol lanjut mengikuti pelajaran berikutnya di peta itu.`
-                : `Inti peta ${road.title} sudah cukup. Tombol lanjut kembali ke katalog.`}
-            </p>
-          ) : null}
-          <div className="mt-5 grid grid-cols-3 gap-3 border-t border-line pt-4">
+          <div className="mt-5 grid grid-cols-3 divide-x divide-line border-t border-line pt-4">
             <Stat label="Benar" value={String(solved)} />
             <Stat label="Hari" value={String(save.dayStreak)} />
             <Stat label="Variasi" value={compact(total)} />
           </div>
-          <p className="mt-3 text-sm text-muted">
-            Bank soal dihitung ulang dari parameter, jadi latihannya tidak habis. Catatan tersimpan di peramban ini.
-          </p>
         </div>
       </section>
 
-      <section className="mt-10 grid gap-3 md:grid-cols-3">
+      <section className="mt-8 grid gap-3 md:grid-cols-3">
         {[
-          ["1", "Baca satu ide", "Jangan scroll mencari rumus sebelum ide intinya bisa diucapkan."],
-          ["2", "Gerakkan satu slider", "Sebut apa yang berubah. Kalau tidak berubah, itu juga jawaban."],
-          ["3", "Lima soal, dua kalimat", "Salah itu data. Catat dengan kata sendiri, bukan salinan rumus."],
+          ["01", "Baca satu ide", "Jangan scroll mencari rumus sebelum ide intinya bisa diucapkan."],
+          ["02", "Gerakkan satu slider", "Sebut apa yang berubah. Kalau tidak berubah, itu juga jawaban."],
+          ["03", "Lima soal, dua kalimat", "Salah itu data. Catat dengan kata sendiri, bukan salinan rumus."],
         ].map(([n, title, body]) => (
-          <article key={n} className="card p-4">
-            <p className="font-mono text-sm text-copper">{n}</p>
-            <h2 className="mt-2 text-2xl">{title}</h2>
-            <p className="mt-2 text-sm text-muted">{body}</p>
+          <article key={n} className="card flex h-full flex-col p-5">
+            <p className="font-mono text-xs tracking-[0.16em] text-copper">{n}</p>
+            <h2 className="mt-3 text-xl">{title}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted">{body}</p>
           </article>
         ))}
       </section>
+      <p className="mt-3 text-sm text-muted">Bank soal dihitung ulang dari parameter. Catatan tersimpan di peramban ini.</p>
 
       <section className="mt-10">
         <div className="mb-3 flex items-end justify-between gap-3">
@@ -95,7 +91,7 @@ function Home() {
         <p className="mb-4 max-w-2xl text-sm text-muted">
           Bukan seluruh katalog untuk setiap orang. Inti di depan, cabang di bawah, dan materi di luar bidang tertulis di halaman petanya.
         </p>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid items-stretch gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {ROADMAPS.map((item) => {
             const required = flatSteps(item, false);
             const done = doneCount(item, save.correct, false);
@@ -105,17 +101,17 @@ function Home() {
                 key={item.id}
                 to="/peta/$roleId"
                 params={{ roleId: item.id }}
-                className={`card card-link block p-5 ${save.road === item.id ? "border-copper" : ""}`}
+                className={`card card-link flex h-full flex-col p-5 ${save.road === item.id ? "border-copper" : ""}`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <p className="text-sm font-semibold text-copper">{item.kicker}</p>
-                  <p className="font-display text-3xl tabular-nums leading-none">
+                  <p className="font-display text-2xl tabular-nums leading-none">
                     {done}
                     <span className="text-muted">/{required.length}</span>
                   </p>
                 </div>
-                <h3 className="mt-2 text-2xl">{item.title}</h3>
-                <p className="mt-2 text-sm text-muted">{item.line}</p>
+                <h3 className="mt-3 text-xl">{item.title}</h3>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">{item.line}</p>
                 <span className="mt-4 block h-1.5 overflow-hidden rounded-full bg-line">
                   <span className="block h-full bg-copper" style={{ width: `${Math.round(ratio * 100)}%` }} />
                 </span>
@@ -155,16 +151,16 @@ function Home() {
                     <Link
                       to="/belajar/$topicId"
                       params={{ topicId: topic.id }}
-                      className="flex items-center gap-4 px-4 py-4"
+                      className="flex items-center gap-3 px-4 py-3.5"
                     >
-                      <span className="w-8 font-mono text-sm text-muted">{String(index + 1).padStart(2, "0")}</span>
+                      <span className="w-8 shrink-0 font-mono text-xs text-muted">{String(index + 1).padStart(2, "0")}</span>
                       <span className="min-w-0 flex-1">
                         <span className="block font-medium">{topic.title}</span>
                         <span className="block truncate text-sm text-muted">{topic.blurb}</span>
                       </span>
-                      <span className="hidden text-right text-sm text-muted sm:block">
+                      <span className="hidden w-16 shrink-0 text-right text-xs text-muted sm:block">
                         {topic.minutes} mnt
-                        <span className="mt-1 block h-1 w-16 overflow-hidden rounded-full bg-line">
+                        <span className="mt-1 block h-1 overflow-hidden rounded-full bg-line">
                           <span className="block h-full bg-copper" style={{ width: `${Math.min(100, done * 20)}%` }} />
                         </span>
                       </span>
@@ -181,11 +177,42 @@ function Home() {
   );
 }
 
+const PLANETS = [
+  { id: "merkurius", name: "Merkurius", orbit: "18%", size: "7px", dur: "7s", start: "24deg" },
+  { id: "venus", name: "Venus", orbit: "27%", size: "10px", dur: "11s", start: "150deg" },
+  { id: "bumi", name: "Bumi", orbit: "36%", size: "11px", dur: "15s", start: "70deg" },
+  { id: "mars", name: "Mars", orbit: "45%", size: "9px", dur: "19s", start: "210deg" },
+  { id: "yupiter", name: "Yupiter", orbit: "56%", size: "22px", dur: "26s", start: "310deg" },
+  { id: "saturnus", name: "Saturnus", orbit: "68%", size: "18px", dur: "32s", start: "48deg" },
+  { id: "uranus", name: "Uranus", orbit: "78%", size: "13px", dur: "38s", start: "180deg" },
+  { id: "neptunus", name: "Neptunus", orbit: "87%", size: "13px", dur: "46s", start: "260deg" },
+  { id: "pluto", name: "Pluto", orbit: "96%", size: "5px", dur: "54s", start: "120deg" },
+] as const;
+
+function SolarSystem() {
+  return (
+    <div className="solar" aria-hidden="true">
+      <div className="solar-stage">
+        <span className="sun" />
+        {PLANETS.map((planet) => (
+          <span
+            key={planet.id}
+            className="orbit"
+            style={{ ["--orbit" as string]: planet.orbit, ["--dur" as string]: planet.dur, ["--start" as string]: planet.start }}
+          >
+            <span className={`planet planet-${planet.id}`} style={{ ["--size" as string]: planet.size }} title={planet.name} />
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div>
-      <p className="font-display text-3xl tabular-nums">{value}</p>
-      <p className="text-sm text-muted">{label}</p>
+    <div className="min-w-0 px-2 first:pl-0 last:pr-0">
+      <p className="font-display text-2xl tabular-nums leading-none">{value}</p>
+      <p className="mt-1 text-xs text-muted">{label}</p>
     </div>
   );
 }

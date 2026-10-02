@@ -32,7 +32,7 @@ function Roads() {
         <section key={group.title} className="mt-10">
           <h2 className="text-3xl">{group.title}</h2>
           <p className="mt-2 mb-4 max-w-2xl text-sm text-muted">{group.note}</p>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid items-stretch gap-3 sm:grid-cols-2">
             {group.ids.map((id) => {
               const road = getRoadmap(id);
               if (!road) return null;
@@ -58,16 +58,16 @@ function RoadCard({
   const done = doneCount(road, correct, false);
   const ratio = required.length ? done / required.length : 0;
   return (
-    <Link to="/peta/$roleId" params={{ roleId: road.id }} className={`card card-link block p-5 ${active ? "border-copper" : ""}`}>
+    <Link to="/peta/$roleId" params={{ roleId: road.id }} className={`card card-link flex h-full flex-col p-5 ${active ? "border-copper" : ""}`}>
       <div className="flex items-start justify-between gap-3">
         <p className="text-sm font-semibold text-copper">{road.kicker}</p>
-        <p className="font-display text-3xl tabular-nums leading-none">
+        <p className="font-display text-2xl tabular-nums leading-none">
           {done}
           <span className="text-muted">/{required.length}</span>
         </p>
       </div>
-      <h2 className="mt-2 text-2xl">{road.title}</h2>
-      <p className="mt-2 text-sm text-muted">{road.line}</p>
+      <h2 className="mt-3 text-xl">{road.title}</h2>
+      <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">{road.line}</p>
       <p className="mt-3 text-sm text-muted">{formatSpan(minutesOf(required))} inti</p>
       <span className="mt-3 block h-1.5 overflow-hidden rounded-full bg-line">
         <span className="block h-full bg-copper" style={{ width: `${Math.round(ratio * 100)}%` }} />

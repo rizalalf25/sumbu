@@ -1,4 +1,5 @@
-import { fmt, problem, take, type Level, type Problem } from "./mathx";
+import { fmt, problem, take, type Level, type Problem } from "./mathx.ts";
+import { EXTRA_GENS } from "./problems-extra.ts";
 
 const G = 10;
 const PI = 3.14;
@@ -182,6 +183,7 @@ function eksponen(seed: number, level: Level): Problem {
 }
 
 const ANGLES = [30, 45, 60] as const;
+const TABLE_ANGLES = [0, 30, 45, 60, 90] as const;
 function trigValue(fn: "sin" | "cos" | "tan", angle: number): number {
   const table: Record<string, number> = {
     sin30: 0.5,
@@ -193,15 +195,20 @@ function trigValue(fn: "sin" | "cos" | "tan", angle: number): number {
     sin60: 0.866,
     cos60: 0.5,
     tan60: 1.732,
+    sin0: 0,
+    cos0: 1,
+    tan0: 0,
+    sin90: 1,
+    cos90: 0,
   };
   return table[`${fn}${angle}`] ?? 0;
 }
 
 function trig(seed: number, level: Level): Problem {
-  const note = "Pakai: sin30=0,5 cos30=0,866 tan30=0,577; sin45=cos45=0,707 tan45=1; sin60=0,866 cos60=0,5 tan60=1,732.";
+  const note = "Pakai: sin0=0 cos0=1 tan0=0; sin90=1 cos90=0; sin30=0,5 cos30=0,866 tan30=0,577; sin45=cos45=0,707 tan45=1; sin60=0,866 cos60=0,5 tan60=1,732.";
   if (level === 1) {
     const fn = take(seed, 1, ["sin", "cos", "tan"] as const);
-    const angle = take(seed, 2, ANGLES);
+    const angle = fn === "tan" ? take(seed, 2, [0, 30, 45, 60] as const) : take(seed, 2, TABLE_ANGLES);
     const value = trigValue(fn, angle);
     return problem(`Berapa ${fn} ${angle}°?`, note, value, "Ini sudut istimewa. Hafal segitiga 30-60 dan 45.", [
       `${fn} ${angle}° = ${fmt(value, 3)}.`,
@@ -267,7 +274,13 @@ function geometri(seed: number, level: Level): Problem {
     ]);
   }
   if (level === 2) {
-    const r = take(seed, 1, [2, 3, 4, 5, 6, 7, 8, 10, 12]);
+    const r = take(seed, 1, [2, 3, 4, 5, 6, 7, 8, 10, 12, 15, 20]);
+    if (take(seed, 2, [0, 1]) === 1) {
+      const k = 2 * PI * r;
+      return problem(`Jari-jari lingkaran ${r}. Berapa kelilingnya?`, "Pakai π = 3,14. Keliling = 2πr.", k, "Keliling memakai r, bukan r².", [
+        `2 × 3,14 × ${r} = ${fmt(k)}.`,
+      ]);
+    }
     const value = PI * r * r;
     return problem(`Jari-jari lingkaran ${r}. Berapa luasnya?`, "Pakai π = 3,14. Luas = π r².", value, "Kuadratkan jari-jari dulu, baru kali 3,14.", [
       `r² = ${r * r}.`, `3,14 × ${r * r} = ${fmt(value)}.`,
@@ -345,11 +358,11 @@ function limit(seed: number, level: Level): Problem {
   const a = take(seed, 1, [1, 2, 3, 4, 5, 6, 8, -2, -3]);
   if (level === 2) {
     return problem(
-      `Berapa limit x → ${a} dari (x² − ${a * a}) / (x − ${a === 0 ? "0" : `(${a})`})?`,
-      "Bentuk 0/0. Faktorkan dulu. Jika a negatif, x − (a) = x + |a|.",
+      `Berapa limit x → ${a} dari (x² − ${a * a}) / (${a > 0 ? `x − ${a}` : `x + ${-a}`})?`,
+      "Bentuk 0/0. Faktorkan dulu.",
       2 * a,
-      "x² − a² = (x−a)(x+a). Corek (x−a).",
-      [`Setelah dicorek: x + (${a}).`, `Di x = ${a}: ${a} + (${a}) = ${2 * a}.`],
+      "x² − a² = (x−a)(x+a). Coret faktor yang membuat nol.",
+      [`Setelah dicoret tinggal x ${a > 0 ? "+" : "−"} ${Math.abs(a)}.`, `Di x = ${a}: ${a} + (${a}) = ${2 * a}.`],
     );
   }
   return problem(
@@ -521,17 +534,25 @@ function vektor(seed: number, level: Level): Problem {
       [`${x1}×${x2} + ${y1}×${y2} = ${value}.`],
     );
   }
-  const a = take(seed, 1, [1, 2, 3, 4, 5]);
-  const b = take(seed, 2, [-2, -1, 0, 2, 3]);
-  const c = take(seed, 3, [1, 2, 4, -3]);
-  const d = take(seed, 4, [2, 3, 5, -1]);
-  const value = a * d - b * c;
+  const five = [
+    [3, 4],
+    [4, 3],
+    [5, 0],
+    [0, 5],
+    [-3, 4],
+    [4, -3],
+    [-4, -3],
+  ] as const;
+  const [x1, y1] = take(seed, 1, five);
+  const [x2, y2] = take(seed, 2, five);
+  const dot = x1 * x2 + y1 * y2;
+  const value = dot / 25;
   return problem(
-    `Determinan matriks [[${a}, ${b}], [${c}, ${d}]].`,
-    "det = ad − bc.",
+    `Cosine similarity antara (${x1}, ${y1}) dan (${x2}, ${y2})?`,
+    "cos θ = (a·b) / (|a| |b|). Kedua vektor panjangnya 5.",
     value,
-    "Diagonal utama dikali, diagonal lain dikurangi.",
-    [`${a}×${d} − (${b})×(${c}) = ${value}.`],
+    "1 berarti searah, 0 tegak lurus, −1 berlawanan. Embedding dibandingkan dengan cara ini.",
+    [`a·b = ${x1}×${x2} + ${y1}×${y2} = ${dot}.`, "|a||b| = 5 × 5 = 25.", `cos θ = ${dot}/25 = ${fmt(value)}.`],
   );
 }
 
@@ -726,7 +747,7 @@ function gelombang(seed: number, level: Level): Problem {
     ]);
   }
   if (level === 2) {
-    const L = take(seed, 1, [0.1, 0.4, 0.9, 1.6, 2.5]);
+    const L = take(seed, 1, [0.1, 0.2, 0.4, 0.6, 0.9, 1, 1.6, 2.5, 3.6]);
     const root = Math.sqrt(L / G);
     const value = 2 * PI * root;
     return problem(
@@ -767,7 +788,7 @@ function fluida(seed: number, level: Level): Problem {
     const V = take(seed, 1, [0.001, 0.002, 0.005, 0.01, 0.02]);
     const value = 1000 * G * V;
     return problem(
-      `Benda mendesak air laut tawar bervolume ${fmt(V, 3)} m³. ρ = 1000, g = ${G}. Gaya apung (N)?`,
+      `Benda mendesak air tawar bervolume ${fmt(V, 3)} m³. ρ = 1000, g = ${G}. Gaya apung (N)?`,
       "Archimedes: F = ρ fluida × g × volume yang terdesak.",
       value,
       "Pakai volume terdesak, bukan selalu volume benda utuh.",
@@ -849,7 +870,7 @@ function optik(seed: number, level: Level): Problem {
       [`|${sp}/${s}| = ${fmt(sp / s)}.`],
     );
   }
-  const n2 = take(seed, 2, [1.25, 1.5, 2, 2.5, 4]);
+  const n2 = take(seed, 2, [1.25, 1.33, 1.5, 1.6, 2, 2.4, 2.5, 4]);
   const sinr = 0.5 / n2;
   return problem(
     `Cahaya dari udara (n=1) menuju medium n = ${fmt(n2)} dengan sudut datang 30°. Berapa sin sudut bias?`,
@@ -892,13 +913,22 @@ function foton(seed: number, level: Level): Problem {
       [`K = ${fmt(e)} − ${fmt(phi)} = ${fmt(k)}.`],
     );
   }
-  const over = e > phi ? 1 : 0;
+  const [work, lamCut] = take(seed, 3, [
+    [1, 1240],
+    [1.24, 1000],
+    [2, 620],
+    [2.48, 500],
+    [3.1, 400],
+    [4, 310],
+    [5, 248],
+  ] as const);
   return problem(
-    `E = ${fmt(e)} eV, φ = ${fmt(phi)} eV. Apakah elektron lepas? Jawab 1 jika ya, 0 jika tidak.`,
-    "Lepas hanya jika energi foton lebih besar daripada fungsi kerja.",
-    over,
-    "Bandingkan dua angka. Tidak perlu rumus baru.",
-    [over === 1 ? "E lebih besar, elektron lepas." : "E tidak cukup, tidak ada elektron lepas, K = 0."],
+    `Logam dengan fungsi kerja ${fmt(work)} eV. Berapa panjang gelombang ambang (nm), yaitu λ terpanjang yang masih melepas elektron?`,
+    "λ₀ (nm) ≈ 1240 / φ (eV).",
+    lamCut,
+    "Gelombang yang lebih panjang dari ambang membawa foton yang terlalu lemah.",
+    [`λ₀ = 1240 / ${fmt(work)} = ${lamCut} nm.`],
+    2,
   );
 }
 
@@ -974,14 +1004,18 @@ function deret(seed: number, level: Level): Problem {
       [`S = ${a} / (1/2) = ${fmt(a / 0.5)}.`],
     );
   }
-  const x = take(seed, 1, [1, 0.5, 2]);
-  const value = 1 + x + (x * x) / 2;
+  const x = take(seed, 1, [0.1, 0.2, 0.5, 1, 1.5, 2, -0.5, -1]);
+  const terms = take(seed, 2, [2, 3, 4]);
+  const parts = [1, x, (x * x) / 2, (x * x * x) / 6].slice(0, terms);
+  const value = parts.reduce((sum, v) => sum + v, 0);
+  const label = ["1", "x", "x²/2", "x³/6"].slice(0, terms).join(" + ");
   return problem(
-    `Hampiri e^x dengan tiga suku: 1 + x + x²/2, untuk x = ${fmt(x)}.`,
+    `Hampiri e^x dengan ${terms} suku pertama (${label}), untuk x = ${fmt(x)}.`,
     "Ini polinom Taylor, bukan nilai e yang dihafal.",
     value,
-    "Hitung suku x²/2 terpisah.",
-    [`1 + ${fmt(x)} + ${fmt((x * x) / 2)} = ${fmt(value)}.`],
+    "Hitung tiap suku terpisah, baru jumlahkan.",
+    [`Suku: ${parts.map((v) => fmt(v, 3)).join(" ; ")}.`, `Jumlah ≈ ${fmt(value, 3)}.`],
+    0.01,
   );
 }
 
@@ -1112,13 +1146,14 @@ function medan(seed: number, level: Level): Problem {
     );
   }
   if (level === 2) {
-    const c = take(seed, 1, [1, 2, 3, 4, 5]);
+    const c = take(seed, 1, [1, 2, 3, 4, 5, -2]);
+    const d = take(seed, 2, [1, 2, 3, 4, 5, -1]);
     return problem(
-      `F = (${-c} y, ${c} x, 0). Komponen z dari curl F?`,
+      `F = (${-c} y, ${d} x, 0). Komponen z dari curl F?`,
       "∇×F komponen z = ∂Fy/∂x − ∂Fx/∂y.",
-      2 * c,
-      "Fx = −c y, turunannya ke y adalah −c. Minus ketemu minus.",
-      [`∂Fy/∂x = ${c}.`, `∂Fx/∂y = ${-c}.`, `Selisih = ${c} − (${-c}) = ${2 * c}.`],
+      d + c,
+      "Turunkan Fx terhadap y dengan tandanya. Minus ketemu minus.",
+      [`∂Fy/∂x = ${d}.`, `∂Fx/∂y = ${-c}.`, `Selisih = ${d} − (${-c}) = ${d + c}.`],
     );
   }
   const a = take(seed, 1, [1, 2, 3, 4]);
@@ -1135,13 +1170,14 @@ function medan(seed: number, level: Level): Problem {
 function fluks(seed: number, level: Level): Problem {
   const L = take(seed, 1, [1, 2, 3]);
   if (level === 1) {
-    const value = 3 * L ** 3;
+    const side = take(seed, 5, [0.5, 1, 2, 3, 4, 5, 10]);
+    const value = 3 * side ** 3;
     return problem(
-      `F = (x, y, z). Fluks keluar melalui permukaan kubus sisi ${L} yang pusatnya di titik asal?`,
+      `F = (x, y, z). Fluks keluar melalui permukaan kubus sisi ${fmt(side)} yang pusatnya di titik asal?`,
       "Divergensi Gauss: fluks tertutup = ∭ ∇·F dV.",
       value,
       "∇·F = 3, volume kubus L³.",
-      [`∇·F = 1+1+1 = 3.`, `Volume = ${L ** 3}.`, `Fluks = ${value}.`],
+      ["∇·F = 1+1+1 = 3.", `Volume = ${fmt(side ** 3, 3)}.`, `Fluks = ${fmt(value, 3)}.`],
     );
   }
   const a = take(seed, 2, [1, 2, 0]);
@@ -1180,12 +1216,17 @@ function fourier(seed: number, level: Level): Problem {
       0.03,
     );
   }
+  const m = take(seed, 2, [1, 2, 3, 4, 5, 6]);
+  const bm = (2 * (-1) ** (m + 1)) / m;
+  const k = m === n ? n + 1 : n;
+  const bk = (2 * (-1) ** (k + 1)) / k;
   return problem(
-    `Tanda b${n} untuk f(x)=x. Jawab 1 jika positif, −1 jika negatif.`,
-    "bn = 2(−1)^{n+1}/n.",
-    value > 0 ? 1 : -1,
-    "n ganjil pada rumus ini positif, n genap negatif.",
-    [value > 0 ? "Tanda positif, jawab 1." : "Tanda negatif, jawab −1."],
+    `Untuk f(x)=x pada (−π, π), berapa b${m} + b${k}?`,
+    "bn = 2(−1)^{n+1}/n. Tanda berganti: n ganjil positif, n genap negatif.",
+    bm + bk,
+    "Hitung masing-masing dengan tandanya, baru jumlahkan.",
+    [`b${m} = ${fmt(bm)}.`, `b${k} = ${fmt(bk)}.`, `Jumlah = ${fmt(bm + bk)}.`],
+    0.02,
   );
 }
 
@@ -1273,7 +1314,7 @@ function pde(seed: number, level: Level): Problem {
     const n = take(seed, 2, [1, 2, 3]);
     const value = (n * n * 10) / (L * L);
     return problem(
-      `Dawai panjang ${L}, ujung tetap. Ambil π² = 10. Nilai eigen λ_${n} = (nπ/L)²?`,
+      `Dawai panjang ${L} m, ujung tetap. Ambil π² = 10. Nilai eigen λ_${n} = (nπ/L)²?`,
       "Syarat batas ujung tetap memaksa sinus dan λ positif.",
       value,
       "n = 1 adalah nada dasar. n menaik, λ naik kuadrat.",
@@ -1348,7 +1389,7 @@ function residu(seed: number, level: Level): Problem {
   }
   if (level === 2) {
     const a = take(seed, 1, [1, 2, 3, 4]);
-    const b = take(seed, 2, [0, 1, -1, 2, 5]);
+    const b = take(seed, 2, [0, 1, 2, 5, -5, 7]);
     return problem(
       `Residu (z + (${b})) / (z − ${a}) di z = ${a}?`,
       "Kalikan (z−a), lalu masukkan z=a.",
@@ -1357,17 +1398,21 @@ function residu(seed: number, level: Level): Problem {
       [`Res = ${a} + (${b}) = ${a + b}.`],
     );
   }
-  const inside = take(seed, 1, [0, 1]);
+  const r1 = take(seed, 1, [1, 2, 3, 4, 5, -2]);
+  const r2 = take(seed, 2, [1, 2, -1, -3, 4]);
+  const c = take(seed, 3, [1, 3, 0.5, 4]);
+  const inside = c < 2;
+  const value = r1 + (inside ? r2 : 0);
   return problem(
-    inside
-      ? "Kutub sederhana residu 3 berada di dalam kontur tertutup berlawanan jarum jam. Integral keliling dibagi 2π (yaitu koefisien yang dikali i, anggap 2πi × res / 2π) — singkatnya: berapa residunya?"
-      : "Kontur |z|=1, satu-satunya kandidat kutub di z=4. Integral keliling fungsi meromorf itu?",
-    inside
-      ? "Integral = 2πi × jumlah residu di dalam. Di soal ini yang ditanya residunya."
-      : "Tidak ada kutub di dalam, integral Cauchy = 0.",
-    inside ? 3 : 0,
-    inside ? "Yang ditanya residu, yaitu 3, bukan 2πi." : "Kutub di luar kontur tidak menyumbang.",
-    [inside ? "Residu yang diberikan = 3." : "Integral = 0."],
+    `f punya kutub sederhana di z = 0 (residu ${r1}) dan di z = ${fmt(c)} (residu ${r2}). Kontur |z| = 2 berlawanan jarum jam. Berapa ∮f dz / (2πi)?`,
+    "∮f dz = 2πi × jumlah residu di dalam kontur.",
+    value,
+    "Kutub di luar lingkaran tidak ikut dijumlah.",
+    [
+      `z = 0 di dalam: ikut, ${r1}.`,
+      inside ? `z = ${fmt(c)} di dalam: ikut, ${r2}.` : `z = ${fmt(c)} di luar |z| = 2: tidak ikut.`,
+      `Jumlah = ${value}.`,
+    ],
   );
 }
 
@@ -1403,7 +1448,7 @@ function numerik(seed: number, level: Level): Problem {
     );
   }
   const exact = 8 / 3;
-  const approx = take(seed, 1, [3, 2.5, 2.7]);
+  const approx = take(seed, 1, [3, 2.5, 2.7, 2.6, 2.8, 2.4, 2.75, 2.65]);
   const value = (Math.abs(approx - exact) / exact) * 100;
   return problem(
     `Integral eksak ∫_0^2 x² dx = 8/3. Suatu hampiran memberi ${fmt(approx)}. Persen galat terhadap nilai eksak?`,
@@ -1421,7 +1466,7 @@ function khusus(seed: number, level: Level): Problem {
   if (level === 1) {
     const value = (3 * x * x - 1) / 2;
     return problem(
-      `P2(x) = (3x² − 1)/2. Berapa P2(${fmt(x)})?`,
+      `P2(x) = (3x² − 1)/2. Berapa P2(x) untuk x = ${fmt(x)}?`,
       "P_n(1) = 1 untuk semua n. Cek dengan x=1.",
       value,
       "Kuadrat dulu, baru bagi dua.",
@@ -1429,13 +1474,13 @@ function khusus(seed: number, level: Level): Problem {
     );
   }
   if (level === 2) {
-    return problem(`P1(x) = x. Berapa P1(${fmt(x)})?`, "Legendre derajat 1 adalah identitas.", x, "Tidak ada yang disederhanakan.", [
-      `P1(${fmt(x)}) = ${fmt(x)}.`,
+    return problem(`P1(x) = x. Berapa P1(x) untuk x = ${fmt(x)}?`, "Legendre derajat 1 adalah identitas.", x, "Tidak ada yang disederhanakan.", [
+      `P1 = x = ${fmt(x)}.`,
     ]);
   }
   const value = (5 * x ** 3 - 3 * x) / 2;
   return problem(
-    `P3(x) = (5x³ − 3x)/2. Berapa P3(${fmt(x)})?`,
+    `P3(x) = (5x³ − 3x)/2. Berapa P3(x) untuk x = ${fmt(x)}?`,
     "Muncul pada bagian sudut atom hidrogen.",
     value,
     "Jangan buang suku linear.",
@@ -1454,14 +1499,17 @@ function statistik(seed: number, level: Level): Problem {
   }
   if (level === 2) {
     const lam = take(seed, 6, [1, 2, 3]);
-    const approx = lam === 1 ? 0.37 : lam === 2 ? 0.14 : 0.05;
+    const k = take(seed, 7, [0, 1, 2, 3]);
+    const base = lam === 1 ? 0.37 : lam === 2 ? 0.14 : 0.05;
+    const fact = [1, 1, 2, 6][k] ?? 1;
+    const value = (base * lam ** k) / fact;
     return problem(
-      `Poisson λ = ${lam}. P(0) = e^{−λ}. Pakai e^{−1}=0,37, e^{−2}=0,14, e^{−3}=0,05. Berapa P(0)?`,
-      "λ^0 / 0! = 1, jadi tinggal faktor eksponen.",
-      approx,
-      "Tidak ada kejadian bukan berarti peluang nol.",
-      [`P(0) = ${fmt(approx)}.`],
-      0.02,
+      `Poisson λ = ${lam}. Berapa P(${k})? Pakai e^{−1}=0,37, e^{−2}=0,14, e^{−3}=0,05.`,
+      "P(k) = e^{−λ} λ^k / k!.",
+      value,
+      "k! untuk k = 0, 1, 2, 3 adalah 1, 1, 2, 6.",
+      [`λ^${k} / ${k}! = ${fmt(lam ** k / fact, 3)}.`, `P(${k}) = ${fmt(base)} × itu = ${fmt(value, 3)}.`],
+      0.015,
     );
   }
   const variance = data.reduce((s, n) => s + (n - mean) ** 2, 0) / data.length;
@@ -1515,57 +1563,12 @@ const GENS: Record<string, (seed: number, level: Level) => Problem> = {
   numerik,
   khusus,
   statistik,
-};
-
-export const BANK: Record<string, number> = {
-  bilangan: 407,
-  aljabar: 766,
-  fungsi: 776,
-  eksponen: 115,
-  trig: 67,
-  geometri: 110,
-  barisan: 560,
-  limit: 210,
-  turunan: 206,
-  integral: 219,
-  peluang: 50,
-  vektor: 712,
-  satuan: 40,
-  kinematika: 458,
-  parabola: 99,
-  newton: 79,
-  energi: 74,
-  momentum: 152,
-  gelombang: 56,
-  fluida: 52,
-  listrik: 106,
-  optik: 61,
-  foton: 54,
-  kompleks: 279,
-  deret: 34,
-  parsial: 678,
-  lipat: 120,
-  matriks: 1194,
-  medan: 188,
-  fluks: 57,
-  fourier: 33,
-  laplace: 33,
-  ode: 108,
-  pde: 41,
-  variasi: 231,
-  residu: 29,
-  numerik: 73,
-  khusus: 27,
-  statistik: 995,
+  ...EXTRA_GENS,
 };
 
 export function makeProblem(id: string, seed: number, level: Level): Problem {
   const fn = GENS[id] ?? lin;
   return fn(Math.abs(seed) + 1, level);
-}
-
-export function bankTotal(): number {
-  return Object.values(BANK).reduce((s, n) => s + n, 0);
 }
 
 export function topicIds(): string[] {

@@ -1,6 +1,8 @@
 export type Phase = "kerja" | "jeda" | "panjang";
 
-const WORK = 25 * 60;
+const WORK_KEY = "sumbu-pomo-work";
+export const WORK_CHOICES = [12, 25] as const;
+let work = 25 * 60;
 const SHORT = 5 * 60;
 const LONG = 15 * 60;
 const BPM = 76;
@@ -20,6 +22,7 @@ export type StudySnap = {
   running: boolean;
   remaining: number;
   round: number;
+  workMinutes: number;
 };
 
 type Listener = (snap: StudySnap) => void;
@@ -30,7 +33,34 @@ let volume = 0.45;
 let music = false;
 let phase: Phase = "kerja";
 let running = false;
-let remaining = WORK;
+let remaining = work;
+let loadedWork = false;
+
+function loadWork() {
+  if (loadedWork || typeof window === "undefined") return;
+  loadedWork = true;
+  try {
+    const saved = Number(localStorage.getItem(WORK_KEY));
+    if (WORK_CHOICES.includes(saved as (typeof WORK_CHOICES)[number])) {
+      work = saved * 60;
+      if (!running && phase === "kerja") remaining = work;
+    }
+  } catch {
+    // Penyimpanan diblokir: pakai 25 menit.
+  }
+}
+
+/** Panjang blok kerja: 12 menit (blok pendek) atau 25 menit (Pomodoro klasik). */
+export function setWorkMinutes(minutes: number) {
+  work = minutes * 60;
+  try {
+    localStorage.setItem(WORK_KEY, String(minutes));
+  } catch {
+    // Abaikan.
+  }
+  if (!running && phase === "kerja") remaining = work;
+  emit();
+}
 let round = 0;
 let endsAt = 0;
 let tick: number | null = null;
@@ -51,7 +81,8 @@ function midi(note: number) {
 }
 
 function snap(): StudySnap {
-  return { music, volume, phase, running, remaining: liveRemaining(), round };
+  loadWork();
+  return { music, volume, phase, running, remaining: liveRemaining(), round, workMinutes: work / 60 };
 }
 
 function liveRemaining() {
@@ -225,7 +256,7 @@ export function toggleMusic() {
 }
 
 function phaseLength(nextPhase: Phase) {
-  if (nextPhase === "kerja") return WORK;
+  if (nextPhase === "kerja") return work;
   if (nextPhase === "jeda") return SHORT;
   return LONG;
 }
@@ -285,7 +316,7 @@ export function skipPomo() {
 export function resetPomo() {
   running = false;
   phase = "kerja";
-  remaining = WORK;
+  remaining = work;
   round = 0;
   emit();
 }

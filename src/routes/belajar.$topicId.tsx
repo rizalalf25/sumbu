@@ -6,7 +6,7 @@ import { TopicVisual } from "@/components/visual";
 import { NOTE_FRAME, useSave } from "@/lib/progress";
 import { bankOf, getTopic } from "@/lib/topics";
 
-export const Route = createFileRoute("/belajar/$topicId")({ component: Lesson });
+export const Route = createFileRoute("/belajar/$topicId")({ component: LessonRoute });
 
 const STEPS = ["Janji", "Ide", "Rumus", "Lihat", "Kasus", "Jebakan", "Catat"] as const;
 
@@ -20,20 +20,31 @@ const COACH = [
   "Dua kalimat dengan kata sendiri. Lalu lima soal.",
 ];
 
-function Lesson() {
+const TRACK_LABEL = { math: "Matematika dasar", physics: "Fisika dasar", advanced: "Lanjutan" } as const;
+
+function LessonRoute() {
   const { topicId } = Route.useParams();
+  // key: pindah materi = state langkah, cek, dan catatan mulai bersih.
+  return <Lesson key={topicId} topicId={topicId} />;
+}
+
+function Lesson({ topicId }: { topicId: string }) {
   const topic = getTopic(topicId);
   const { save, ready, setNote, setStep } = useSave();
   const [step, setLocal] = useState(0);
+  const [resumed, setResumed] = useState(false);
   const [hideTex, setHideTex] = useState(false);
   const [showCheck, setShowCheck] = useState(false);
   const [note, setLocalNote] = useState("");
 
   useEffect(() => {
-    if (!ready || !topic) return;
+    if (!ready || !topic || resumed) return;
+    setResumed(true);
     setLocalNote(save.notes[topic.id] ?? "");
-    setStep(topic.id, 0);
-  }, [ready, topic, setStep]);
+    const last = save.steps[topic.id] ?? 0;
+    // Lanjutkan dari langkah terakhir, kecuali materi sudah sampai akhir: mulai lagi dari awal.
+    if (last > 0 && last < STEPS.length - 1) setLocal(last);
+  }, [ready, topic, resumed, save.notes, save.steps]);
 
   if (!topic) {
     return (
@@ -57,7 +68,7 @@ function Lesson() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-sm font-semibold text-copper">
-            {topic.chapter ?? (topic.track === "physics" ? "Fisika dasar" : "Matematika dasar")}
+            {topic.chapter ?? TRACK_LABEL[topic.track]}
           </p>
           <h1 className="mt-1 text-4xl">{topic.title}</h1>
         </div>
@@ -85,13 +96,10 @@ function Lesson() {
             <p className="text-sm font-semibold text-copper">Janji layar ini</p>
             <h2 className="mt-2 text-3xl">{topic.promise}</h2>
             <p className="mt-4 text-xl">{topic.oneIdea}</p>
-            <figure className="mt-4">
-              <img className="analogy-photo" src={`/analogi/${topic.id}.jpg`} alt="" />
-              <figcaption className="mt-3 border-l-2 border-copper pl-3 text-sm leading-relaxed md:text-base">
-                <span className="font-semibold text-copper">Bayangkan. </span>
-                {topic.analogy}
-              </figcaption>
-            </figure>
+            <p className="mt-4 border-l-2 border-copper pl-3 text-sm leading-relaxed md:text-base">
+              <span className="font-semibold text-copper">Bayangkan. </span>
+              {topic.analogy}
+            </p>
           </article>
         )}
         {step === 1 && (

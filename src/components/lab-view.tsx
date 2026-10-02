@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { idn } from "@/lib/mathx";
 import type { SceneKind } from "./scenes";
 
 type SliderSpec = { key: string; label: string; min: number; max: number; step: number };
@@ -103,6 +104,9 @@ const UI: Record<
   },
 };
 
+/** Adegan yang bergerak terhadap waktu. Bawaannya diam; gerak dimulai dengan tombol. */
+const MOVING = new Set<SceneKind>(["projectile", "pendulum", "wave"]);
+
 export function LabView({ kind }: { kind: SceneKind }) {
   const cfg = UI[kind];
   const [values, setValues] = useState(cfg.initial);
@@ -110,6 +114,10 @@ export function LabView({ kind }: { kind: SceneKind }) {
   latest.current = values;
   const host = useRef<HTMLDivElement>(null);
   const [note, setNote] = useState("Menyiapkan ruang visual…");
+  const [playing, setPlaying] = useState(false);
+  const playingRef = useRef(playing);
+  playingRef.current = playing;
+  const moves = MOVING.has(kind);
 
   useEffect(() => {
     const el = host.current;
@@ -119,7 +127,7 @@ export function LabView({ kind }: { kind: SceneKind }) {
     import("./scenes")
       .then(({ mountScene }) => {
         if (dead) return;
-        dispose = mountScene(el, kind, () => latest.current);
+        dispose = mountScene(el, kind, () => latest.current, () => playingRef.current);
         setNote("");
       })
       .catch(() => setNote("Gambar 3D tidak tersedia di perangkat ini. Rumus di bawah tetap berlaku."));
@@ -135,12 +143,17 @@ export function LabView({ kind }: { kind: SceneKind }) {
         <div ref={host} className="absolute inset-0" />
         {note ? <p className="absolute inset-x-4 bottom-4 text-sm text-muted">{note}</p> : null}
       </div>
+      {moves ? (
+        <button type="button" className="btn-ghost justify-self-start" aria-pressed={playing} onClick={() => setPlaying((v) => !v)}>
+          {playing ? "Jeda gerak" : "Putar gerak"}
+        </button>
+      ) : null}
       <div className="grid gap-3">
         {cfg.sliders.map((slider) => (
           <label key={slider.key} className="grid gap-1 text-sm">
             <span className="flex items-center justify-between gap-3">
               <span>{slider.label}</span>
-              <span className="font-mono tabular-nums text-ink">{Number(values[slider.key] ?? 0).toFixed(slider.step < 1 ? 1 : 0)}</span>
+              <span className="font-mono tabular-nums text-ink">{idn(Number(values[slider.key] ?? 0).toFixed(slider.step < 1 ? 1 : 0))}</span>
             </span>
             <input
               type="range"
@@ -153,7 +166,7 @@ export function LabView({ kind }: { kind: SceneKind }) {
           </label>
         ))}
       </div>
-      <p className="text-sm text-muted">{cfg.caption(values)}</p>
+      <p className="text-sm text-muted">{idn(cfg.caption(values))}</p>
       <p className="text-sm text-ink">Seret gambar untuk memutar pandangan. Ubah satu penggeser, lalu sebut apa yang berubah.</p>
     </div>
   );

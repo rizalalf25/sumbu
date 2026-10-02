@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Shell } from "@/components/shell";
 import { useSave } from "@/lib/progress";
-import { doneCount, flatSteps, formatSpan, getRoadmap, minutesOf, type Roadmap } from "@/lib/roadmaps";
+import { doneCount, flatSteps, formatSpan, getRoadmap, minutesOf, type Roadmap, type Score } from "@/lib/roadmaps";
 
 export const Route = createFileRoute("/peta/")({ component: Roads });
 
@@ -12,9 +12,19 @@ const GROUPS: { title: string; note: string; ids: string[] }[] = [
     ids: ["analis", "ilmuwan", "ai"],
   },
   {
-    title: "STEM lain",
+    title: "Profesi yang sedang tumbuh",
+    note: "Permintaan naik untuk lima tahun ke depan: otomasi, transisi energi, keamanan digital, dan fintech.",
+    ids: ["robotika", "energi", "siber", "quant", "iklim", "iot"],
+  },
+  {
+    title: "Teknik dan sains",
     note: "Hanya bab yang dipakai profesi itu, bukan seluruh katalog.",
     ids: ["aktuaris", "elektro", "mesin", "fisikawan"],
+  },
+  {
+    title: "Perbatasan riset",
+    note: "Bidang muda yang bertumbuh cepat. Butuh fondasi yang lebih panjang.",
+    ids: ["kuantum", "bioinfo"],
   },
 ];
 
@@ -36,7 +46,7 @@ function Roads() {
             {group.ids.map((id) => {
               const road = getRoadmap(id);
               if (!road) return null;
-              return <RoadCard key={id} road={road} correct={save.correct} active={save.road === id} />;
+              return <RoadCard key={id} road={road} score={save} active={save.road === id} />;
             })}
           </div>
         </section>
@@ -47,15 +57,15 @@ function Roads() {
 
 function RoadCard({
   road,
-  correct,
+  score,
   active,
 }: {
   road: Roadmap;
-  correct: Record<string, number>;
+  score: Score;
   active?: boolean;
 }) {
   const required = flatSteps(road, false);
-  const done = doneCount(road, correct, false);
+  const done = doneCount(road, score, false);
   const ratio = required.length ? done / required.length : 0;
   return (
     <Link to="/peta/$roleId" params={{ roleId: road.id }} className={`card card-link flex h-full flex-col p-5 ${active ? "border-copper" : ""}`}>

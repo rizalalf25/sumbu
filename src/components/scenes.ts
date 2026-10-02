@@ -5,7 +5,12 @@ export type SceneKind = "projectile" | "pendulum" | "wave" | "vector" | "charges
 
 type Params = Record<string, number>;
 
-export function mountScene(el: HTMLElement, kind: SceneKind, getParams: () => Params): () => void {
+export function mountScene(
+  el: HTMLElement,
+  kind: SceneKind,
+  getParams: () => Params,
+  isPlaying: () => boolean = () => false,
+): () => void {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setSize(el.clientWidth || 320, el.clientHeight || 280);
@@ -288,7 +293,8 @@ export function mountScene(el: HTMLElement, kind: SceneKind, getParams: () => Pa
   let frame = 0;
   const loop = () => {
     const dt = Math.min(clock.getDelta(), 0.05);
-    if (!reduced) time += dt;
+    // Gerak hanya berjalan setelah pengguna menekan "Putar gerak"; bawaannya diam.
+    if (!reduced && isPlaying()) time += dt;
     update(time, getParams());
     controls.update();
     renderer.render(scene, camera);

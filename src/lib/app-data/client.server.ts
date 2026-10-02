@@ -278,7 +278,9 @@ function tokenIdentityKey(token: string): string {
             .digest("base64url");
         }
       }
-    } catch {}
+    } catch {
+      // Token bukan JWT yang bisa dibaca: pakai hash token utuh di bawah.
+    }
   }
   return createHash("sha256").update(token).digest("base64url");
 }

@@ -40,8 +40,8 @@ function RoadPage() {
 
   const required = flatSteps(road, false);
   const optional = flatSteps(road, true);
-  const done = doneCount(road, save.correct, false);
-  const upcoming = nextStep(road, save.correct);
+  const done = doneCount(road, save, false);
+  const upcoming = nextStep(road, save);
   const upcomingTopic = upcoming ? getTopic(upcoming.topicId) : undefined;
   const leftOut = omittedTopics(road);
   let cursor = 0;
@@ -77,7 +77,9 @@ function RoadPage() {
             />
           </span>
           <p className="mt-4">{road.outcome}</p>
-          <p className="mt-3 text-sm text-muted">{DONE_AT} jawaban benar = cukup untuk peta ini, bukan mahir.</p>
+          <p className="mt-3 text-sm text-muted">
+            Cukup = {DONE_AT} jawaban benar, minimal satu di level Sedang atau Tantangan. Itu tanda cukup untuk peta ini, bukan mahir.
+          </p>
           {save.road === road.id ? (
             <p className="mt-3 text-sm font-semibold text-copper">Peta ini yang dipakai tombol lanjut di beranda.</p>
           ) : (
@@ -128,7 +130,7 @@ function RoadPage() {
               const topic = getTopic(step.topicId);
               if (!topic) return null;
               const score = save.correct[topic.id] ?? 0;
-              const enough = isEnough(score);
+              const enough = isEnough(save, topic.id);
               const here = upcoming?.topicId === topic.id;
               const label = enough ? "Cukup" : score > 0 ? "Mulai" : "Belum";
               return (

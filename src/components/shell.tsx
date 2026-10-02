@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Compass, House, Route, Sigma, Timer } from "lucide-react";
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useSyncExternalStore, type ReactNode } from "react";
 import { StudyDock } from "@/components/study-dock";
 
 const NAV = [
@@ -13,6 +13,39 @@ const NAV = [
 
 type FocusApi = { focus: boolean; setFocus: (v: boolean) => void };
 
+// Mode fokus bertahan saat pindah halaman (dan sampai tab ditutup), bukan hanya di satu layar.
+const FOCUS_KEY = "sumbu-focus";
+const focusListeners = new Set<() => void>();
+let focusValue: boolean | null = null;
+
+function readFocus(): boolean {
+  if (focusValue === null) {
+    try {
+      focusValue = sessionStorage.getItem(FOCUS_KEY) === "1";
+    } catch {
+      focusValue = false;
+    }
+  }
+  return focusValue;
+}
+
+function writeFocus(value: boolean) {
+  focusValue = value;
+  try {
+    sessionStorage.setItem(FOCUS_KEY, value ? "1" : "0");
+  } catch {
+    // Penyimpanan diblokir: tetap berlaku di memori.
+  }
+  focusListeners.forEach((listener) => listener());
+}
+
+function subscribeFocus(listener: () => void) {
+  focusListeners.add(listener);
+  return () => {
+    focusListeners.delete(listener);
+  };
+}
+
 const FocusContext = createContext<FocusApi>({ focus: false, setFocus: () => {} });
 
 export function useFocusMode() {
@@ -21,7 +54,8 @@ export function useFocusMode() {
 
 export function Shell({ children, wide = false }: { children: ReactNode; wide?: boolean }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
-  const [focus, setFocus] = useState(false);
+  const focus = useSyncExternalStore(subscribeFocus, readFocus, () => false);
+  const setFocus = writeFocus;
   const width = wide ? "max-w-5xl" : "max-w-3xl";
 
   return (
@@ -52,7 +86,7 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
             )}
           </div>
         </header>
-        <main className={`mx-auto px-4 py-6 ${focus ? "pb-36" : "pb-52 md:pb-36"} ${width}`}>{children}</main>
+        <main className={`mx-auto px-4 py-6 ${focus ? "pb-24" : "pb-36 md:pb-24"} ${width}`}>{children}</main>
         <StudyDock focus={focus} />
         {!focus && (
           <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-paper/75 backdrop-blur-md md:hidden">

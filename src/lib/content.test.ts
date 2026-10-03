@@ -60,3 +60,26 @@ describe("kesiapan dan cadangan", () => {
     assert.equal(parseSave(JSON.stringify({ halo: 1 })), null);
   });
 });
+
+describe("daftar belanja dan panduan rakit", async () => {
+  const { KITS, kitAsText, kitTotal, rupiahRange } = await import("./kits.ts");
+
+  it("proyek perangkat keras punya daftar belanja dan panduan rakit", () => {
+    for (const id of ["drone", "line-follower", "stasiun-cuaca", "inkubator"]) {
+      const kit = KITS[id];
+      assert.ok(kit, `kit ${id}`);
+      assert.ok(kit.parts.some((part) => part.group === "inti"), `komponen inti ${id}`);
+      assert.ok(kit.build.length >= 5, `panduan rakit ${id}`);
+    }
+    assert.ok(KITS.drone.build.length >= 12, "panduan drone detail");
+  });
+
+  it("total dan teks belanja masuk akal", () => {
+    const [min, max] = kitTotal(KITS.drone, ["inti", "habis"]);
+    assert.ok(min > 2_000_000 && max < 15_000_000 && min < max, `total drone ${min}–${max}`);
+    const owned = new Set([0]);
+    assert.ok(kitTotal(KITS.drone, ["inti"], owned)[0] < kitTotal(KITS.drone, ["inti"])[0]);
+    assert.match(kitAsText("Drone", KITS.drone, owned), /\[sudah ada\]/);
+    assert.equal(rupiahRange([950000, 4200000]), "Rp950 rb – Rp4,2 jt");
+  });
+});

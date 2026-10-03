@@ -12,6 +12,7 @@ Cocok untuk perhatian yang mudah loncat. Tidak ada dinding teks, tidak ada anima
 - **Studio.** Adegan Three.js: parabola, bandul, gelombang, vektor, muatan, permukaan, medan. Gerak baru berjalan setelah tombol "Putar gerak" ditekan.
 - **Peta profesi.** Hanya pelajaran yang terpakai, bukan seluruh katalog, lengkap dengan bahasa pemrograman yang disarankan, dua proyek, dan meter kesiapan kerja.
 - **Proyek studi kasus.** 30 proyek (2 per peta), dari dasbor KPI sampai drone quadcopter. Tiap tahap menyebut materi dan pelajaran kode yang dipakai, dan bisa dicentang.
+- **Daftar belanja dan panduan rakit.** 10 proyek perangkat keras (drone, robot pengikut garis, stasiun cuaca, inkubator, konverter buck, model BMS, PLTS mini, braket rak, bandul, spektrum audio) punya daftar komponen, alat, bahan habis pakai, perkiraan harga, total yang bisa dikurangi barang yang sudah dimiliki, dan langkah rakit dengan peringatan keselamatan.
 - **Kode.** 32 pelajaran Python, SQL, C/C++, R, dan Bash dengan soal "tebak keluaran". Contohnya memakai rumus yang sama dengan materi.
 - **Metode.** Sesi 12 menit, mode fokus, cara mencatat, dan cadangan/pulihkan progres ke file JSON.
 

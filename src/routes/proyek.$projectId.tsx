@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { FocusToggle, Shell } from "@/components/shell";
 import { getLesson } from "@/lib/code";
+import { BuildGuide, ShoppingList } from "@/components/kit-panel";
+import { kitOf } from "@/lib/kits";
 import { useSave } from "@/lib/progress";
 import { getProject, LEVEL_LABEL, projectsOf } from "@/lib/projects";
 import { getRoadmap } from "@/lib/roadmaps";
@@ -11,7 +13,7 @@ export const Route = createFileRoute("/proyek/$projectId")({ component: ProjectP
 function ProjectPage() {
   const { projectId } = Route.useParams();
   const project = getProject(projectId);
-  const { save, toggleMilestone } = useSave();
+  const { save, toggleMilestone, toggleOwned, toggleBuild } = useSave();
 
   if (!project) {
     return (
@@ -28,6 +30,9 @@ function ProjectPage() {
   const done = new Set(save.proj[project.id] ?? []);
   const total = project.milestones.length;
   const other = projectsOf(project.road).find((item) => item.id !== project.id);
+  const kit = kitOf(project.id);
+  const owned = new Set(save.kit[project.id] ?? []);
+  const built = new Set(save.build[project.id] ?? []);
 
   return (
     <Shell>
@@ -56,6 +61,25 @@ function ProjectPage() {
         </p>
       </article>
 
+      <nav className="chip-row mt-5 flex gap-2 overflow-x-auto pb-1" aria-label="Bagian proyek">
+        {kit ? (
+          <>
+            <a href="#belanja" className="chip shrink-0">
+              Daftar belanja
+            </a>
+            <a href="#rakit" className="chip shrink-0">
+              Panduan rakit
+            </a>
+          </>
+        ) : null}
+        <a href="#tahapan" className="chip shrink-0">
+          Tahapan
+        </a>
+        <a href="#portofolio" className="chip shrink-0">
+          Portofolio
+        </a>
+      </nav>
+
       {project.safety ? (
         <article className="card mt-4 border-signal p-5">
           <p className="text-sm font-semibold text-signal">Keselamatan</p>
@@ -63,8 +87,22 @@ function ProjectPage() {
         </article>
       ) : null}
 
-      <section className="mt-8">
-        <h2 className="text-3xl">Tahapan</h2>
+      {kit ? (
+        <>
+          <ShoppingList title={project.title} kit={kit} owned={owned} onToggle={(i) => toggleOwned(project.id, i)} />
+          <BuildGuide kit={kit} done={built} onToggle={(i) => toggleBuild(project.id, i)} />
+        </>
+      ) : (
+        <article id="belanja" className="card mt-4 p-5">
+          <p className="text-sm font-semibold text-copper">Tidak perlu membeli perangkat</p>
+          <p className="mt-2">
+            Proyek ini cukup dengan laptop (RAM ≥ 8 GB) dan akun gratis. Pustaka, data, dan layanan yang dipakai ada di bagian “Alat dan bahan” di bawah.
+          </p>
+        </article>
+      )}
+
+      <section id="tahapan" className="fase mt-10">
+        <h2 className="text-3xl">Tahapan {kit ? "belajar dan analisis" : "proyek"}</h2>
         <p className="mt-2 text-sm text-muted">Centang tahap yang selesai. Tersimpan di peramban ini.</p>
         <ol className="card rail mt-4 overflow-hidden">
           {project.milestones.map((m, i) => {
@@ -107,7 +145,7 @@ function ProjectPage() {
         </ol>
       </section>
 
-      <section className="mt-8 grid gap-3 md:grid-cols-2">
+      <section id="portofolio" className="fase mt-8 grid gap-3 md:grid-cols-2">
         <article className="card p-5">
           <h2 className="text-2xl">Alat dan bahan</h2>
           <ul className="mt-3 grid gap-2 text-sm">

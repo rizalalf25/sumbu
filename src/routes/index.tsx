@@ -4,6 +4,8 @@ import { Shell } from "@/components/shell";
 import { useSave } from "@/lib/progress";
 import { doneCount, flatSteps, getRoadmap, isEnough, nextStep, ROADMAPS } from "@/lib/roadmaps";
 import { TRACKS, allTopics, bankTotal, getTopic } from "@/lib/topics";
+import { LESSONS } from "@/lib/code";
+import { PROJECTS } from "@/lib/projects";
 
 export const Route = createFileRoute("/")({ component: Home });
 
@@ -76,6 +78,22 @@ function Home() {
         ))}
       </section>
       <p className="mt-3 text-sm text-muted">Bank soal dihitung ulang dari parameter. Catatan tersimpan di peramban ini.</p>
+
+      <section className="mt-8 grid gap-3 md:grid-cols-3">
+        {(
+          [
+            ["/proyek", "Proyek studi kasus", `${PROJECTS.length} proyek`, "Drone, PLTS atap, asisten RAG, deteksi serangan, dan lainnya. Tahap demi tahap, dengan materi yang dipakai."],
+            ["/kode", "Bahasa pemrograman", `${LESSONS.length} pelajaran`, "Python, SQL, C++, R, dan Bash. Contohnya memakai rumus yang sama dengan materi di sini."],
+            ["/studio", "Studio 3D", "7 adegan", "Lemparan, bandul, gelombang, vektor, muatan, permukaan, dan medan yang bisa diputar."],
+          ] as const
+        ).map(([to, title, kicker, body]) => (
+          <Link key={to} to={to} className="card card-link flex h-full flex-col p-5">
+            <p className="text-sm font-semibold text-copper">{kicker}</p>
+            <h2 className="mt-2 text-xl">{title}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted">{body}</p>
+          </Link>
+        ))}
+      </section>
 
       <section className="mt-10">
         <div className="mb-3 flex items-end justify-between gap-3">

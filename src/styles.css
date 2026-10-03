@@ -76,6 +76,8 @@
     font-family: var(--font-display);
     font-weight: 600;
     letter-spacing: 0.04em;
+    text-align: center;
+    text-wrap: balance;
     box-shadow: 0 0 22px color-mix(in oklab, var(--color-copper) 32%, transparent);
   }
 
@@ -261,6 +263,15 @@
 
   .chip:hover {
     border-color: var(--color-copper);
+  }
+
+  /* Baris chip yang bisa digeser tanpa bilah gulir yang terlihat. */
+  .chip-row {
+    scrollbar-width: none;
+  }
+
+  .chip-row::-webkit-scrollbar {
+    display: none;
   }
 
   .fase {

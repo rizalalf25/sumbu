@@ -59,7 +59,7 @@ function RoadPage() {
       <h1 className="mt-1 text-4xl md:text-5xl">{road.title}</h1>
       <p className="mt-4 max-w-2xl text-lg text-muted">{road.summary}</p>
 
-      <nav className="mt-5 flex gap-2 overflow-x-auto pb-1" aria-label="Bagian peta">
+      <nav className="chip-row mt-5 flex gap-2 overflow-x-auto pb-1" aria-label="Bagian peta">
         {road.phases.map((phase, index) => (
           <a key={phase.title} href={`#fase-${index}`} className="chip shrink-0">
             {phase.title}

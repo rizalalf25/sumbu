@@ -558,7 +558,7 @@ function EntropyPlay() {
   const data = Array.from({ length: 21 }, (_, i) => ({ x: i / 20, y: Number(H(i / 20).toFixed(3)) }));
   return (
     <div className="grid gap-3">
-      <Plot data={data} />
+      <Plot data={data} numeric />
       <div className="grid grid-cols-2 gap-3">
         <Big label="Entropi koin" value={f2(H(p))} unit="bit" />
         <Big label="Loss jika model memberi p pada jawaban benar" value={p > 0 ? f2(-Math.log(p)) : "∞"} />
@@ -631,12 +631,12 @@ function PidPlay() {
     integ += e * dt;
     const u = kp * e + ki * integ;
     y += ((u - y) / 1) * dt;
-    if (i % 5 === 0) data.push({ x: Number(t.toFixed(1)), y: Number(y.toFixed(3)), z: 1 });
+    if (i % 5 === 0) data.push({ x: Number(t.toFixed(2)), y: Number(y.toFixed(3)), z: 1 });
   }
   const finalErr = 1 - y;
   return (
     <div className="grid gap-3">
-      <Plot data={data} y2 />
+      <Plot data={data} y2 numeric />
       <div className="grid grid-cols-2 gap-3">
         <Big label="Galat di t = 10" value={f2(finalErr)} />
         <Big label="Teori P saja: 1/(1+Kp)" value={f2(1 / (1 + kp))} />

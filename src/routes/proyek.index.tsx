@@ -18,8 +18,16 @@ function ProjectsHome() {
         Dua proyek untuk setiap peta: satu untuk memulai, satu yang layak masuk portofolio. Setiap tahap menyebut materi dan pelajaran kode yang dipakai, jadi kamu tahu harus kembali ke mana saat macet.
       </p>
 
+      <nav className="chip-row mt-6 flex gap-2 overflow-x-auto pb-1" aria-label="Lompat ke peta">
+        {roads.map((road) => (
+          <a key={road.id} href={`#proyek-${road.id}`} className={`chip shrink-0 ${road.id === save.road ? "border-copper text-copper" : ""}`}>
+            {road.title}
+          </a>
+        ))}
+      </nav>
+
       {roads.map((road) => (
-        <section key={road.id} className="mt-10">
+        <section key={road.id} id={`proyek-${road.id}`} className="fase mt-10">
           <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
             <div>
               <p className="text-sm font-semibold text-copper">{road.kicker}</p>

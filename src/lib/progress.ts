@@ -12,6 +12,12 @@ export type Save = {
   kit: Record<string, number[]>;
   /** Indeks langkah panduan rakit yang sudah selesai, per proyek. */
   build: Record<string, number[]>;
+  /** Tantangan kode yang sudah lulus. */
+  challenge: Record<string, number>;
+  /** Draf jawaban tantangan kode yang belum selesai. */
+  drafts: Record<string, string>;
+  /** Latihan LPDP: soal yang pernah dijawab benar, riwayat simulasi, esai, dan catatan wawancara. */
+  lpdp: LpdpSave;
   attempts: Record<string, number>;
   notes: Record<string, string>;
   steps: Record<string, number>;
@@ -24,6 +30,16 @@ export type Save = {
 
 const KEY = "sumbu-v1";
 
+export type LpdpSim = { at: string; total: number; correct: number; per: Record<string, [number, number]>; seconds: number };
+export type LpdpSave = {
+  right: Record<string, number>;
+  wrong: Record<string, number>;
+  sims: LpdpSim[];
+  essays: Record<string, string>;
+  interview: Record<string, string>;
+};
+export const emptyLpdp: LpdpSave = { right: {}, wrong: {}, sims: [], essays: {}, interview: {} };
+
 export const emptySave: Save = {
   correct: {},
   hard: {},
@@ -31,6 +47,9 @@ export const emptySave: Save = {
   proj: {},
   kit: {},
   build: {},
+  challenge: {},
+  drafts: {},
+  lpdp: emptyLpdp,
   attempts: {},
   notes: {},
   steps: {},
@@ -56,7 +75,7 @@ export function parseSave(text: string): Save | null {
   try {
     const parsed = JSON.parse(text) as Partial<Save>;
     if (!parsed || typeof parsed !== "object" || typeof parsed.correct !== "object") return null;
-    return { ...emptySave, ...parsed, hard: parsed.hard ?? {}, code: parsed.code ?? {}, proj: parsed.proj ?? {}, kit: parsed.kit ?? {}, build: parsed.build ?? {} };
+    return { ...emptySave, ...parsed, hard: parsed.hard ?? {}, code: parsed.code ?? {}, proj: parsed.proj ?? {}, kit: parsed.kit ?? {}, build: parsed.build ?? {}, challenge: parsed.challenge ?? {}, drafts: parsed.drafts ?? {}, lpdp: { ...emptyLpdp, ...parsed.lpdp } };
   } catch {
     return null;
   }
@@ -80,7 +99,7 @@ export function loadSave(): Save {
     const raw = localStorage.getItem(KEY);
     if (!raw) return emptySave;
     const parsed = JSON.parse(raw) as Partial<Save>;
-    const save = { ...emptySave, ...parsed };
+    const save = { ...emptySave, ...parsed, lpdp: { ...emptyLpdp, ...parsed.lpdp } };
     if (!parsed.hard) {
       // Simpanan lama belum mencatat level. Jangan cabut status "cukup" yang sudah diraih.
       save.hard = Object.fromEntries(Object.entries(save.correct).filter(([, n]) => n >= 3).map(([id]) => [id, 1]));
@@ -186,6 +205,44 @@ export function useSave() {
   const toggleOwned = useCallback((projectId: string, index: number) => toggleIn("kit", projectId, index), [toggleIn]);
   const toggleBuild = useCallback((projectId: string, index: number) => toggleIn("build", projectId, index), [toggleIn]);
 
+  const passChallenge = useCallback(
+    (id: string) => {
+      update((s) => ({ ...s, challenge: { ...s.challenge, [id]: 1 } }));
+    },
+    [update],
+  );
+
+  const setDraft = useCallback(
+    (id: string, text: string) => {
+      update((s) => ({ ...s, drafts: { ...s.drafts, [id]: text.slice(0, 20000) } }));
+    },
+    [update],
+  );
+
+  const markLpdp = useCallback(
+    (questionId: string, ok: boolean) => {
+      update((s) => {
+        const field = ok ? "right" : "wrong";
+        return { ...s, lpdp: { ...s.lpdp, [field]: { ...s.lpdp[field], [questionId]: (s.lpdp[field][questionId] ?? 0) + 1 } } };
+      });
+    },
+    [update],
+  );
+
+  const addLpdpSim = useCallback(
+    (sim: LpdpSim) => {
+      update((s) => ({ ...s, lpdp: { ...s.lpdp, sims: [...s.lpdp.sims, sim].slice(-30) } }));
+    },
+    [update],
+  );
+
+  const setLpdpText = useCallback(
+    (field: "essays" | "interview", key: string, text: string) => {
+      update((s) => ({ ...s, lpdp: { ...s.lpdp, [field]: { ...s.lpdp[field], [key]: text.slice(0, 20000) } } }));
+    },
+    [update],
+  );
+
   const setRoad = useCallback(
     (road: string) => {
       update((s) => ({ ...s, road }));
@@ -193,7 +250,7 @@ export function useSave() {
     [update],
   );
 
-  return { save, ready, markAttempt, setNote, setStep, addSession, setRoad, passLesson, toggleMilestone, toggleOwned, toggleBuild };
+  return { save, ready, markAttempt, setNote, setStep, addSession, setRoad, passLesson, toggleMilestone, toggleOwned, toggleBuild, passChallenge, setDraft, markLpdp, addLpdpSim, setLpdpText };
 }
 
 export const NOTE_FRAME = `IDE (satu kalimat):

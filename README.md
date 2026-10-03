@@ -13,7 +13,9 @@ Cocok untuk perhatian yang mudah loncat. Tidak ada dinding teks, tidak ada anima
 - **Peta profesi.** Hanya pelajaran yang terpakai, bukan seluruh katalog, lengkap dengan bahasa pemrograman yang disarankan, dua proyek, dan meter kesiapan kerja.
 - **Proyek studi kasus.** 30 proyek (2 per peta), dari dasbor KPI sampai drone quadcopter. Tiap tahap menyebut materi dan pelajaran kode yang dipakai, dan bisa dicentang.
 - **Daftar belanja dan panduan rakit.** 10 proyek perangkat keras (drone, robot pengikut garis, stasiun cuaca, inkubator, konverter buck, model BMS, PLTS mini, braket rak, bandul, spektrum audio) punya daftar komponen, alat, bahan habis pakai, perkiraan harga, total yang bisa dikurangi barang yang sudah dimiliki, dan langkah rakit dengan peringatan keselamatan.
-- **Kode.** 32 pelajaran Python, SQL, C/C++, R, dan Bash dengan soal "tebak keluaran". Contohnya memakai rumus yang sama dengan materi.
+- **Kode.** 44 pelajaran Python, SQL, C/C++, R, dan Bash bertingkat (dasar, menengah, lanjut) dengan pewarnaan sintaks dan soal "tebak keluaran". 23 contoh Python dan SQL bisa diubah dan dijalankan langsung di peramban (Pyodide di web worker dan sql.js).
+- **Tantangan kode.** 22 tantangan Python dan SQL yang dinilai otomatis dengan tes, dari median sampai pengendali PID; draf jawaban tersimpan otomatis.
+- **LPDP.** Persiapan beasiswa LPDP: tahapan seleksi, materi dan bank soal tes bakat skolastik (verbal, kuantitatif, penalaran; soal kurasi ditambah soal kuantitatif dan pola tanpa batas), simulasi 30 soal 30 menit dengan pembahasan, latihan esai bertimer, dan latihan wawancara dengan metode STAR. Soalnya buatan SUMBU, bukan soal asli LPDP; ketentuan resmi selalu mengikuti panduan LPDP.
 - **Metode.** Sesi 12 menit, mode fokus, cara mencatat, dan cadangan/pulihkan progres ke file JSON.
 
 Katalog: 57 materi dalam tiga jalur (matematika dasar, fisika dasar, lanjutan), termasuk statistik inferensial, regresi, Bayes, aljabar linear, aturan rantai dan optimasi, bunga dan anuitas, logika dan graf, aritmetika modular, entropi, proses stokastik, kendali, sinyal digital, kuantum, rotasi, termodinamika, magnet, dan kekuatan bahan.

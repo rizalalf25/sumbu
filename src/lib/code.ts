@@ -11,9 +11,15 @@ export type Lang = {
   tryUrl: string;
 };
 
+export type LessonLevel = "dasar" | "menengah" | "lanjut";
+
 export type CodeLesson = {
   id: string;
   lang: LangId;
+  /** Diisi otomatis dari LESSON_META. */
+  level?: LessonLevel;
+  /** Bisa dijalankan langsung di peramban. */
+  run?: "python" | "sql";
   title: string;
   minutes: number;
   idea: string;
@@ -396,6 +402,178 @@ print(hasil[0].data.meas.get_counts())`,
     topic: "kuantum",
   },
 
+  {
+    id: "py-struktur",
+    lang: "python",
+    title: "List, dict, dan set",
+    minutes: 10,
+    idea: "list menyimpan urutan, dict memetakan kunci ke nilai, set menyimpan anggota unik. Memilih wadah yang tepat sering lebih penting daripada algoritmanya.",
+    code: `nilai = [72, 85, 90, 85, 60]
+nama = {"Ani": 85, "Budi": 72}
+nama["Citra"] = 90
+
+unik = set(nilai)
+print(len(nilai), len(unik))
+print(nama.get("Dodi", 0), sorted(unik)[-1])`,
+    explain: [
+      "set(nilai) membuang duplikat: 85 hanya dihitung sekali. Ini himpunan di materi Logika.",
+      "dict.get(kunci, bawaan) tidak error bila kuncinya tidak ada.",
+      "Mencari di set dan dict rata-rata O(1); mencari di list O(n).",
+    ],
+    quiz: {
+      q: "Apa yang dicetak baris pertama?",
+      options: ["5 5", "5 4", "4 4", "5 3"],
+      answer: 1,
+      why: "Lima nilai, empat yang unik (72, 85, 90, 60).",
+    },
+    topic: "diskrit",
+  },
+  {
+    id: "py-komprehensi",
+    lang: "python",
+    title: "List comprehension",
+    minutes: 10,
+    idea: "Comprehension menulis “ubah setiap anggota, saring yang memenuhi syarat” dalam satu baris yang terbaca seperti kalimat matematika.",
+    code: `suhu_c = [20, 25, 30, 35]
+suhu_f = [c * 9 / 5 + 32 for c in suhu_c]
+panas = [f for f in suhu_f if f > 80]
+print(panas, sum(suhu_c) / len(suhu_c))`,
+    explain: [
+      "Baris kedua sama dengan {9c/5 + 32 | c ∈ suhu_c} dalam notasi himpunan.",
+      "if di akhir menyaring: hanya suhu di atas 80 °F yang dipertahankan.",
+      "Pembagian / di Python selalu menghasilkan float, jadi 68 menjadi 68.0.",
+    ],
+    quiz: {
+      q: "Apa yang dicetak?",
+      options: ["[86, 95] 27", "[86.0, 95.0] 27.5", "[77.0, 86.0, 95.0] 27.5", "[95.0] 27.5"],
+      answer: 1,
+      why: "Fahrenheit: 68, 77, 86, 95. Yang > 80: 86 dan 95. Rata-rata Celcius 110/4 = 27,5.",
+    },
+  },
+  {
+    id: "py-file",
+    lang: "python",
+    title: "Membaca CSV dan menjumlah per kelompok",
+    minutes: 12,
+    idea: "Data nyata datang sebagai file teks. Modul csv membaca baris demi baris; setiap nilai awalnya berupa teks dan harus diubah ke angka sebelum dihitung.",
+    code: `import csv, io
+
+data = io.StringIO("""kota,omzet
+Bandung,10
+Bandung,30
+Medan,20
+Medan,20
+Medan,50""")
+
+total = {}
+for baris in csv.DictReader(data):
+    total[baris["kota"]] = total.get(baris["kota"], 0) + int(baris["omzet"])
+print(total)`,
+    explain: [
+      "io.StringIO berpura-pura menjadi file; di proyek nyata ganti dengan open(\"penjualan.csv\").",
+      "DictReader memakai baris pertama sebagai nama kolom.",
+      "Tanpa int(), \"10\" + \"30\" menjadi teks \"1030\", bukan 40.",
+    ],
+    quiz: {
+      q: "Apa yang dicetak?",
+      options: ["{'Bandung': 40, 'Medan': 90}", "{'Bandung': '1030', 'Medan': '202050'}", "{'Bandung': 20, 'Medan': 30}", "[40, 90]"],
+      answer: 0,
+      why: "Omzet tiap kota dijumlahkan sebagai bilangan: 10+30 dan 20+20+50.",
+    },
+    topic: "sampel",
+  },
+  {
+    id: "py-uji",
+    lang: "python",
+    title: "Menguji kode dengan assert",
+    minutes: 12,
+    idea: "Kode yang belum diuji hanya dugaan. assert memeriksa satu fakta; kumpulan assert adalah tes yang bisa dijalankan ulang setiap kali kode diubah. pytest menjalankan ratusan tes seperti ini sekaligus.",
+    code: `def median(data):
+    urut = sorted(data)
+    n = len(urut)
+    tengah = n // 2
+    if n % 2:
+        return urut[tengah]
+    return (urut[tengah - 1] + urut[tengah]) / 2
+
+assert median([3, 1, 2]) == 2
+assert median([4, 1, 3, 2]) == 2.5
+assert median([5]) == 5
+print("semua tes lulus")
+print(median([10, 2, 8, 4]))`,
+    explain: [
+      "Uji kasus ganjil, genap, dan satu data: tiga cabang kode, tiga tes.",
+      "Bila satu assert salah, program berhenti dengan AssertionError dan menunjuk barisnya.",
+      "Tantangan kode di halaman Kode dinilai dengan cara yang sama.",
+    ],
+    quiz: {
+      q: "Apa yang dicetak baris terakhir?",
+      options: ["6.0", "5.0", "8", "AssertionError"],
+      answer: 0,
+      why: "Diurutkan 2, 4, 8, 10; dua nilai tengah 4 dan 8, rata-ratanya 6.0.",
+    },
+    topic: "sampel",
+  },
+  {
+    id: "py-algoritma",
+    lang: "python",
+    title: "Pencarian biner dan Big-O",
+    minutes: 14,
+    idea: "Pada data terurut, membuang separuh kemungkinan di setiap langkah membuat pencarian di sejuta data selesai dalam sekitar 20 langkah. Big-O menyebut pertumbuhannya: O(log n).",
+    code: `def cari_biner(arr, target):
+    kiri, kanan, langkah = 0, len(arr) - 1, 0
+    while kiri <= kanan:
+        langkah += 1
+        tengah = (kiri + kanan) // 2
+        if arr[tengah] == target:
+            return tengah, langkah
+        if arr[tengah] < target:
+            kiri = tengah + 1
+        else:
+            kanan = tengah - 1
+    return -1, langkah
+
+data = list(range(0, 1000, 2))   # 500 bilangan genap
+print(cari_biner(data, 998))`,
+    explain: [
+      "500 data, tetapi paling banyak ⌈log₂ 500⌉ = 9 langkah.",
+      "Pencarian linear butuh sampai 500 langkah untuk data yang sama.",
+      "Syaratnya: data harus terurut. Mengurutkan sendiri butuh O(n log n).",
+    ],
+    quiz: {
+      q: "Apa yang dicetak?",
+      options: ["(499, 9)", "(499, 500)", "(998, 9)", "(-1, 9)"],
+      answer: 0,
+      why: "998 ada di indeks terakhir (499) dan ditemukan dalam 9 langkah.",
+    },
+    topic: "eksponen",
+  },
+  {
+    id: "py-rekursi",
+    lang: "python",
+    title: "Rekursi dan memoisasi",
+    minutes: 12,
+    idea: "Fungsi rekursif memanggil dirinya untuk soal yang lebih kecil. Tanpa ingatan, ia menghitung ulang hal yang sama berkali-kali; memoisasi menyimpan hasil yang sudah dihitung.",
+    code: `from functools import lru_cache
+
+@lru_cache(maxsize=None)
+def fib(n):
+    return n if n < 2 else fib(n - 1) + fib(n - 2)
+
+print(fib(30), fib.cache_info().misses)`,
+    explain: [
+      "Tanpa @lru_cache, fib(30) memanggil fungsi lebih dari 1,6 juta kali.",
+      "Dengan cache, setiap n dari 0 sampai 30 hanya dihitung sekali: 31 kali.",
+      "Ide yang sama dipakai di pemrograman dinamis, misalnya penjajaran urutan DNA.",
+    ],
+    quiz: {
+      q: "Berapa nilai misses (berapa kali fib benar-benar dihitung)?",
+      options: ["30", "31", "832040", "1346269"],
+      answer: 1,
+      why: "Setiap n dari 0 sampai 30 dihitung tepat sekali: 31 nilai.",
+    },
+    topic: "barisan",
+  },
   // ------------------------------------------------------------------- SQL
   {
     id: "sql-select",
@@ -556,6 +734,54 @@ FROM ab GROUP BY varian;`,
     topic: "inferensi",
   },
 
+  {
+    id: "sql-cte",
+    lang: "sql",
+    title: "Subquery dan CTE",
+    minutes: 12,
+    idea: "CTE (WITH … AS) memberi nama pada hasil antara, sehingga query panjang terbaca bertahap. Subquery di WHERE membandingkan setiap baris dengan hasil ringkasan.",
+    code: `WITH total_kota AS (
+  SELECT kota, SUM(omzet) AS total
+  FROM penjualan
+  GROUP BY kota
+)
+SELECT kota, total
+FROM total_kota
+WHERE total > (SELECT AVG(total) FROM total_kota);`,
+    explain: [
+      "Langkah 1: total per kota (Bandung 40, Medan 90).",
+      "Langkah 2: rata-rata total kota = 65.",
+      "Langkah 3: hanya kota di atas 65 yang tampil.",
+    ],
+    quiz: {
+      q: "Apa hasilnya?",
+      options: ["Bandung 40", "Medan 90", "Bandung 40 dan Medan 90", "Tidak ada baris"],
+      answer: 1,
+      why: "Rata-rata (40 + 90)/2 = 65; hanya Medan yang di atasnya.",
+    },
+  },
+  {
+    id: "sql-indeks",
+    lang: "sql",
+    title: "Indeks dan EXPLAIN",
+    minutes: 12,
+    idea: "Tanpa indeks, basis data membaca seluruh tabel (SCAN) untuk menemukan beberapa baris. Indeks seperti daftar isi buku: langsung melompat ke halaman yang dicari (SEARCH).",
+    code: `CREATE INDEX idx_pesanan_pelanggan ON pesanan(pelanggan_id);
+
+EXPLAIN QUERY PLAN
+SELECT * FROM pesanan WHERE pelanggan_id = 1;`,
+    explain: [
+      "EXPLAIN QUERY PLAN tidak menjalankan query; ia menunjukkan rencananya.",
+      "SEARCH … USING INDEX berarti indeks dipakai; SCAN berarti seluruh tabel dibaca.",
+      "Indeks mempercepat baca tetapi memperlambat tulis sedikit. Buat untuk kolom yang sering disaring atau di-JOIN.",
+    ],
+    quiz: {
+      q: "Kata apa di hasil EXPLAIN yang menandakan seluruh tabel dibaca?",
+      options: ["SEARCH", "SCAN", "INDEX", "PLAN"],
+      answer: 1,
+      why: "SCAN membaca semua baris satu per satu; pada jutaan baris ini lambat.",
+    },
+  },
   // ------------------------------------------------------------------- C++
   {
     id: "cpp-dasar",
@@ -738,6 +964,76 @@ class Ketinggian : public rclcpp::Node {
     topic: "sinyal",
   },
 
+  {
+    id: "cpp-pointer",
+    lang: "cpp",
+    title: "Nilai, referensi, dan pointer",
+    minutes: 12,
+    idea: "C++ membedakan menyalin nilai, meminjam variabel (referensi &), dan menunjuk alamatnya (pointer *). Ini yang membuat C++ cepat, dan juga sumber bug paling berbahaya.",
+    code: `#include <iostream>
+
+void tambah(int nilai, int& ref, int* ptr) {
+  nilai += 1;   // salinan: tidak berpengaruh ke luar
+  ref += 1;     // referensi: mengubah variabel asli
+  *ptr += 1;    // pointer: mengubah isi di alamat itu
+}
+
+int main() {
+  int a = 0, b = 0, c = 0;
+  tambah(a, b, &c);
+  std::cout << a << b << c << "\\n";
+}`,
+    explain: [
+      "a disalin, jadi tetap 0.",
+      "b dan c berubah karena fungsi bekerja pada variabel aslinya.",
+      "Pointer yang menunjuk ke memori yang sudah dibebaskan adalah celah keamanan klasik.",
+    ],
+    quiz: {
+      q: "Apa yang dicetak?",
+      options: ["000", "111", "011", "001"],
+      answer: 2,
+      why: "Hanya salinan a yang tidak kembali; b lewat referensi dan c lewat pointer berubah.",
+    },
+  },
+  {
+    id: "cpp-kelas",
+    lang: "cpp",
+    title: "Struct, vector, dan filter sensor",
+    minutes: 12,
+    idea: "struct mengemas data dan fungsinya; std::vector adalah array yang bisa tumbuh. Bersama-sama mereka membentuk filter rata-rata bergerak yang biasa dipakai untuk sensor yang berisik.",
+    code: `#include <iostream>
+#include <numeric>
+#include <vector>
+
+struct Sensor {
+  std::vector<float> data;
+  void tambah(float x) {
+    data.push_back(x);
+    if (data.size() > 3) data.erase(data.begin());
+  }
+  float rata() const {
+    return std::accumulate(data.begin(), data.end(), 0.0f) / data.size();
+  }
+};
+
+int main() {
+  Sensor s;
+  for (float x : {10.0f, 20.0f, 30.0f, 40.0f}) s.tambah(x);
+  std::cout << s.rata() << "\\n";
+}`,
+    explain: [
+      "Hanya tiga bacaan terakhir yang disimpan; yang tertua dibuang.",
+      "std::accumulate menjumlahkan isi vector.",
+      "Di mikrokontroler, buffer melingkar (circular buffer) lebih hemat daripada erase.",
+    ],
+    quiz: {
+      q: "Apa yang dicetak?",
+      options: ["25", "30", "20", "100"],
+      answer: 1,
+      why: "Tersisa 20, 30, 40; rata-ratanya 30.",
+    },
+    topic: "sampel",
+  },
   // --------------------------------------------------------------------- R
   {
     id: "r-vektor",
@@ -843,6 +1139,33 @@ penjualan |>
     topic: "sampel",
   },
 
+  {
+    id: "r-ggplot",
+    lang: "r",
+    title: "ggplot2: grafik berlapis",
+    minutes: 10,
+    idea: "ggplot2 membangun grafik lapis demi lapis: data, pemetaan sumbu, lalu geometri. Satu baris tambahan menambahkan garis regresi lengkap dengan pita ketidakpastiannya.",
+    code: `library(ggplot2)
+
+df <- data.frame(iklan = 1:5, penjualan = c(12, 14, 18, 20, 21))
+
+ggplot(df, aes(x = iklan, y = penjualan)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(x = "Biaya iklan (juta)", y = "Penjualan (juta)")`,
+    explain: [
+      "aes() memetakan kolom ke sumbu.",
+      "geom_smooth(method = \"lm\") menggambar garis regresi linear.",
+      "se = TRUE menambahkan pita interval kepercayaan 95% di sekitar garis.",
+    ],
+    quiz: {
+      q: "Apa yang ditambahkan se = TRUE?",
+      options: ["Label sumbu", "Pita interval kepercayaan di sekitar garis", "Titik data", "Judul grafik"],
+      answer: 1,
+      why: "se berarti standard error; pitanya menunjukkan ketidakpastian garis.",
+    },
+    topic: "regresi",
+  },
   // ------------------------------------------------------------------ Bash
   {
     id: "sh-dasar",
@@ -941,6 +1264,36 @@ echo -n "Halo" | sha256sum   # hasil sama sekali berbeda`,
     },
     topic: "entropi",
   },
+  {
+    id: "sh-skrip",
+    lang: "bash",
+    title: "Skrip, variabel, dan perulangan",
+    minutes: 12,
+    idea: "Perintah yang diketik berulang-ulang sebaiknya dijadikan skrip. set -euo pipefail membuat skrip berhenti saat ada yang salah, bukan diam-diam melanjutkan dengan data rusak.",
+    code: `#!/usr/bin/env bash
+set -euo pipefail
+
+for f in data/*.csv; do
+  baris=$(( $(wc -l < "$f") - 1 ))
+  echo "$f: $baris baris data"
+done`,
+    explain: [
+      "for f in data/*.csv mengulang untuk setiap file CSV di folder data.",
+      "$(( … )) adalah aritmetika; wc -l < \"$f\" menghitung baris tanpa mencetak nama file.",
+      "Tanda kutip di \"$f\" mencegah error bila nama file mengandung spasi.",
+    ],
+    quiz: {
+      q: "Apa efek set -e?",
+      options: [
+        "Mencetak setiap perintah sebelum dijalankan",
+        "Menghentikan skrip begitu ada perintah yang gagal",
+        "Mengabaikan semua galat",
+        "Menjalankan skrip lebih cepat",
+      ],
+      answer: 1,
+      why: "-e: keluar saat perintah gagal; -u: galat bila variabel belum diisi; pipefail: kegagalan di tengah pipa ikut terdeteksi.",
+    },
+  },
 ];
 
 /** Bahasa yang disarankan untuk tiap peta, urut prioritas, lengkap dengan pelajaran yang relevan. */
@@ -948,17 +1301,17 @@ export type RoadLang = { lang: LangId; why: string; lessons: string[]; optional?
 
 export const ROAD_LANGS: Record<string, RoadLang[]> = {
   analis: [
-    { lang: "sql", why: "Bahasa sehari-hari analis: hampir semua angka diambil dari basis data.", lessons: ["sql-select", "sql-agregat", "sql-join", "sql-having", "sql-window", "sql-ab"] },
-    { lang: "python", why: "pandas dan grafik untuk analisis yang tidak muat di spreadsheet.", lessons: ["py-dasar", "py-alur", "py-pandas", "py-plot"] },
+    { lang: "sql", why: "Bahasa sehari-hari analis: hampir semua angka diambil dari basis data.", lessons: ["sql-select", "sql-agregat", "sql-join", "sql-having", "sql-window", "sql-cte", "sql-ab"] },
+    { lang: "python", why: "pandas dan grafik untuk analisis yang tidak muat di spreadsheet.", lessons: ["py-dasar", "py-alur", "py-struktur", "py-file", "py-pandas", "py-plot"] },
     { lang: "r", why: "Alternatif Python untuk uji statistik cepat.", lessons: ["r-vektor", "r-uji"], optional: true },
   ],
   ilmuwan: [
-    { lang: "python", why: "Ekosistem utama ilmu data: NumPy, pandas, scikit-learn.", lessons: ["py-dasar", "py-alur", "py-fungsi", "py-kelas", "py-numpy", "py-pandas", "py-plot", "py-gd", "py-sklearn"] },
-    { lang: "sql", why: "Mengambil dan menyiapkan data sendiri tanpa menunggu tim lain.", lessons: ["sql-select", "sql-agregat", "sql-join", "sql-window"] },
+    { lang: "python", why: "Ekosistem utama ilmu data: NumPy, pandas, scikit-learn.", lessons: ["py-dasar", "py-alur", "py-struktur", "py-komprehensi", "py-fungsi", "py-kelas", "py-file", "py-uji", "py-numpy", "py-pandas", "py-plot", "py-gd", "py-sklearn"] },
+    { lang: "sql", why: "Mengambil dan menyiapkan data sendiri tanpa menunggu tim lain.", lessons: ["sql-select", "sql-agregat", "sql-join", "sql-window", "sql-cte"] },
     { lang: "r", why: "Banyak dipakai di riset dan statistik terapan.", lessons: ["r-vektor", "r-lm", "r-dplyr"], optional: true },
   ],
   ai: [
-    { lang: "python", why: "Bahasa hampir semua kerangka AI: PyTorch, Hugging Face, LangChain.", lessons: ["py-dasar", "py-alur", "py-fungsi", "py-kelas", "py-numpy", "py-gd", "py-torch", "py-sklearn"] },
+    { lang: "python", why: "Bahasa hampir semua kerangka AI: PyTorch, Hugging Face, LangChain.", lessons: ["py-dasar", "py-alur", "py-struktur", "py-komprehensi", "py-fungsi", "py-kelas", "py-uji", "py-algoritma", "py-numpy", "py-gd", "py-torch", "py-sklearn"] },
     { lang: "bash", why: "Melatih model berarti bekerja di server GPU lewat terminal.", lessons: ["sh-dasar", "sh-pipa"] },
     { lang: "sql", why: "Data pelatihan dan log evaluasi sering tinggal di tabel.", lessons: ["sql-select", "sql-agregat"], optional: true },
   ],
@@ -981,7 +1334,7 @@ export const ROAD_LANGS: Record<string, RoadLang[]> = {
     { lang: "bash", why: "Menjalankan simulasi di klaster komputasi.", lessons: ["sh-dasar", "sh-pipa"], optional: true },
   ],
   robotika: [
-    { lang: "cpp", why: "Firmware pengendali penerbangan, loop PID, dan node ROS 2 yang harus cepat.", lessons: ["cpp-dasar", "cpp-overflow", "cpp-arduino", "cpp-adc", "cpp-pid", "cpp-ros"] },
+    { lang: "cpp", why: "Firmware pengendali penerbangan, loop PID, dan node ROS 2 yang harus cepat.", lessons: ["cpp-dasar", "cpp-overflow", "cpp-arduino", "cpp-adc", "cpp-pointer", "cpp-kelas", "cpp-pid", "cpp-ros"] },
     { lang: "python", why: "Simulasi, perencanaan lintasan, dan visi komputer.", lessons: ["py-dasar", "py-alur", "py-fungsi", "py-kelas", "py-numpy", "py-sim"] },
     { lang: "bash", why: "Robot menjalankan Linux; build dan peluncuran ROS 2 lewat terminal.", lessons: ["sh-dasar"], optional: true },
   ],
@@ -991,14 +1344,14 @@ export const ROAD_LANGS: Record<string, RoadLang[]> = {
     { lang: "cpp", why: "Pengendali inverter dan BMS ditulis di mikrokontroler.", lessons: ["cpp-dasar", "cpp-adc", "cpp-pid"], optional: true },
   ],
   siber: [
-    { lang: "bash", why: "Membaca log, mengelola izin, dan menjalankan alat keamanan.", lessons: ["sh-dasar", "sh-pipa", "sh-izin", "sh-hash"] },
-    { lang: "python", why: "Skrip otomasi, analisis log, dan prototipe kriptografi.", lessons: ["py-dasar", "py-alur", "py-fungsi", "py-kelas", "py-pandas"] },
-    { lang: "cpp", why: "Memahami overflow memori adalah dasar analisis kerentanan.", lessons: ["cpp-dasar", "cpp-overflow"] },
+    { lang: "bash", why: "Membaca log, mengelola izin, dan menjalankan alat keamanan.", lessons: ["sh-dasar", "sh-pipa", "sh-izin", "sh-hash", "sh-skrip"] },
+    { lang: "python", why: "Skrip otomasi, analisis log, dan prototipe kriptografi.", lessons: ["py-dasar", "py-alur", "py-struktur", "py-fungsi", "py-kelas", "py-file", "py-pandas"] },
+    { lang: "cpp", why: "Memahami pointer dan overflow memori adalah dasar analisis kerentanan.", lessons: ["cpp-dasar", "cpp-overflow", "cpp-pointer"] },
     { lang: "sql", why: "SIEM dan log keamanan diquery dengan bahasa mirip SQL.", lessons: ["sql-select", "sql-agregat", "sql-having"], optional: true },
   ],
   quant: [
-    { lang: "python", why: "Riset strategi, backtest, dan model risiko.", lessons: ["py-dasar", "py-alur", "py-fungsi", "py-kelas", "py-numpy", "py-pandas", "py-plot", "py-sim", "py-sklearn"] },
-    { lang: "sql", why: "Data harga dan transaksi historis.", lessons: ["sql-select", "sql-agregat", "sql-join", "sql-window"] },
+    { lang: "python", why: "Riset strategi, backtest, dan model risiko.", lessons: ["py-dasar", "py-alur", "py-struktur", "py-fungsi", "py-kelas", "py-uji", "py-numpy", "py-pandas", "py-plot", "py-sim", "py-sklearn"] },
+    { lang: "sql", why: "Data harga dan transaksi historis.", lessons: ["sql-select", "sql-agregat", "sql-join", "sql-window", "sql-cte"] },
     { lang: "cpp", why: "Sistem eksekusi berlatensi rendah.", lessons: ["cpp-dasar", "cpp-overflow"], optional: true },
   ],
   iklim: [
@@ -1007,7 +1360,7 @@ export const ROAD_LANGS: Record<string, RoadLang[]> = {
     { lang: "bash", why: "Mengunduh dan memproses ribuan file data di server.", lessons: ["sh-dasar", "sh-pipa"], optional: true },
   ],
   iot: [
-    { lang: "cpp", why: "Firmware ESP32 dan Arduino: sensor, ADC, kendali, komunikasi.", lessons: ["cpp-dasar", "cpp-overflow", "cpp-arduino", "cpp-adc", "cpp-pid"] },
+    { lang: "cpp", why: "Firmware ESP32 dan Arduino: sensor, ADC, kendali, komunikasi.", lessons: ["cpp-dasar", "cpp-overflow", "cpp-arduino", "cpp-adc", "cpp-kelas", "cpp-pid"] },
     { lang: "python", why: "Gateway, dasbor, dan MicroPython di perangkat.", lessons: ["py-dasar", "py-alur", "py-fungsi", "py-pandas"] },
     { lang: "bash", why: "Raspberry Pi dan server IoT berjalan di Linux.", lessons: ["sh-dasar", "sh-izin"], optional: true },
   ],
@@ -1015,11 +1368,36 @@ export const ROAD_LANGS: Record<string, RoadLang[]> = {
     { lang: "python", why: "Qiskit, Cirq, dan PennyLane semuanya berbasis Python.", lessons: ["py-dasar", "py-alur", "py-fungsi", "py-numpy", "py-qiskit"] },
   ],
   bioinfo: [
-    { lang: "python", why: "Biopython, pandas, dan scikit-learn untuk data urutan dan ekspresi gen.", lessons: ["py-dasar", "py-alur", "py-fungsi", "py-numpy", "py-pandas", "py-plot", "py-sklearn"] },
-    { lang: "r", why: "Bioconductor adalah standar analisis ekspresi gen.", lessons: ["r-vektor", "r-uji", "r-lm", "r-dplyr"] },
+    { lang: "python", why: "Biopython, pandas, dan scikit-learn untuk data urutan dan ekspresi gen.", lessons: ["py-dasar", "py-alur", "py-struktur", "py-fungsi", "py-file", "py-rekursi", "py-numpy", "py-pandas", "py-plot", "py-sklearn"] },
+    { lang: "r", why: "Bioconductor adalah standar analisis ekspresi gen.", lessons: ["r-vektor", "r-uji", "r-lm", "r-dplyr", "r-ggplot"] },
     { lang: "bash", why: "Alat genomik dijalankan dari terminal di server.", lessons: ["sh-dasar", "sh-pipa"] },
   ],
 };
+
+const LEVELS: Record<LessonLevel, string[]> = {
+  dasar: ["py-dasar", "py-alur", "py-struktur", "py-komprehensi", "py-fungsi", "sql-select", "sql-agregat", "sql-join", "cpp-dasar", "cpp-overflow", "cpp-arduino", "r-vektor", "sh-dasar", "sh-pipa"],
+  menengah: ["py-kelas", "py-file", "py-uji", "py-numpy", "py-pandas", "py-plot", "py-algoritma", "sql-having", "sql-window", "sql-cte", "sql-ab", "cpp-adc", "cpp-pointer", "cpp-kelas", "r-dplyr", "r-lm", "r-ggplot", "sh-izin", "sh-hash", "sh-skrip"],
+  lanjut: ["py-rekursi", "py-gd", "py-sklearn", "py-sim", "py-torch", "py-qiskit", "sql-indeks", "cpp-pid", "cpp-ros", "r-uji"],
+};
+
+/** Pelajaran Python yang pustakanya tersedia di Pyodide (peramban). PyTorch, Qiskit, dan grafik tidak. */
+const RUN_PYTHON = new Set(["py-dasar", "py-alur", "py-struktur", "py-komprehensi", "py-fungsi", "py-kelas", "py-file", "py-uji", "py-numpy", "py-pandas", "py-algoritma", "py-rekursi", "py-gd", "py-sklearn", "py-sim"]);
+
+export const LEVEL_LABEL: Record<LessonLevel, string> = { dasar: "Dasar", menengah: "Menengah", lanjut: "Lanjut" };
+const LEVEL_RANK: Record<LessonLevel, number> = { dasar: 0, menengah: 1, lanjut: 2 };
+
+for (const [level, ids] of Object.entries(LEVELS) as [LessonLevel, string[]][]) {
+  for (const id of ids) {
+    const lesson = LESSONS.find((item) => item.id === id);
+    if (!lesson) throw new Error(`Tingkat untuk pelajaran yang tidak ada: ${id}`);
+    lesson.level = level;
+  }
+}
+for (const lesson of LESSONS) {
+  if (!lesson.level) throw new Error(`Pelajaran ${lesson.id} belum punya tingkat`);
+  if (lesson.lang === "sql") lesson.run = "sql";
+  if (RUN_PYTHON.has(lesson.id)) lesson.run = "python";
+}
 
 const lessonById = new Map(LESSONS.map((lesson) => [lesson.id, lesson]));
 const langById = new Map(LANGS.map((lang) => [lang.id, lang]));
@@ -1046,8 +1424,11 @@ export function getLang(id: LangId): Lang {
   return langById.get(id)!;
 }
 
+/** Pelajaran satu bahasa, urut dari dasar ke lanjut (urutan tulis dipertahankan di dalam tingkat). */
 export function lessonsOf(lang: LangId): CodeLesson[] {
-  return LESSONS.filter((lesson) => lesson.lang === lang);
+  return LESSONS.filter((lesson) => lesson.lang === lang).sort(
+    (a, b) => LEVEL_RANK[a.level ?? "dasar"] - LEVEL_RANK[b.level ?? "dasar"],
+  );
 }
 
 export function roadLangs(roadId: string): RoadLang[] {

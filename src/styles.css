@@ -312,43 +312,47 @@
     word-break: break-word;
   }
 
-  .token.comment,
-  .token.prolog {
+  .hljs-comment,
+  .hljs-quote {
     color: var(--color-muted);
     font-style: italic;
   }
 
-  .token.keyword,
-  .token.important,
-  .token.boolean {
+  .hljs-keyword,
+  .hljs-literal,
+  .hljs-selector-tag,
+  .hljs-type {
     color: #7cc7ff;
   }
 
-  .token.string,
-  .token.char,
-  .token.triple-quoted-string {
+  .hljs-string,
+  .hljs-regexp,
+  .hljs-char.escape_ {
     color: #f2c879;
   }
 
-  .token.number {
+  .hljs-number {
     color: #ff9e7a;
   }
 
-  .token.function,
-  .token.class-name,
-  .token.builtin {
+  .hljs-title,
+  .hljs-title.function_,
+  .hljs-title.class_,
+  .hljs-built_in {
     color: var(--color-copper);
   }
 
-  .token.operator,
-  .token.punctuation {
-    color: #b6c4d4;
+  .hljs-meta,
+  .hljs-meta .hljs-keyword,
+  .hljs-variable,
+  .hljs-template-variable {
+    color: #d7a8ff;
   }
 
-  .token.decorator,
-  .token.macro,
-  .token.directive {
-    color: #d7a8ff;
+  .hljs-operator,
+  .hljs-punctuation,
+  .hljs-params {
+    color: #b6c4d4;
   }
 
   /* Baris chip yang bisa digeser tanpa bilah gulir yang terlihat. */

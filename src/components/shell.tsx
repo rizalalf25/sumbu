@@ -1,14 +1,16 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Compass, House, Route, Sigma, Timer } from "lucide-react";
+import { Code2, Compass, FolderKanban, House, Route, Sigma, Timer } from "lucide-react";
 import { createContext, useContext, useSyncExternalStore, type ReactNode } from "react";
 import { StudyDock } from "@/components/study-dock";
 
 const NAV = [
-  { to: "/", label: "Beranda", icon: House },
-  { to: "/peta", label: "Peta", icon: Route },
-  { to: "/rumus", label: "Rumus", icon: Sigma },
-  { to: "/studio", label: "Studio", icon: Compass },
-  { to: "/metode", label: "Metode", icon: Timer },
+  { to: "/", label: "Beranda", icon: House, mobile: true },
+  { to: "/peta", label: "Peta", icon: Route, mobile: true },
+  { to: "/proyek", label: "Proyek", icon: FolderKanban, mobile: true },
+  { to: "/kode", label: "Kode", icon: Code2, mobile: true },
+  { to: "/rumus", label: "Rumus", icon: Sigma, mobile: true },
+  { to: "/studio", label: "Studio", icon: Compass, mobile: false },
+  { to: "/metode", label: "Metode", icon: Timer, mobile: false },
 ] as const;
 
 type FocusApi = { focus: boolean; setFocus: (v: boolean) => void };
@@ -91,7 +93,7 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
         {!focus && (
           <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-paper/75 backdrop-blur-md md:hidden">
             <ul className="grid grid-cols-5">
-              {NAV.map((item) => {
+              {NAV.filter((item) => item.mobile).map((item) => {
                 const Icon = item.icon;
                 const on = item.to === "/" ? path === "/" : path === item.to || path.startsWith(`${item.to}/`);
                 return (

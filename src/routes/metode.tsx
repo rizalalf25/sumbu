@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useRef, useState } from "react";
 import { Shell } from "@/components/shell";
-import { NOTE_FRAME } from "@/lib/progress";
+import { NOTE_FRAME, restoreSave, useSave } from "@/lib/progress";
 
 export const Route = createFileRoute("/metode")({ component: Method });
 
@@ -75,9 +76,64 @@ function Method() {
         </article>
       </section>
 
+      <Backup />
+
       <Link to="/" className="btn mt-8">
         Pilih satu materi
       </Link>
     </Shell>
+  );
+}
+
+function Backup() {
+  const { save } = useSave();
+  const input = useRef<HTMLInputElement>(null);
+  const [message, setMessage] = useState("");
+
+  const download = () => {
+    const blob = new Blob([JSON.stringify(save, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `sumbu-progres-${new Date().toISOString().slice(0, 10)}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    setMessage("Cadangan diunduh. Simpan di tempat yang aman, misalnya Google Drive.");
+  };
+
+  const restore = async (file: File) => {
+    const text = await file.text();
+    if (!window.confirm("Progres di peramban ini akan diganti dengan isi file cadangan. Lanjutkan?")) return;
+    if (restoreSave(text)) window.location.reload();
+    else setMessage("File itu bukan cadangan SUMBU yang valid. Progres tidak diubah.");
+  };
+
+  return (
+    <section className="card mt-8 p-5">
+      <h2 className="text-3xl">Cadangan progres</h2>
+      <p className="mt-3 max-w-2xl text-muted">
+        Progres, catatan, kuis kode, dan centang proyek hanya tersimpan di peramban ini. Unduh cadangan sebelum ganti perangkat atau membersihkan data peramban, lalu pulihkan di perangkat baru.
+      </p>
+      <div className="mt-4 flex flex-wrap gap-2">
+        <button type="button" className="btn" onClick={download}>
+          Unduh cadangan
+        </button>
+        <button type="button" className="btn-ghost" onClick={() => input.current?.click()}>
+          Pulihkan dari file
+        </button>
+        <input
+          ref={input}
+          type="file"
+          accept="application/json,.json"
+          className="hidden"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (file) void restore(file);
+            event.target.value = "";
+          }}
+        />
+      </div>
+      {message ? <p className="mt-3 text-sm">{message}</p> : null}
+    </section>
   );
 }

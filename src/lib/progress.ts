@@ -4,6 +4,10 @@ export type Save = {
   correct: Record<string, number>;
   /** Jawaban benar di level Sedang atau Tantangan. */
   hard: Record<string, number>;
+  /** Pelajaran kode yang kuisnya sudah dijawab benar. */
+  code: Record<string, number>;
+  /** Indeks tahapan proyek yang sudah dicentang. */
+  proj: Record<string, number[]>;
   attempts: Record<string, number>;
   notes: Record<string, string>;
   steps: Record<string, number>;
@@ -19,6 +23,8 @@ const KEY = "sumbu-v1";
 export const emptySave: Save = {
   correct: {},
   hard: {},
+  code: {},
+  proj: {},
   attempts: {},
   notes: {},
   steps: {},
@@ -37,6 +43,29 @@ function dayStamp(deltaDays = 0): string {
     month: "2-digit",
     day: "2-digit",
   }).format(target);
+}
+
+/** Ubah teks JSON cadangan menjadi Save yang valid, atau null bila bukan cadangan SUMBU. */
+export function parseSave(text: string): Save | null {
+  try {
+    const parsed = JSON.parse(text) as Partial<Save>;
+    if (!parsed || typeof parsed !== "object" || typeof parsed.correct !== "object") return null;
+    return { ...emptySave, ...parsed, hard: parsed.hard ?? {}, code: parsed.code ?? {}, proj: parsed.proj ?? {} };
+  } catch {
+    return null;
+  }
+}
+
+/** Timpa progres di peramban ini dengan cadangan. Mengembalikan false bila gagal. */
+export function restoreSave(text: string): boolean {
+  const save = parseSave(text);
+  if (!save) return false;
+  try {
+    localStorage.setItem(KEY, JSON.stringify(save));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function loadSave(): Save {
@@ -128,6 +157,25 @@ export function useSave() {
     update((s) => ({ ...s, sessions: s.sessions + 1 }));
   }, [update]);
 
+  const passLesson = useCallback(
+    (lessonId: string) => {
+      update((s) => ({ ...s, code: { ...s.code, [lessonId]: 1 } }));
+    },
+    [update],
+  );
+
+  const toggleMilestone = useCallback(
+    (projectId: string, index: number) => {
+      update((s) => {
+        const done = new Set(s.proj[projectId] ?? []);
+        if (done.has(index)) done.delete(index);
+        else done.add(index);
+        return { ...s, proj: { ...s.proj, [projectId]: [...done].sort((a, b) => a - b) } };
+      });
+    },
+    [update],
+  );
+
   const setRoad = useCallback(
     (road: string) => {
       update((s) => ({ ...s, road }));
@@ -135,7 +183,7 @@ export function useSave() {
     [update],
   );
 
-  return { save, ready, markAttempt, setNote, setStep, addSession, setRoad };
+  return { save, ready, markAttempt, setNote, setStep, addSession, setRoad, passLesson, toggleMilestone };
 }
 
 export const NOTE_FRAME = `IDE (satu kalimat):

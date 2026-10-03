@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { CodeBlock, RunPanel } from "@/components/code-view";
 import { FocusToggle, Shell } from "@/components/shell";
-import { getLang, getLesson, lessonsOf } from "@/lib/code";
+import { getLang, getLesson, LEVEL_LABEL, lessonsOf } from "@/lib/code";
 import { useSave } from "@/lib/progress";
 import { getTopic } from "@/lib/topics";
 
@@ -16,7 +17,6 @@ function CodeLessonPage({ lessonId }: { lessonId: string }) {
   const lesson = getLesson(lessonId);
   const { save, passLesson } = useSave();
   const [pick, setPick] = useState<number | null>(null);
-  const [copied, setCopied] = useState(false);
 
   if (!lesson) {
     return (
@@ -38,16 +38,6 @@ function CodeLessonPage({ lessonId }: { lessonId: string }) {
   const correct = pick === lesson.quiz.answer;
   const passed = Boolean(save.code[lesson.id]);
 
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(lesson.code);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1500);
-    } catch {
-      setCopied(false);
-    }
-  };
-
   return (
     <Shell>
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -60,7 +50,7 @@ function CodeLessonPage({ lessonId }: { lessonId: string }) {
         <FocusToggle />
       </div>
       <p className="mt-3 text-sm text-muted">
-        sekitar {lesson.minutes} menit{passed ? " · sudah lulus" : ""}
+        {LEVEL_LABEL[lesson.level ?? "dasar"]} · sekitar {lesson.minutes} menit{passed ? " · sudah lulus" : ""}
         {topic ? (
           <>
             {" · memakai materi "}
@@ -76,16 +66,12 @@ function CodeLessonPage({ lessonId }: { lessonId: string }) {
         <p className="mt-2 text-lg">{lesson.idea}</p>
       </article>
 
-      <div className="card mt-4 overflow-hidden">
-        <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-2">
-          <span className="font-mono text-xs text-muted">{lang.name}</span>
-          <button type="button" className="btn-quiet px-2 py-1 text-xs" onClick={copy}>
-            {copied ? "Tersalin" : "Salin kode"}
-          </button>
-        </div>
-        <pre className="overflow-x-auto p-4 font-mono text-sm leading-6 [font-variant-ligatures:none]">
-          <code>{lesson.code}</code>
-        </pre>
+      <div className="mt-4">
+        {lesson.run ? (
+          <RunPanel key={lesson.id} initial={lesson.code} lang={lesson.lang} run={lesson.run} label={lang.name} />
+        ) : (
+          <CodeBlock code={lesson.code} lang={lesson.lang} label={lang.name} />
+        )}
       </div>
 
       <article className="card mt-4 p-5">
@@ -142,11 +128,12 @@ function CodeLessonPage({ lessonId }: { lessonId: string }) {
       </article>
 
       <p className="mt-4 text-sm text-muted">
-        Jalankan sendiri di{" "}
+        {lesson.run ? "Tebak dulu, lalu tekan Jalankan di atas untuk membuktikan. Ubah satu angka dan tebak lagi. " : ""}
+        Untuk proyek sungguhan, pakai{" "}
         <a href={lang.tryUrl} target="_blank" rel="noreferrer" className="font-semibold text-copper">
           {lang.tryLabel}
         </a>
-        , lalu ubah satu angka dan tebak lagi keluarannya.
+        .
       </p>
 
       <div className="mt-6 flex items-center justify-between gap-3">

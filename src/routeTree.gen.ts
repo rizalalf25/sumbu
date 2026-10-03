@@ -18,10 +18,17 @@ import { Route as BelajarTopicIdRouteImport } from './routes/belajar.$topicId'
 import { Route as KodeIndexRouteImport } from './routes/kode.index'
 import { Route as KodeLessonIdRouteImport } from './routes/kode.$lessonId'
 import { Route as LatihanTopicIdRouteImport } from './routes/latihan.$topicId'
+import { Route as LpdpIndexRouteImport } from './routes/lpdp.index'
+import { Route as LpdpSubRouteImport } from './routes/lpdp.$sub'
+import { Route as LpdpEsaiRouteImport } from './routes/lpdp.esai'
+import { Route as LpdpSimulasiRouteImport } from './routes/lpdp.simulasi'
+import { Route as LpdpWawancaraRouteImport } from './routes/lpdp.wawancara'
 import { Route as PetaIndexRouteImport } from './routes/peta.index'
 import { Route as PetaRoleIdRouteImport } from './routes/peta.$roleId'
 import { Route as ProyekIndexRouteImport } from './routes/proyek.index'
 import { Route as ProyekProjectIdRouteImport } from './routes/proyek.$projectId'
+import { Route as KodeTantanganIndexRouteImport } from './routes/kode.tantangan.index'
+import { Route as KodeTantanganChallengeIdRouteImport } from './routes/kode.tantangan.$challengeId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -68,6 +75,31 @@ const LatihanTopicIdRoute = LatihanTopicIdRouteImport.update({
   path: '/latihan/$topicId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LpdpIndexRoute = LpdpIndexRouteImport.update({
+  id: '/lpdp/',
+  path: '/lpdp/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LpdpSubRoute = LpdpSubRouteImport.update({
+  id: '/lpdp/$sub',
+  path: '/lpdp/$sub',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LpdpEsaiRoute = LpdpEsaiRouteImport.update({
+  id: '/lpdp/esai',
+  path: '/lpdp/esai',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LpdpSimulasiRoute = LpdpSimulasiRouteImport.update({
+  id: '/lpdp/simulasi',
+  path: '/lpdp/simulasi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LpdpWawancaraRoute = LpdpWawancaraRouteImport.update({
+  id: '/lpdp/wawancara',
+  path: '/lpdp/wawancara',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PetaIndexRoute = PetaIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -88,6 +120,17 @@ const ProyekProjectIdRoute = ProyekProjectIdRouteImport.update({
   path: '/proyek/$projectId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KodeTantanganIndexRoute = KodeTantanganIndexRouteImport.update({
+  id: '/kode/tantangan/',
+  path: '/kode/tantangan/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KodeTantanganChallengeIdRoute =
+  KodeTantanganChallengeIdRouteImport.update({
+    id: '/kode/tantangan/$challengeId',
+    path: '/kode/tantangan/$challengeId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -98,11 +141,18 @@ export interface FileRoutesByFullPath {
   '/belajar/$topicId': typeof BelajarTopicIdRoute
   '/kode/$lessonId': typeof KodeLessonIdRoute
   '/latihan/$topicId': typeof LatihanTopicIdRoute
+  '/lpdp/$sub': typeof LpdpSubRoute
+  '/lpdp/esai': typeof LpdpEsaiRoute
+  '/lpdp/simulasi': typeof LpdpSimulasiRoute
+  '/lpdp/wawancara': typeof LpdpWawancaraRoute
   '/peta/$roleId': typeof PetaRoleIdRoute
   '/proyek/$projectId': typeof ProyekProjectIdRoute
   '/kode/': typeof KodeIndexRoute
+  '/lpdp/': typeof LpdpIndexRoute
   '/peta/': typeof PetaIndexRoute
   '/proyek/': typeof ProyekIndexRoute
+  '/kode/tantangan/$challengeId': typeof KodeTantanganChallengeIdRoute
+  '/kode/tantangan/': typeof KodeTantanganIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -112,11 +162,18 @@ export interface FileRoutesByTo {
   '/belajar/$topicId': typeof BelajarTopicIdRoute
   '/kode/$lessonId': typeof KodeLessonIdRoute
   '/latihan/$topicId': typeof LatihanTopicIdRoute
+  '/lpdp/$sub': typeof LpdpSubRoute
+  '/lpdp/esai': typeof LpdpEsaiRoute
+  '/lpdp/simulasi': typeof LpdpSimulasiRoute
+  '/lpdp/wawancara': typeof LpdpWawancaraRoute
   '/peta/$roleId': typeof PetaRoleIdRoute
   '/proyek/$projectId': typeof ProyekProjectIdRoute
   '/kode': typeof KodeIndexRoute
+  '/lpdp': typeof LpdpIndexRoute
   '/peta': typeof PetaIndexRoute
   '/proyek': typeof ProyekIndexRoute
+  '/kode/tantangan/$challengeId': typeof KodeTantanganChallengeIdRoute
+  '/kode/tantangan': typeof KodeTantanganIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -128,11 +185,18 @@ export interface FileRoutesById {
   '/belajar/$topicId': typeof BelajarTopicIdRoute
   '/kode/$lessonId': typeof KodeLessonIdRoute
   '/latihan/$topicId': typeof LatihanTopicIdRoute
+  '/lpdp/$sub': typeof LpdpSubRoute
+  '/lpdp/esai': typeof LpdpEsaiRoute
+  '/lpdp/simulasi': typeof LpdpSimulasiRoute
+  '/lpdp/wawancara': typeof LpdpWawancaraRoute
   '/peta/$roleId': typeof PetaRoleIdRoute
   '/proyek/$projectId': typeof ProyekProjectIdRoute
   '/kode/': typeof KodeIndexRoute
+  '/lpdp/': typeof LpdpIndexRoute
   '/peta/': typeof PetaIndexRoute
   '/proyek/': typeof ProyekIndexRoute
+  '/kode/tantangan/$challengeId': typeof KodeTantanganChallengeIdRoute
+  '/kode/tantangan/': typeof KodeTantanganIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -145,11 +209,18 @@ export interface FileRouteTypes {
     | '/belajar/$topicId'
     | '/kode/$lessonId'
     | '/latihan/$topicId'
+    | '/lpdp/$sub'
+    | '/lpdp/esai'
+    | '/lpdp/simulasi'
+    | '/lpdp/wawancara'
     | '/peta/$roleId'
     | '/proyek/$projectId'
     | '/kode/'
+    | '/lpdp/'
     | '/peta/'
     | '/proyek/'
+    | '/kode/tantangan/$challengeId'
+    | '/kode/tantangan/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -159,11 +230,18 @@ export interface FileRouteTypes {
     | '/belajar/$topicId'
     | '/kode/$lessonId'
     | '/latihan/$topicId'
+    | '/lpdp/$sub'
+    | '/lpdp/esai'
+    | '/lpdp/simulasi'
+    | '/lpdp/wawancara'
     | '/peta/$roleId'
     | '/proyek/$projectId'
     | '/kode'
+    | '/lpdp'
     | '/peta'
     | '/proyek'
+    | '/kode/tantangan/$challengeId'
+    | '/kode/tantangan'
   id:
     | '__root__'
     | '/'
@@ -174,11 +252,18 @@ export interface FileRouteTypes {
     | '/belajar/$topicId'
     | '/kode/$lessonId'
     | '/latihan/$topicId'
+    | '/lpdp/$sub'
+    | '/lpdp/esai'
+    | '/lpdp/simulasi'
+    | '/lpdp/wawancara'
     | '/peta/$roleId'
     | '/proyek/$projectId'
     | '/kode/'
+    | '/lpdp/'
     | '/peta/'
     | '/proyek/'
+    | '/kode/tantangan/$challengeId'
+    | '/kode/tantangan/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -190,9 +275,16 @@ export interface RootRouteChildren {
   BelajarTopicIdRoute: typeof BelajarTopicIdRoute
   KodeLessonIdRoute: typeof KodeLessonIdRoute
   LatihanTopicIdRoute: typeof LatihanTopicIdRoute
+  LpdpSubRoute: typeof LpdpSubRoute
+  LpdpEsaiRoute: typeof LpdpEsaiRoute
+  LpdpSimulasiRoute: typeof LpdpSimulasiRoute
+  LpdpWawancaraRoute: typeof LpdpWawancaraRoute
   ProyekProjectIdRoute: typeof ProyekProjectIdRoute
   KodeIndexRoute: typeof KodeIndexRoute
+  LpdpIndexRoute: typeof LpdpIndexRoute
   ProyekIndexRoute: typeof ProyekIndexRoute
+  KodeTantanganChallengeIdRoute: typeof KodeTantanganChallengeIdRoute
+  KodeTantanganIndexRoute: typeof KodeTantanganIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -260,6 +352,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LatihanTopicIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lpdp/': {
+      id: '/lpdp/'
+      path: '/lpdp'
+      fullPath: '/lpdp/'
+      preLoaderRoute: typeof LpdpIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lpdp/$sub': {
+      id: '/lpdp/$sub'
+      path: '/lpdp/$sub'
+      fullPath: '/lpdp/$sub'
+      preLoaderRoute: typeof LpdpSubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lpdp/esai': {
+      id: '/lpdp/esai'
+      path: '/lpdp/esai'
+      fullPath: '/lpdp/esai'
+      preLoaderRoute: typeof LpdpEsaiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lpdp/simulasi': {
+      id: '/lpdp/simulasi'
+      path: '/lpdp/simulasi'
+      fullPath: '/lpdp/simulasi'
+      preLoaderRoute: typeof LpdpSimulasiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lpdp/wawancara': {
+      id: '/lpdp/wawancara'
+      path: '/lpdp/wawancara'
+      fullPath: '/lpdp/wawancara'
+      preLoaderRoute: typeof LpdpWawancaraRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/peta/': {
       id: '/peta/'
       path: '/'
@@ -288,6 +415,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProyekProjectIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/kode/tantangan/': {
+      id: '/kode/tantangan/'
+      path: '/kode/tantangan'
+      fullPath: '/kode/tantangan/'
+      preLoaderRoute: typeof KodeTantanganIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kode/tantangan/$challengeId': {
+      id: '/kode/tantangan/$challengeId'
+      path: '/kode/tantangan/$challengeId'
+      fullPath: '/kode/tantangan/$challengeId'
+      preLoaderRoute: typeof KodeTantanganChallengeIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -312,9 +453,16 @@ const rootRouteChildren: RootRouteChildren = {
   BelajarTopicIdRoute: BelajarTopicIdRoute,
   KodeLessonIdRoute: KodeLessonIdRoute,
   LatihanTopicIdRoute: LatihanTopicIdRoute,
+  LpdpSubRoute: LpdpSubRoute,
+  LpdpEsaiRoute: LpdpEsaiRoute,
+  LpdpSimulasiRoute: LpdpSimulasiRoute,
+  LpdpWawancaraRoute: LpdpWawancaraRoute,
   ProyekProjectIdRoute: ProyekProjectIdRoute,
   KodeIndexRoute: KodeIndexRoute,
+  LpdpIndexRoute: LpdpIndexRoute,
   ProyekIndexRoute: ProyekIndexRoute,
+  KodeTantanganChallengeIdRoute: KodeTantanganChallengeIdRoute,
+  KodeTantanganIndexRoute: KodeTantanganIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

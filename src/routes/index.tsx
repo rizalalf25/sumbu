@@ -4,6 +4,7 @@ import { Shell } from "@/components/shell";
 import { useSave } from "@/lib/progress";
 import { doneCount, flatSteps, getRoadmap, isEnough, nextStep, ROADMAPS } from "@/lib/roadmaps";
 import { TRACKS, allTopics, bankTotal, getTopic } from "@/lib/topics";
+import { CHALLENGES } from "@/lib/challenges";
 import { LESSONS } from "@/lib/code";
 import { PROJECTS } from "@/lib/projects";
 
@@ -79,12 +80,22 @@ function Home() {
       </section>
       <p className="mt-3 text-sm text-muted">Bank soal dihitung ulang dari parameter. Catatan tersimpan di peramban ini.</p>
 
-      <section className="mt-8 grid gap-3 md:grid-cols-3">
+      <Link to="/lpdp" className="card card-link mt-8 flex flex-wrap items-center justify-between gap-4 p-5">
+        <span>
+          <span className="block text-sm font-semibold text-copper">Beasiswa LPDP</span>
+          <span className="mt-1 block text-2xl">Persiapan tes, esai, dan wawancara</span>
+          <span className="mt-1 block text-sm text-muted">Materi dan bank soal verbal, kuantitatif, penalaran · simulasi 30 menit · latihan esai dan wawancara.</span>
+        </span>
+        <span className="btn">Buka LPDP</span>
+      </Link>
+
+      <section className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {(
           [
-            ["/proyek", "Proyek studi kasus", `${PROJECTS.length} proyek`, "Drone, PLTS atap, asisten RAG, deteksi serangan, dan lainnya. Tahap demi tahap, dengan materi yang dipakai."],
-            ["/kode", "Bahasa pemrograman", `${LESSONS.length} pelajaran`, "Python, SQL, C++, R, dan Bash. Contohnya memakai rumus yang sama dengan materi di sini."],
+            ["/proyek", "Proyek studi kasus", `${PROJECTS.length} proyek`, "Drone, PLTS atap, asisten RAG, deteksi serangan. Lengkap dengan daftar belanja dan panduan rakit."],
+            ["/kode", "Bahasa pemrograman", `${LESSONS.length} pelajaran · ${CHALLENGES.length} tantangan`, "Python, SQL, C++, R, Bash. Python dan SQL bisa dijalankan langsung di peramban."],
             ["/studio", "Studio 3D", "7 adegan", "Lemparan, bandul, gelombang, vektor, muatan, permukaan, dan medan yang bisa diputar."],
+            ["/rumus", "Lembar rumus", "semua materi", "Cari rumus yang sedang dipakai, sembunyikan, coba ingat, lalu buka."],
           ] as const
         ).map(([to, title, kicker, body]) => (
           <Link key={to} to={to} className="card card-link flex h-full flex-col p-5">

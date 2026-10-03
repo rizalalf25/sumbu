@@ -1,14 +1,15 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Code2, Compass, FolderKanban, House, Route, Sigma, Timer } from "lucide-react";
+import { Code2, Compass, FolderKanban, GraduationCap, House, Route, Sigma, Timer } from "lucide-react";
 import { createContext, useContext, useSyncExternalStore, type ReactNode } from "react";
 import { StudyDock } from "@/components/study-dock";
 
 const NAV = [
   { to: "/", label: "Beranda", icon: House, mobile: true },
   { to: "/peta", label: "Peta", icon: Route, mobile: true },
+  { to: "/lpdp", label: "LPDP", icon: GraduationCap, mobile: true },
   { to: "/proyek", label: "Proyek", icon: FolderKanban, mobile: true },
   { to: "/kode", label: "Kode", icon: Code2, mobile: true },
-  { to: "/rumus", label: "Rumus", icon: Sigma, mobile: true },
+  { to: "/rumus", label: "Rumus", icon: Sigma, mobile: false },
   { to: "/studio", label: "Studio", icon: Compass, mobile: false },
   { to: "/metode", label: "Metode", icon: Timer, mobile: false },
 ] as const;
@@ -74,7 +75,7 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
                 Keluar fokus
               </button>
             ) : (
-              <nav className="hidden items-center gap-1 md:flex">
+              <nav className="hidden items-center gap-1 lg:flex">
                 {NAV.map((item) => (
                   <Link
                     key={item.to}
@@ -88,10 +89,10 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
             )}
           </div>
         </header>
-        <main className={`mx-auto px-4 py-6 ${focus ? "pb-24" : "pb-36 md:pb-24"} ${width}`}>{children}</main>
+        <main className={`mx-auto px-4 py-6 ${focus ? "pb-24" : "pb-36 lg:pb-24"} ${width}`}>{children}</main>
         <StudyDock focus={focus} />
         {!focus && (
-          <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-paper/75 backdrop-blur-md md:hidden">
+          <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-paper/75 backdrop-blur-md lg:hidden">
             <ul className="grid grid-cols-5">
               {NAV.filter((item) => item.mobile).map((item) => {
                 const Icon = item.icon;

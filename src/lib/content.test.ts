@@ -83,3 +83,27 @@ describe("daftar belanja dan panduan rakit", async () => {
     assert.equal(rupiahRange([950000, 4200000]), "Rp950 rb – Rp4,2 jt");
   });
 });
+
+describe("pelajaran dan tantangan kode", async () => {
+  const { LESSONS, lessonsOf } = await import("./code.ts");
+  const { CHALLENGES, pythonHarness } = await import("./challenges.ts");
+
+  it("setiap pelajaran punya tingkat, dan SQL selalu bisa dijalankan", () => {
+    for (const lesson of LESSONS) {
+      assert.ok(lesson.level, `tingkat ${lesson.id}`);
+      if (lesson.lang === "sql") assert.equal(lesson.run, "sql");
+      if (lesson.lang !== "python" && lesson.lang !== "sql") assert.equal(lesson.run, undefined);
+    }
+    const py = lessonsOf("python");
+    assert.equal(py[0].level, "dasar");
+    assert.equal(py.at(-1)?.level, "lanjut");
+  });
+
+  it("tantangan unik dan kerangka penguji Python berisi kode pengguna dan penanda", () => {
+    assert.equal(new Set(CHALLENGES.map((c) => c.id)).size, CHALLENGES.length);
+    const harness = pythonHarness("def f():\n    return 1", 'cek("satu", f() == 1)');
+    assert.match(harness, /def f\(\):/);
+    assert.match(harness, /__LULUS__/);
+    assert.match(harness, / {4}cek\("satu", f\(\) == 1\)/);
+  });
+});

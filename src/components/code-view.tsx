@@ -1,22 +1,7 @@
-import Prism from "prismjs";
-import "prismjs/components/prism-clike";
-import "prismjs/components/prism-c";
-import "prismjs/components/prism-cpp";
-import "prismjs/components/prism-python";
-import "prismjs/components/prism-sql";
-import "prismjs/components/prism-r";
-import "prismjs/components/prism-bash";
 import { useRef, useState, type KeyboardEvent } from "react";
 import type { LangId } from "@/lib/code";
+import { highlight } from "@/lib/highlight";
 import { runPython, runSql, type PyStatus, type SqlTable } from "@/lib/runner";
-
-const PRISM_LANG: Record<LangId, string> = { python: "python", sql: "sql", cpp: "cpp", r: "r", bash: "bash" };
-
-export function highlight(code: string, lang: LangId): string {
-  const grammar = Prism.languages[PRISM_LANG[lang]];
-  if (!grammar) return code.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]!);
-  return Prism.highlight(code, grammar, PRISM_LANG[lang]);
-}
 
 export function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
@@ -48,7 +33,7 @@ export function CodeBlock({ code, lang, label }: { code: string; lang: LangId; l
         <CopyButton text={code} />
       </div>
       <pre className="code-layer overflow-x-auto">
-        <code dangerouslySetInnerHTML={{ __html: highlight(code, lang) }} />
+        <code className="hljs" dangerouslySetInnerHTML={{ __html: highlight(code, lang) }} />
       </pre>
     </div>
   );

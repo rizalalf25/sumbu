@@ -8,6 +8,10 @@ export type Save = {
   code: Record<string, number>;
   /** Indeks tahapan proyek yang sudah dicentang. */
   proj: Record<string, number[]>;
+  /** Indeks barang di daftar belanja yang sudah dimiliki, per proyek. */
+  kit: Record<string, number[]>;
+  /** Indeks langkah panduan rakit yang sudah selesai, per proyek. */
+  build: Record<string, number[]>;
   attempts: Record<string, number>;
   notes: Record<string, string>;
   steps: Record<string, number>;
@@ -25,6 +29,8 @@ export const emptySave: Save = {
   hard: {},
   code: {},
   proj: {},
+  kit: {},
+  build: {},
   attempts: {},
   notes: {},
   steps: {},
@@ -50,7 +56,7 @@ export function parseSave(text: string): Save | null {
   try {
     const parsed = JSON.parse(text) as Partial<Save>;
     if (!parsed || typeof parsed !== "object" || typeof parsed.correct !== "object") return null;
-    return { ...emptySave, ...parsed, hard: parsed.hard ?? {}, code: parsed.code ?? {}, proj: parsed.proj ?? {} };
+    return { ...emptySave, ...parsed, hard: parsed.hard ?? {}, code: parsed.code ?? {}, proj: parsed.proj ?? {}, kit: parsed.kit ?? {}, build: parsed.build ?? {} };
   } catch {
     return null;
   }
@@ -164,17 +170,21 @@ export function useSave() {
     [update],
   );
 
-  const toggleMilestone = useCallback(
-    (projectId: string, index: number) => {
+  const toggleIn = useCallback(
+    (field: "proj" | "kit" | "build", projectId: string, index: number) => {
       update((s) => {
-        const done = new Set(s.proj[projectId] ?? []);
+        const done = new Set(s[field][projectId] ?? []);
         if (done.has(index)) done.delete(index);
         else done.add(index);
-        return { ...s, proj: { ...s.proj, [projectId]: [...done].sort((a, b) => a - b) } };
+        return { ...s, [field]: { ...s[field], [projectId]: [...done].sort((a, b) => a - b) } };
       });
     },
     [update],
   );
+
+  const toggleMilestone = useCallback((projectId: string, index: number) => toggleIn("proj", projectId, index), [toggleIn]);
+  const toggleOwned = useCallback((projectId: string, index: number) => toggleIn("kit", projectId, index), [toggleIn]);
+  const toggleBuild = useCallback((projectId: string, index: number) => toggleIn("build", projectId, index), [toggleIn]);
 
   const setRoad = useCallback(
     (road: string) => {
@@ -183,7 +193,7 @@ export function useSave() {
     [update],
   );
 
-  return { save, ready, markAttempt, setNote, setStep, addSession, setRoad, passLesson, toggleMilestone };
+  return { save, ready, markAttempt, setNote, setStep, addSession, setRoad, passLesson, toggleMilestone, toggleOwned, toggleBuild };
 }
 
 export const NOTE_FRAME = `IDE (satu kalimat):

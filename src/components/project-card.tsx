@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { kitOf, kitTotal, rupiahRange } from "@/lib/kits";
 import { LEVEL_LABEL, type Project } from "@/lib/projects";
 
 export function ProjectCard({ project, done }: { project: Project; done: number }) {
@@ -16,6 +17,18 @@ export function ProjectCard({ project, done }: { project: Project; done: number 
       </div>
       <h3 className="mt-3 text-xl">{project.title}</h3>
       <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">{project.brief}</p>
+      <p className="mt-3 text-sm">
+        {(() => {
+          const kit = kitOf(project.id);
+          if (!kit) return <span className="text-muted">Cukup laptop</span>;
+          const total = kitTotal(kit, ["inti", "habis", "alat"]);
+          return (
+            <span>
+              Perangkat <span className="font-semibold text-copper">{rupiahRange(total)}</span>
+            </span>
+          );
+        })()}
+      </p>
       <span className="mt-4 block h-1.5 overflow-hidden rounded-full bg-line">
         <span className="block h-full bg-copper" style={{ width: `${Math.round((done / total) * 100)}%` }} />
       </span>

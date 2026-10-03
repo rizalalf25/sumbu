@@ -39,12 +39,27 @@ export function Range({
   );
 }
 
-export function Plot({ data, y2 = false }: { data: { x: number; y: number; z?: number }[]; y2?: boolean }) {
+export function Plot({
+  data,
+  y2 = false,
+  numeric = false,
+}: {
+  data: { x: number; y: number; z?: number }[];
+  y2?: boolean;
+  /** Sumbu x numerik dengan tik bulat, untuk data yang rapat (bukan satu titik per label). */
+  numeric?: boolean;
+}) {
   return (
     <div className="h-52">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-          <XAxis dataKey="x" stroke="var(--color-muted)" tick={{ fontSize: 12 }} tickFormatter={(v) => idn(String(v))} />
+          <XAxis
+            dataKey="x"
+            stroke="var(--color-muted)"
+            tick={{ fontSize: 12 }}
+            tickFormatter={(v) => idn(String(v))}
+            {...(numeric ? { type: "number" as const, domain: ["dataMin", "dataMax"], tickCount: 6, allowDecimals: true } : {})}
+          />
           <YAxis stroke="var(--color-muted)" width={36} tick={{ fontSize: 12 }} tickFormatter={(v) => idn(String(v))} />
           <Line type="monotone" dataKey="y" stroke="var(--color-copper)" dot={false} strokeWidth={2} isAnimationActive={false} />
           {y2 ? (

@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as MetodeRouteImport } from './routes/metode'
 import { Route as PetaRouteImport } from './routes/peta'
 import { Route as RumusRouteImport } from './routes/rumus'
@@ -27,12 +29,25 @@ import { Route as PetaIndexRouteImport } from './routes/peta.index'
 import { Route as PetaRoleIdRouteImport } from './routes/peta.$roleId'
 import { Route as ProyekIndexRouteImport } from './routes/proyek.index'
 import { Route as ProyekProjectIdRouteImport } from './routes/proyek.$projectId'
+import { Route as RuangIndexRouteImport } from './routes/ruang.index'
+import { Route as RuangRoomIdRouteImport } from './routes/ruang.$roomId'
+import { Route as ApiAuthSplatRouteImport } from './routes/api.auth.$'
 import { Route as KodeTantanganIndexRouteImport } from './routes/kode.tantangan.index'
 import { Route as KodeTantanganChallengeIdRouteImport } from './routes/kode.tantangan.$challengeId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MetodeRoute = MetodeRouteImport.update({
@@ -120,6 +135,21 @@ const ProyekProjectIdRoute = ProyekProjectIdRouteImport.update({
   path: '/proyek/$projectId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RuangIndexRoute = RuangIndexRouteImport.update({
+  id: '/ruang/',
+  path: '/ruang/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RuangRoomIdRoute = RuangRoomIdRouteImport.update({
+  id: '/ruang/$roomId',
+  path: '/ruang/$roomId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const KodeTantanganIndexRoute = KodeTantanganIndexRouteImport.update({
   id: '/kode/tantangan/',
   path: '/kode/tantangan/',
@@ -134,6 +164,8 @@ const KodeTantanganChallengeIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/login': typeof LoginRoute
   '/metode': typeof MetodeRoute
   '/peta': typeof PetaRouteWithChildren
   '/rumus': typeof RumusRoute
@@ -147,15 +179,20 @@ export interface FileRoutesByFullPath {
   '/lpdp/wawancara': typeof LpdpWawancaraRoute
   '/peta/$roleId': typeof PetaRoleIdRoute
   '/proyek/$projectId': typeof ProyekProjectIdRoute
+  '/ruang/$roomId': typeof RuangRoomIdRoute
   '/kode/': typeof KodeIndexRoute
   '/lpdp/': typeof LpdpIndexRoute
   '/peta/': typeof PetaIndexRoute
   '/proyek/': typeof ProyekIndexRoute
+  '/ruang/': typeof RuangIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/kode/tantangan/$challengeId': typeof KodeTantanganChallengeIdRoute
   '/kode/tantangan/': typeof KodeTantanganIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/login': typeof LoginRoute
   '/metode': typeof MetodeRoute
   '/rumus': typeof RumusRoute
   '/studio': typeof StudioRoute
@@ -168,16 +205,21 @@ export interface FileRoutesByTo {
   '/lpdp/wawancara': typeof LpdpWawancaraRoute
   '/peta/$roleId': typeof PetaRoleIdRoute
   '/proyek/$projectId': typeof ProyekProjectIdRoute
+  '/ruang/$roomId': typeof RuangRoomIdRoute
   '/kode': typeof KodeIndexRoute
   '/lpdp': typeof LpdpIndexRoute
   '/peta': typeof PetaIndexRoute
   '/proyek': typeof ProyekIndexRoute
+  '/ruang': typeof RuangIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/kode/tantangan/$challengeId': typeof KodeTantanganChallengeIdRoute
   '/kode/tantangan': typeof KodeTantanganIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/login': typeof LoginRoute
   '/metode': typeof MetodeRoute
   '/peta': typeof PetaRouteWithChildren
   '/rumus': typeof RumusRoute
@@ -191,10 +233,13 @@ export interface FileRoutesById {
   '/lpdp/wawancara': typeof LpdpWawancaraRoute
   '/peta/$roleId': typeof PetaRoleIdRoute
   '/proyek/$projectId': typeof ProyekProjectIdRoute
+  '/ruang/$roomId': typeof RuangRoomIdRoute
   '/kode/': typeof KodeIndexRoute
   '/lpdp/': typeof LpdpIndexRoute
   '/peta/': typeof PetaIndexRoute
   '/proyek/': typeof ProyekIndexRoute
+  '/ruang/': typeof RuangIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/kode/tantangan/$challengeId': typeof KodeTantanganChallengeIdRoute
   '/kode/tantangan/': typeof KodeTantanganIndexRoute
 }
@@ -202,6 +247,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/dashboard'
+    | '/login'
     | '/metode'
     | '/peta'
     | '/rumus'
@@ -215,15 +262,20 @@ export interface FileRouteTypes {
     | '/lpdp/wawancara'
     | '/peta/$roleId'
     | '/proyek/$projectId'
+    | '/ruang/$roomId'
     | '/kode/'
     | '/lpdp/'
     | '/peta/'
     | '/proyek/'
+    | '/ruang/'
+    | '/api/auth/$'
     | '/kode/tantangan/$challengeId'
     | '/kode/tantangan/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/dashboard'
+    | '/login'
     | '/metode'
     | '/rumus'
     | '/studio'
@@ -236,15 +288,20 @@ export interface FileRouteTypes {
     | '/lpdp/wawancara'
     | '/peta/$roleId'
     | '/proyek/$projectId'
+    | '/ruang/$roomId'
     | '/kode'
     | '/lpdp'
     | '/peta'
     | '/proyek'
+    | '/ruang'
+    | '/api/auth/$'
     | '/kode/tantangan/$challengeId'
     | '/kode/tantangan'
   id:
     | '__root__'
     | '/'
+    | '/dashboard'
+    | '/login'
     | '/metode'
     | '/peta'
     | '/rumus'
@@ -258,16 +315,21 @@ export interface FileRouteTypes {
     | '/lpdp/wawancara'
     | '/peta/$roleId'
     | '/proyek/$projectId'
+    | '/ruang/$roomId'
     | '/kode/'
     | '/lpdp/'
     | '/peta/'
     | '/proyek/'
+    | '/ruang/'
+    | '/api/auth/$'
     | '/kode/tantangan/$challengeId'
     | '/kode/tantangan/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DashboardRoute: typeof DashboardRoute
+  LoginRoute: typeof LoginRoute
   MetodeRoute: typeof MetodeRoute
   PetaRoute: typeof PetaRouteWithChildren
   RumusRoute: typeof RumusRoute
@@ -280,9 +342,12 @@ export interface RootRouteChildren {
   LpdpSimulasiRoute: typeof LpdpSimulasiRoute
   LpdpWawancaraRoute: typeof LpdpWawancaraRoute
   ProyekProjectIdRoute: typeof ProyekProjectIdRoute
+  RuangRoomIdRoute: typeof RuangRoomIdRoute
   KodeIndexRoute: typeof KodeIndexRoute
   LpdpIndexRoute: typeof LpdpIndexRoute
   ProyekIndexRoute: typeof ProyekIndexRoute
+  RuangIndexRoute: typeof RuangIndexRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   KodeTantanganChallengeIdRoute: typeof KodeTantanganChallengeIdRoute
   KodeTantanganIndexRoute: typeof KodeTantanganIndexRoute
 }
@@ -294,6 +359,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/metode': {
@@ -415,6 +494,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProyekProjectIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ruang/': {
+      id: '/ruang/'
+      path: '/ruang'
+      fullPath: '/ruang/'
+      preLoaderRoute: typeof RuangIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ruang/$roomId': {
+      id: '/ruang/$roomId'
+      path: '/ruang/$roomId'
+      fullPath: '/ruang/$roomId'
+      preLoaderRoute: typeof RuangRoomIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/kode/tantangan/': {
       id: '/kode/tantangan/'
       path: '/kode/tantangan'
@@ -446,6 +546,8 @@ const PetaRouteWithChildren = PetaRoute._addFileChildren(PetaRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DashboardRoute: DashboardRoute,
+  LoginRoute: LoginRoute,
   MetodeRoute: MetodeRoute,
   PetaRoute: PetaRouteWithChildren,
   RumusRoute: RumusRoute,
@@ -458,9 +560,12 @@ const rootRouteChildren: RootRouteChildren = {
   LpdpSimulasiRoute: LpdpSimulasiRoute,
   LpdpWawancaraRoute: LpdpWawancaraRoute,
   ProyekProjectIdRoute: ProyekProjectIdRoute,
+  RuangRoomIdRoute: RuangRoomIdRoute,
   KodeIndexRoute: KodeIndexRoute,
   LpdpIndexRoute: LpdpIndexRoute,
   ProyekIndexRoute: ProyekIndexRoute,
+  RuangIndexRoute: RuangIndexRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
   KodeTantanganChallengeIdRoute: KodeTantanganChallengeIdRoute,
   KodeTantanganIndexRoute: KodeTantanganIndexRoute,
 }

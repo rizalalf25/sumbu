@@ -1,0 +1,41 @@
+name: Sumbu QC
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      - run: npm run build:node
+      - run: npx playwright install --with-deps chromium
+      - name: Start built preview
+        run: npm run preview > preview.log 2>&1 &
+        env:
+          SUMBU_ALLOW_LOCAL_DB: "true"
+          SUMBU_DATA_DIR: .data/ci
+          BETTER_AUTH_URL: http://127.0.0.1:8081
+      - run: node scripts/wait-for-preview.mjs
+      - run: npm run test:e2e
+        env:
+          E2E_BASE_URL: http://127.0.0.1:8081
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-qc
+          path: |
+            screenshots/
+            preview.log

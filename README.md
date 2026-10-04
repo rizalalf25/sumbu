@@ -2,7 +2,9 @@
 
 Aplikasi web untuk belajar matematika dan fisika. Satu materi dibuka satu napas: inti dulu, gambar yang bisa digerakkan, kasus nyata, baru soal. Bahasa antarmukanya Indonesia.
 
-Cocok untuk perhatian yang mudah loncat. Tidak ada dinding teks, tidak ada animasi yang berjalan sendiri. Rumus ditampilkan dengan KaTeX, progres tersimpan di peramban ini saja.
+Cocok untuk perhatian yang mudah loncat. Tidak ada dinding teks, tidak ada animasi yang berjalan sendiri. Rumus ditampilkan dengan KaTeX. Materi terbuka tanpa akun; setelah login, progres dan catatan pribadi tersimpan ke database dan bisa dilanjutkan lintas perangkat.
+
+SUMBU kini full stack: daftar/login email dan password, dashboard belajar, progres per pengguna, cadangan JSON, dan ruang diskusi terbuka. Tidak diperlukan kode undangan. Panduan menerbitkan untuk akses bersama teman ada di [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ## Isi
 
@@ -31,10 +33,10 @@ Satu langkah peta dianggap cukup setelah tiga jawaban benar pada materinya, deng
 
 ## Menjalankan
 
-Perlu Node.js dan npm.
+Perlu Node.js 22.13+ dan npm (QC memakai Node 24).
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
@@ -44,6 +46,7 @@ Buka [http://localhost:8080](http://localhost:8080).
 
 ```bash
 npm run typecheck
+npm run lint
 npm test
 npm run build
 ```
@@ -54,14 +57,14 @@ Setelah menambah atau mengubah generator soal, hitung ulang jumlah variasi:
 npm run bank
 ```
 
-`npm run build` menghasilkan keluaran produksi. Pratinjau lokal:
+`npm run build` menghasilkan keluaran produksi Vercel. `npm run build:node` menghasilkan server Node mandiri. Pratinjau build dengan database QA lokal dijelaskan di [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ```bash
-npm run preview:restart
+npm run preview
 ```
 
 ## Tumpukan
 
-React, TanStack Start, Vite, TypeScript, Tailwind CSS v4, KaTeX, Three.js.
+React, TanStack Start, Vite, TypeScript, Tailwind CSS v4, KaTeX, Three.js, Better Auth, PostgreSQL, dan PGLite untuk pengembangan lokal.
 
-Progres, catatan, dan peta aktif disimpan di `localStorage`. Tidak ada akun yang wajib untuk belajar.
+Progres, catatan, dan peta aktif disimpan per akun di PostgreSQL, dengan salinan lokal untuk koneksi terputus. Tamu memakai `localStorage`. Akun tidak wajib untuk membuka materi. Diskusi memerlukan akun dan keanggotaan ruang; siapa pun yang terdaftar bisa langsung bergabung.

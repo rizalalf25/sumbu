@@ -36,7 +36,9 @@ Alur browser mencakup materi tanpa akun, perlindungan dashboard, daftar/login/ke
 
 Tes pendidikan mencakup awal/akhir jalur lima bahasa, tujuh langkah, jawaban salah dan pengulangan kuis, kelulusan, pemulihan langkah terakhir/catatan/draf, eksekusi SQL sungguhan, contoh dan latihan semua jenis LPDP, 30 pembahasan setelah simulasi, serta catatan Kode dan hasil LPDP lintas perangkat. Tampilan Kode/LPDP dibandingkan pada dev dan build, desktop dan ponsel.
 
-Smoke Kode/LPDP mengonfirmasi HTTP 200, tidak ada luapan horizontal, tidak ada error JavaScript, dan tidak ada perbedaan bermakna terhadap dev; skrip tetap memberi exit 2 karena lingkungan QC memblokir request font Google dan bridge Grok lama. Kedua request lama itu tetap dipertahankan; tampilan memakai font cadangan dan alur belajar tetap lulus tes browser.
+Smoke Kode/LPDP mengonfirmasi HTTP 200, tidak ada luapan horizontal, tidak ada error JavaScript, dan tidak ada perbedaan bermakna terhadap dev. Pemeriksaan awal memberi exit 2 karena akses jaringan ke font Google dan bridge Grok lama diblokir. Setelah izin jaringan tersedia, pemeriksaan ulang kedua halaman lulus dengan exit 0; kedua request lama tetap dipertahankan.
+
+[GitHub Actions untuk pembaruan Kode/LPDP](https://github.com/rizalalf25/sumbu/actions/runs/37225267693) menjalankan QC pada Linux/Chromium, termasuk kedua build dan kedua skrip tes browser. Seluruh langkah pengujian berhasil.
 
 ## Hal yang masih memerlukan hosting
 

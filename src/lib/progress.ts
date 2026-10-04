@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useSyncExternalStore } from "react";
+import { progressSchema } from "./progress-schema.ts";
+import {
+  getSaveSnapshot,
+  getServerSaveSnapshot,
+  readStoredSave,
+  subscribeSave,
+  updateSave,
+} from "./progress-store.ts";
 
 export type Save = {
   correct: Record<string, number>;
@@ -28,9 +36,13 @@ export type Save = {
   sessions: number;
 };
 
-const KEY = "sumbu-v1";
-
-export type LpdpSim = { at: string; total: number; correct: number; per: Record<string, [number, number]>; seconds: number };
+export type LpdpSim = {
+  at: string;
+  total: number;
+  correct: number;
+  per: Record<string, [number, number]>;
+  seconds: number;
+};
 export type LpdpSave = {
   right: Record<string, number>;
   wrong: Record<string, number>;
@@ -40,25 +52,7 @@ export type LpdpSave = {
 };
 export const emptyLpdp: LpdpSave = { right: {}, wrong: {}, sims: [], essays: {}, interview: {} };
 
-export const emptySave: Save = {
-  correct: {},
-  hard: {},
-  code: {},
-  proj: {},
-  kit: {},
-  build: {},
-  challenge: {},
-  drafts: {},
-  lpdp: emptyLpdp,
-  attempts: {},
-  notes: {},
-  steps: {},
-  lastTopic: null,
-  road: null,
-  dayStreak: 0,
-  lastDay: null,
-  sessions: 0,
-};
+export const emptySave: Save = progressSchema.parse({});
 
 function dayStamp(deltaDays = 0): string {
   const target = new Date(Date.now() + deltaDays * 86_400_000);
@@ -73,9 +67,10 @@ function dayStamp(deltaDays = 0): string {
 /** Ubah teks JSON cadangan menjadi Save yang valid, atau null bila bukan cadangan SUMBU. */
 export function parseSave(text: string): Save | null {
   try {
-    const parsed = JSON.parse(text) as Partial<Save>;
-    if (!parsed || typeof parsed !== "object" || typeof parsed.correct !== "object") return null;
-    return { ...emptySave, ...parsed, hard: parsed.hard ?? {}, code: parsed.code ?? {}, proj: parsed.proj ?? {}, kit: parsed.kit ?? {}, build: parsed.build ?? {}, challenge: parsed.challenge ?? {}, drafts: parsed.drafts ?? {}, lpdp: { ...emptyLpdp, ...parsed.lpdp } };
+    const parsed: unknown = JSON.parse(text);
+    if (!parsed || typeof parsed !== "object" || !("correct" in parsed)) return null;
+    const result = progressSchema.safeParse(parsed);
+    return result.success ? (result.data as Save) : null;
   } catch {
     return null;
   }
@@ -86,7 +81,8 @@ export function restoreSave(text: string): boolean {
   const save = parseSave(text);
   if (!save) return false;
   try {
-    localStorage.setItem(KEY, JSON.stringify(save));
+    if (!getSaveSnapshot().ready) return false;
+    updateSave(() => save);
     return true;
   } catch {
     return false;
@@ -94,46 +90,16 @@ export function restoreSave(text: string): boolean {
 }
 
 export function loadSave(): Save {
-  if (typeof window === "undefined") return emptySave;
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (!raw) return emptySave;
-    const parsed = JSON.parse(raw) as Partial<Save>;
-    const save = { ...emptySave, ...parsed, lpdp: { ...emptyLpdp, ...parsed.lpdp } };
-    if (!parsed.hard) {
-      // Simpanan lama belum mencatat level. Jangan cabut status "cukup" yang sudah diraih.
-      save.hard = Object.fromEntries(Object.entries(save.correct).filter(([, n]) => n >= 3).map(([id]) => [id, 1]));
-    }
-    return save;
-  } catch {
-    return emptySave;
-  }
-}
-
-function writeSave(save: Save) {
-  try {
-    localStorage.setItem(KEY, JSON.stringify(save));
-  } catch {
-    // Penyimpanan penuh atau diblokir: progres tetap jalan di memori sesi ini.
-  }
+  return readStoredSave();
 }
 
 export function useSave() {
-  const [save, setSave] = useState<Save>(emptySave);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    setSave(loadSave());
-    setReady(true);
-  }, []);
-
-  const update = useCallback((fn: (s: Save) => Save) => {
-    setSave((prev) => {
-      const next = fn(prev);
-      writeSave(next);
-      return next;
-    });
-  }, []);
+  const { save, ready, status } = useSyncExternalStore(
+    subscribeSave,
+    getSaveSnapshot,
+    getServerSaveSnapshot,
+  );
+  const update = updateSave;
 
   const markAttempt = useCallback(
     (topicId: string, ok: boolean, level = 1) => {
@@ -161,18 +127,22 @@ export function useSave() {
   );
 
   const setNote = useCallback(
-    (topicId: string, text: string) => {
-      update((s) => ({ ...s, notes: { ...s.notes, [topicId]: text.slice(0, 4000) }, lastTopic: topicId }));
+    (topicId: string, text: string, trackTopic = true) => {
+      update((s) => ({
+        ...s,
+        notes: { ...s.notes, [topicId]: text.slice(0, 4000) },
+        lastTopic: trackTopic ? topicId : s.lastTopic,
+      }));
     },
     [update],
   );
 
   const setStep = useCallback(
-    (topicId: string, step: number) => {
+    (topicId: string, step: number, trackTopic = true) => {
       update((s) => ({
         ...s,
         steps: { ...s.steps, [topicId]: step },
-        lastTopic: topicId,
+        lastTopic: trackTopic ? topicId : s.lastTopic,
       }));
     },
     [update],
@@ -201,9 +171,18 @@ export function useSave() {
     [update],
   );
 
-  const toggleMilestone = useCallback((projectId: string, index: number) => toggleIn("proj", projectId, index), [toggleIn]);
-  const toggleOwned = useCallback((projectId: string, index: number) => toggleIn("kit", projectId, index), [toggleIn]);
-  const toggleBuild = useCallback((projectId: string, index: number) => toggleIn("build", projectId, index), [toggleIn]);
+  const toggleMilestone = useCallback(
+    (projectId: string, index: number) => toggleIn("proj", projectId, index),
+    [toggleIn],
+  );
+  const toggleOwned = useCallback(
+    (projectId: string, index: number) => toggleIn("kit", projectId, index),
+    [toggleIn],
+  );
+  const toggleBuild = useCallback(
+    (projectId: string, index: number) => toggleIn("build", projectId, index),
+    [toggleIn],
+  );
 
   const passChallenge = useCallback(
     (id: string) => {
@@ -223,7 +202,13 @@ export function useSave() {
     (questionId: string, ok: boolean) => {
       update((s) => {
         const field = ok ? "right" : "wrong";
-        return { ...s, lpdp: { ...s.lpdp, [field]: { ...s.lpdp[field], [questionId]: (s.lpdp[field][questionId] ?? 0) + 1 } } };
+        return {
+          ...s,
+          lpdp: {
+            ...s.lpdp,
+            [field]: { ...s.lpdp[field], [questionId]: (s.lpdp[field][questionId] ?? 0) + 1 },
+          },
+        };
       });
     },
     [update],
@@ -238,7 +223,10 @@ export function useSave() {
 
   const setLpdpText = useCallback(
     (field: "essays" | "interview", key: string, text: string) => {
-      update((s) => ({ ...s, lpdp: { ...s.lpdp, [field]: { ...s.lpdp[field], [key]: text.slice(0, 20000) } } }));
+      update((s) => ({
+        ...s,
+        lpdp: { ...s.lpdp, [field]: { ...s.lpdp[field], [key]: text.slice(0, 20000) } },
+      }));
     },
     [update],
   );
@@ -250,7 +238,25 @@ export function useSave() {
     [update],
   );
 
-  return { save, ready, markAttempt, setNote, setStep, addSession, setRoad, passLesson, toggleMilestone, toggleOwned, toggleBuild, passChallenge, setDraft, markLpdp, addLpdpSim, setLpdpText };
+  return {
+    save,
+    ready,
+    status,
+    markAttempt,
+    setNote,
+    setStep,
+    addSession,
+    setRoad,
+    passLesson,
+    toggleMilestone,
+    toggleOwned,
+    toggleBuild,
+    passChallenge,
+    setDraft,
+    markLpdp,
+    addLpdpSim,
+    setLpdpText,
+  };
 }
 
 export const NOTE_FRAME = `IDE (satu kalimat):

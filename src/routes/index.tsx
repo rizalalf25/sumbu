@@ -36,10 +36,15 @@ function Home() {
     <Shell wide>
       <section className="orbit-hero">
         <div className="orbit-copy">
-          <p className="font-mono text-xs font-semibold tracking-[0.22em] text-copper">BELAJAR TERFOKUS</p>
-          <h1 className="mt-2 font-display text-3xl text-ink md:text-4xl">Satu napas. Satu konsep.</h1>
+          <p className="font-mono text-xs font-semibold tracking-[0.22em] text-copper">
+            BELAJAR TERFOKUS
+          </p>
+          <h1 className="mt-2 font-display text-3xl text-ink md:text-4xl">
+            Satu napas. Satu konsep.
+          </h1>
           <p className="mt-3 text-sm leading-relaxed text-muted md:text-base">
-            Matematika dan fisika untuk perhatian yang mudah loncat. Rumus, gambar, kasus nyata, lalu soal — tidak semuanya sekaligus.
+            Matematika dan fisika untuk perhatian yang mudah loncat. Rumus, gambar, kasus nyata,
+            lalu soal — tidak semuanya sekaligus.
           </p>
           {road ? (
             <p className="mt-3 text-sm text-muted">
@@ -47,7 +52,11 @@ function Home() {
             </p>
           ) : null}
           <div className="mt-5 grid grid-cols-2 gap-2">
-            <Link to="/belajar/$topicId" params={{ topicId: next.id }} className="btn col-span-2 w-full">
+            <Link
+              to="/belajar/$topicId"
+              params={{ topicId: next.id }}
+              className="btn col-span-2 w-full"
+            >
               Lanjut: {next.title}
             </Link>
             <Link to="/metode" className="btn-ghost w-full">
@@ -67,9 +76,21 @@ function Home() {
 
       <section className="mt-8 grid gap-3 md:grid-cols-3">
         {[
-          ["01", "Baca satu ide", "Jangan scroll mencari rumus sebelum ide intinya bisa diucapkan."],
-          ["02", "Gerakkan satu slider", "Sebut apa yang berubah. Kalau tidak berubah, itu juga jawaban."],
-          ["03", "Lima soal, dua kalimat", "Salah itu data. Catat dengan kata sendiri, bukan salinan rumus."],
+          [
+            "01",
+            "Baca satu ide",
+            "Jangan scroll mencari rumus sebelum ide intinya bisa diucapkan.",
+          ],
+          [
+            "02",
+            "Gerakkan satu slider",
+            "Sebut apa yang berubah. Kalau tidak berubah, itu juga jawaban.",
+          ],
+          [
+            "03",
+            "Lima soal, dua kalimat",
+            "Salah itu data. Catat dengan kata sendiri, bukan salinan rumus.",
+          ],
         ].map(([n, title, body]) => (
           <article key={n} className="card flex h-full flex-col p-5">
             <p className="font-mono text-xs tracking-[0.16em] text-copper">{n}</p>
@@ -78,13 +99,25 @@ function Home() {
           </article>
         ))}
       </section>
-      <p className="mt-3 text-sm text-muted">Bank soal dihitung ulang dari parameter. Catatan tersimpan di peramban ini.</p>
+      <p className="mt-3 text-sm text-muted">
+        Belajar bebas tanpa akun.{" "}
+        <Link to="/login" className="text-copper">
+          Masuk
+        </Link>{" "}
+        untuk menyimpan progres lintas perangkat dan belajar bersama teman.
+      </p>
 
-      <Link to="/lpdp" className="card card-link mt-8 flex flex-wrap items-center justify-between gap-4 p-5">
+      <Link
+        to="/lpdp"
+        className="card card-link mt-8 flex flex-wrap items-center justify-between gap-4 p-5"
+      >
         <span>
           <span className="block text-sm font-semibold text-copper">Beasiswa LPDP</span>
           <span className="mt-1 block text-2xl">Persiapan tes, esai, dan wawancara</span>
-          <span className="mt-1 block text-sm text-muted">Materi dan bank soal verbal, kuantitatif, penalaran · simulasi 30 menit · latihan esai dan wawancara.</span>
+          <span className="mt-1 block text-sm text-muted">
+            Materi dan bank soal verbal, kuantitatif, penalaran · simulasi 30 menit · latihan esai
+            dan wawancara.
+          </span>
         </span>
         <span className="btn">Buka LPDP</span>
       </Link>
@@ -92,10 +125,30 @@ function Home() {
       <section className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {(
           [
-            ["/proyek", "Proyek studi kasus", `${PROJECTS.length} proyek`, "Drone, PLTS atap, asisten RAG, deteksi serangan. Lengkap dengan daftar belanja dan panduan rakit."],
-            ["/kode", "Bahasa pemrograman", `${LESSONS.length} pelajaran · ${CHALLENGES.length} tantangan`, "Python, SQL, C++, R, Bash. Python dan SQL bisa dijalankan langsung di peramban."],
-            ["/studio", "Studio 3D", "7 adegan", "Lemparan, bandul, gelombang, vektor, muatan, permukaan, dan medan yang bisa diputar."],
-            ["/rumus", "Lembar rumus", "semua materi", "Cari rumus yang sedang dipakai, sembunyikan, coba ingat, lalu buka."],
+            [
+              "/proyek",
+              "Proyek studi kasus",
+              `${PROJECTS.length} proyek`,
+              "Drone, PLTS atap, asisten RAG, deteksi serangan. Lengkap dengan daftar belanja dan panduan rakit.",
+            ],
+            [
+              "/kode",
+              "Bahasa pemrograman",
+              `${LESSONS.length} pelajaran · ${CHALLENGES.length} tantangan`,
+              "Python, SQL, C++, R, Bash. Python dan SQL bisa dijalankan langsung di peramban.",
+            ],
+            [
+              "/studio",
+              "Studio 3D",
+              "7 adegan",
+              "Lemparan, bandul, gelombang, vektor, muatan, permukaan, dan medan yang bisa diputar.",
+            ],
+            [
+              "/rumus",
+              "Lembar rumus",
+              "semua materi",
+              "Cari rumus yang sedang dipakai, sembunyikan, coba ingat, lalu buka.",
+            ],
           ] as const
         ).map(([to, title, kicker, body]) => (
           <Link key={to} to={to} className="card card-link flex h-full flex-col p-5">
@@ -117,7 +170,8 @@ function Home() {
           </Link>
         </div>
         <p className="mb-4 max-w-2xl text-sm text-muted">
-          Bukan seluruh katalog untuk setiap orang. Inti di depan, cabang di bawah, dan materi di luar bidang tertulis di halaman petanya.
+          Bukan seluruh katalog untuk setiap orang. Inti di depan, cabang di bawah, dan materi di
+          luar bidang tertulis di halaman petanya.
         </p>
         <div className="grid items-stretch gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {homeRoads(save.road).map((item) => {
@@ -141,7 +195,10 @@ function Home() {
                 <h3 className="mt-3 text-xl">{item.title}</h3>
                 <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">{item.line}</p>
                 <span className="mt-4 block h-1.5 overflow-hidden rounded-full bg-line">
-                  <span className="block h-full bg-copper" style={{ width: `${Math.round(ratio * 100)}%` }} />
+                  <span
+                    className="block h-full bg-copper"
+                    style={{ width: `${Math.round(ratio * 100)}%` }}
+                  />
                 </span>
               </Link>
             );
@@ -173,7 +230,8 @@ function Home() {
             <p className="mb-4 max-w-2xl text-sm text-muted">{track.note}</p>
             <ol className="card divide-y divide-line">
               {rows.map((topic, index) => {
-                const done = Math.min(3, save.correct[topic.id] ?? 0) + (isEnough(save, topic.id) ? 1 : 0);
+                const done =
+                  Math.min(3, save.correct[topic.id] ?? 0) + (isEnough(save, topic.id) ? 1 : 0);
                 return (
                   <li key={topic.id}>
                     <Link
@@ -181,7 +239,9 @@ function Home() {
                       params={{ topicId: topic.id }}
                       className="flex items-center gap-3 px-4 py-3.5"
                     >
-                      <span className="w-8 shrink-0 font-mono text-xs text-muted">{String(index + 1).padStart(2, "0")}</span>
+                      <span className="w-8 shrink-0 font-mono text-xs text-muted">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
                       <span className="min-w-0 flex-1">
                         <span className="block font-medium">{topic.title}</span>
                         <span className="block truncate text-sm text-muted">{topic.blurb}</span>
@@ -189,7 +249,10 @@ function Home() {
                       <span className="hidden w-16 shrink-0 text-right text-xs text-muted sm:block">
                         {topic.minutes} mnt
                         <span className="mt-1 block h-1 overflow-hidden rounded-full bg-line">
-                          <span className="block h-full bg-copper" style={{ width: `${done * 25}%` }} />
+                          <span
+                            className="block h-full bg-copper"
+                            style={{ width: `${done * 25}%` }}
+                          />
                         </span>
                       </span>
                     </Link>
@@ -200,7 +263,11 @@ function Home() {
           </section>
         );
       })}
-      {!filtered.length ? <p className="mt-8 text-muted">Tidak ada materi dengan kata itu. Coba “limit”, “gaya”, atau “Laplace”.</p> : null}
+      {!filtered.length ? (
+        <p className="mt-8 text-muted">
+          Tidak ada materi dengan kata itu. Coba “limit”, “gaya”, atau “Laplace”.
+        </p>
+      ) : null}
     </Shell>
   );
 }

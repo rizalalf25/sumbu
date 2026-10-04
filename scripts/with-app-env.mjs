@@ -110,9 +110,13 @@ function main(argv) {
     console.error("usage: node scripts/with-app-env.mjs <command> [args…]");
     process.exit(2);
   }
-  const env = mergeAppEnv(readAppEnv(projectRoot()), process.env);
-  // Windows memasang bin npm sebagai berkas .cmd yang hanya bisa dijalankan lewat shell.
-  const child = spawn(command, args, { stdio: "inherit", env, shell: process.platform === "win32" });
+  const env = mergeAppEnv({ VITE_AUTH_ENABLED: "true", ...readAppEnv(projectRoot()) }, process.env);
+  // Launch Vite's JS entry directly. Avoid Windows .cmd shell quoting, which
+  // breaks paths with spaces and can interpret command arguments as shell code.
+  const resolvedCommand = command === "vite" ? process.execPath : command;
+  const resolvedArgs =
+    command === "vite" ? [join(projectRoot(), "node_modules/vite/bin/vite.js"), ...args] : args;
+  const child = spawn(resolvedCommand, resolvedArgs, { stdio: "inherit", env, shell: false });
   // The dev server is long-running and is stopped by signalling this wrapper.
   for (const signal of ["SIGINT", "SIGTERM", "SIGHUP"]) {
     process.on(signal, () => child.kill(signal));

@@ -2,7 +2,9 @@
 
 Aplikasi web untuk belajar matematika dan fisika. Satu materi dibuka satu napas: inti dulu, gambar yang bisa digerakkan, kasus nyata, baru soal. Bahasa antarmukanya Indonesia.
 
-Cocok untuk perhatian yang mudah loncat. Tidak ada dinding teks, tidak ada animasi yang berjalan sendiri. Rumus ditampilkan dengan KaTeX, progres tersimpan di peramban ini saja.
+Cocok untuk perhatian yang mudah loncat. Tidak ada dinding teks, tidak ada animasi yang berjalan sendiri. Rumus ditampilkan dengan KaTeX. Materi terbuka tanpa akun; setelah login, progres dan catatan pribadi tersimpan ke database dan bisa dilanjutkan lintas perangkat.
+
+SUMBU kini full stack: daftar/login email dan password, dashboard belajar, progres per pengguna, cadangan JSON, dan ruang diskusi terbuka. Tidak diperlukan kode undangan. Panduan menerbitkan untuk akses bersama teman ada di [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ## Isi
 
@@ -13,9 +15,9 @@ Cocok untuk perhatian yang mudah loncat. Tidak ada dinding teks, tidak ada anima
 - **Peta profesi.** Hanya pelajaran yang terpakai, bukan seluruh katalog, lengkap dengan bahasa pemrograman yang disarankan, dua proyek, dan meter kesiapan kerja.
 - **Proyek studi kasus.** 30 proyek (2 per peta), dari dasbor KPI sampai drone quadcopter. Tiap tahap menyebut materi dan pelajaran kode yang dipakai, dan bisa dicentang.
 - **Daftar belanja dan panduan rakit.** 10 proyek perangkat keras (drone, robot pengikut garis, stasiun cuaca, inkubator, konverter buck, model BMS, PLTS mini, braket rak, bandul, spektrum audio) punya daftar komponen, alat, bahan habis pakai, perkiraan harga, total yang bisa dikurangi barang yang sudah dimiliki, dan langkah rakit dengan peringatan keselamatan.
-- **Kode.** 44 pelajaran Python, SQL, C/C++, R, dan Bash bertingkat (dasar, menengah, lanjut) dengan pewarnaan sintaks dan soal "tebak keluaran". 23 contoh Python dan SQL bisa diubah dan dijalankan langsung di peramban (Pyodide di web worker dan sql.js).
+- **Kode.** 44 pelajaran Python, SQL, C/C++, R, dan Bash bertingkat (dasar, menengah, lanjut). Setiap pelajaran mengikuti Janji → Ide → Baca → Tebak → Coba → Jebakan → Catat, dengan percobaan khusus, catatan, draf tersimpan, dan tautan pelajaran berikutnya. 23 contoh Python dan SQL bisa diubah dan dijalankan langsung di peramban (Pyodide di web worker dan sql.js).
 - **Tantangan kode.** 22 tantangan Python dan SQL yang dinilai otomatis dengan tes, dari median sampai pengendali PID; draf jawaban tersimpan otomatis.
-- **LPDP.** Persiapan beasiswa LPDP: tahapan seleksi, materi dan bank soal tes bakat skolastik (verbal, kuantitatif, penalaran; soal kurasi ditambah soal kuantitatif dan pola tanpa batas), simulasi 30 soal 30 menit dengan pembahasan, latihan esai bertimer, dan latihan wawancara dengan metode STAR. Soalnya buatan SUMBU, bukan soal asli LPDP; ketentuan resmi selalu mengikuti panduan LPDP.
+- **LPDP.** Persiapan beasiswa LPDP: tahapan seleksi, materi dan bank soal tes bakat skolastik (verbal, kuantitatif, penalaran). Semua 17 jenis soal punya contoh cara pengerjaan bertahap, petunjuk sebelum menjawab, dan pembahasan setelah menjawab. Simulasi 30 soal 30 menit menampilkan cara pengerjaan setelah selesai. Ada latihan esai bertimer dan wawancara dengan metode STAR. Soalnya buatan SUMBU, bukan soal asli LPDP; ketentuan resmi selalu mengikuti panduan LPDP.
 - **Metode.** Sesi 12 menit, mode fokus, cara mencatat, dan cadangan/pulihkan progres ke file JSON.
 
 Katalog: 57 materi dalam tiga jalur (matematika dasar, fisika dasar, lanjutan), termasuk statistik inferensial, regresi, Bayes, aljabar linear, aturan rantai dan optimasi, bunga dan anuitas, logika dan graf, aritmetika modular, entropi, proses stokastik, kendali, sinyal digital, kuantum, rotasi, termodinamika, magnet, dan kekuatan bahan.
@@ -31,10 +33,10 @@ Satu langkah peta dianggap cukup setelah tiga jawaban benar pada materinya, deng
 
 ## Menjalankan
 
-Perlu Node.js dan npm.
+Perlu Node.js 22.13+ dan npm (QC memakai Node 24).
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
@@ -44,6 +46,7 @@ Buka [http://localhost:8080](http://localhost:8080).
 
 ```bash
 npm run typecheck
+npm run lint
 npm test
 npm run build
 ```
@@ -54,14 +57,14 @@ Setelah menambah atau mengubah generator soal, hitung ulang jumlah variasi:
 npm run bank
 ```
 
-`npm run build` menghasilkan keluaran produksi. Pratinjau lokal:
+`npm run build` menghasilkan keluaran produksi Vercel. `npm run build:node` menghasilkan server Node mandiri. Pratinjau build dengan database QA lokal dijelaskan di [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ```bash
-npm run preview:restart
+npm run preview
 ```
 
 ## Tumpukan
 
-React, TanStack Start, Vite, TypeScript, Tailwind CSS v4, KaTeX, Three.js.
+React, TanStack Start, Vite, TypeScript, Tailwind CSS v4, KaTeX, Three.js, Better Auth, PostgreSQL, dan PGLite untuk pengembangan lokal.
 
-Progres, catatan, dan peta aktif disimpan di `localStorage`. Tidak ada akun yang wajib untuk belajar.
+Progres, catatan, dan peta aktif disimpan per akun di PostgreSQL, dengan salinan lokal untuk koneksi terputus. Tamu memakai `localStorage`. Akun tidak wajib untuk membuka materi. Diskusi memerlukan akun dan keanggotaan ruang; siapa pun yang terdaftar bisa langsung bergabung.

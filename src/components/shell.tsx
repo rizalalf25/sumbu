@@ -1,7 +1,18 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Code2, Compass, FolderKanban, GraduationCap, House, Route, Sigma, Timer } from "lucide-react";
+import {
+  Code2,
+  Compass,
+  FolderKanban,
+  GraduationCap,
+  House,
+  Route,
+  Sigma,
+  Timer,
+} from "lucide-react";
 import { createContext, useContext, useSyncExternalStore, type ReactNode } from "react";
 import { StudyDock } from "@/components/study-dock";
+import { useCurrentUserState } from "@/lib/auth/use-current-user";
+import { getSaveSnapshot, getServerSaveSnapshot, subscribeSave } from "@/lib/progress-store";
 
 const NAV = [
   { to: "/", label: "Beranda", icon: House, mobile: true },
@@ -60,12 +71,14 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
   const focus = useSyncExternalStore(subscribeFocus, readFocus, () => false);
   const setFocus = writeFocus;
   const width = wide ? "max-w-5xl" : "max-w-3xl";
+  const { user, isPending } = useCurrentUserState();
+  const progress = useSyncExternalStore(subscribeSave, getSaveSnapshot, getServerSaveSnapshot);
 
   return (
     <FocusContext.Provider value={{ focus, setFocus }}>
-      <div className="min-h-screen text-ink">
+      <div className="min-h-screen text-ink" data-auth-pending={isPending ? "true" : "false"}>
         <header className="hud-bar sticky top-0 z-20 border-b border-line bg-paper/80 backdrop-blur-md">
-          <div className={`mx-auto flex items-center justify-between gap-3 px-4 py-3 ${width}`}>
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3">
             <Link to="/" className="flex items-center gap-3" onClick={() => setFocus(false)}>
               <Mark />
               <span className="font-display text-xl leading-none tracking-[0.14em]">SUMBU</span>
@@ -87,16 +100,65 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
                 ))}
               </nav>
             )}
+            {!focus && (
+              <Link
+                to={user ? "/dashboard" : "/login"}
+                className="btn-ghost shrink-0 px-3 text-sm"
+                aria-label={user ? "Buka dashboard akun" : "Masuk atau daftar"}
+              >
+                {isPending ? "Akun" : user ? "Dashboard" : "Masuk"}
+              </Link>
+            )}
           </div>
         </header>
-        <main className={`mx-auto px-4 py-6 ${focus ? "pb-24" : "pb-36 lg:pb-24"} ${width}`}>{children}</main>
+        <main
+          aria-busy={!progress.ready}
+          className={`mx-auto px-4 py-6 ${focus ? "pb-24" : "pb-36 lg:pb-24"} ${width}`}
+        >
+          {!focus && (
+            <div className="mb-5 flex flex-wrap gap-4 text-xs text-muted">
+              <Link to="/dashboard" className="hover:text-copper">
+                Perjalanan saya
+              </Link>
+              <Link to="/ruang" className="hover:text-copper">
+                Ruang belajar
+              </Link>
+              <Link to="/rumus" className="lg:hidden">
+                Rumus
+              </Link>
+              <Link to="/studio" className="lg:hidden">
+                Studio
+              </Link>
+              <Link to="/metode" className="lg:hidden">
+                Metode
+              </Link>
+            </div>
+          )}
+          {!progress.ready && (
+            <p role="status" className="mb-4 text-xs text-muted">
+              Memuat progres belajar…
+            </p>
+          )}
+          {(progress.status === "offline" || progress.status === "conflict") && (
+            <p role="status" className="mb-4 border border-line p-3 text-xs text-muted">
+              Progres tersimpan di perangkat; sinkronisasi perlu perhatian.{" "}
+              <Link to="/dashboard" className="text-copper">
+                Periksa dashboard
+              </Link>
+            </p>
+          )}
+          <div inert={!progress.ready}>{children}</div>
+        </main>
         <StudyDock focus={focus} />
         {!focus && (
           <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-paper/75 backdrop-blur-md lg:hidden">
             <ul className="grid grid-cols-5">
               {NAV.filter((item) => item.mobile).map((item) => {
                 const Icon = item.icon;
-                const on = item.to === "/" ? path === "/" : path === item.to || path.startsWith(`${item.to}/`);
+                const on =
+                  item.to === "/"
+                    ? path === "/"
+                    : path === item.to || path.startsWith(`${item.to}/`);
                 return (
                   <li key={item.to}>
                     <Link
@@ -120,7 +182,14 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
 function Mark() {
   return (
     <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" className="mark-glow">
-      <rect x="1.5" y="1.5" width="25" height="25" className="fill-card stroke-copper" strokeWidth="1.4" />
+      <rect
+        x="1.5"
+        y="1.5"
+        width="25"
+        height="25"
+        className="fill-card stroke-copper"
+        strokeWidth="1.4"
+      />
       <path
         d="M6 15h4.2L12 9l3.2 11 2.2-5H22"
         className="stroke-ink"

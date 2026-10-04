@@ -3,21 +3,28 @@
   "private": true,
   "sideEffects": false,
   "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
   "overrides": {
     "nf3": "0.3.17"
   },
   "scripts": {
     "dev": "node scripts/with-app-env.mjs vite dev --host 0.0.0.0 --port 8080",
-    "build": "node scripts/with-app-env.mjs vite build && npm run db:migrate",
+    "build": "node scripts/validate-deployment.mjs && node scripts/with-app-env.mjs vite build && npm run db:migrate",
     "db:migrate": "node scripts/migrate.mjs",
     "build:dev": "node scripts/with-app-env.mjs vite build --mode development",
+    "build:node": "node scripts/build-node.mjs",
+    "start": "node .output/server/index.mjs",
+    "test:e2e": "node scripts/learning-e2e.mjs",
+    "test:education": "node --experimental-strip-types scripts/education-e2e.mjs",
     "preview": "node scripts/with-app-env.mjs vite preview",
     "preview:restart": "node scripts/preview.mjs restart",
     "preview:stop": "node scripts/preview.mjs stop",
     "typecheck": "tsc --noEmit",
     "bank": "node --experimental-strip-types scripts/bank-count.ts",
     "check:auth": "node scripts/check-auth-invariant.mjs",
-    "test": "node --test 'scripts/**/*.test.mjs' && node --experimental-strip-types --test src/lib/app-data/app-data.test.ts src/lib/app-data/readiness-schedule.test.ts src/lib/auth/gate-identity.test.ts src/lib/auth/sign-in-gate.test.ts src/lib/problems.test.ts src/lib/content.test.ts src/lib/lpdp.test.ts",
+    "test": "node scripts/test.mjs",
     "lint": "eslint .",
     "format": "prettier --write ."
   },

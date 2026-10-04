@@ -3,7 +3,8 @@ import { z } from "zod";
 const id = z
   .string()
   .max(120)
-  .regex(/^[a-zA-Z0-9_-]+$/);
+  .regex(/^[a-zA-Z0-9_:-]+$/)
+  .refine((key) => !["__proto__", "constructor", "prototype"].includes(key));
 const count = z.number().int().min(0).max(1_000_000);
 const counts = z.record(id, count).default({});
 const textKey = z

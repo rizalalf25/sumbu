@@ -77,7 +77,11 @@ export function CodeEditor({
 
   return (
     <div className="code-editor relative">
-      <pre ref={layer} aria-hidden="true" className="code-layer pointer-events-none absolute inset-0 overflow-hidden">
+      <pre
+        ref={layer}
+        aria-hidden="true"
+        className="code-layer pointer-events-none absolute inset-0 overflow-hidden"
+      >
         <code dangerouslySetInnerHTML={{ __html: `${highlight(value, lang)}\n` }} />
       </pre>
       <textarea
@@ -102,7 +106,8 @@ export function CodeEditor({
 }
 
 export function SqlTables({ tables }: { tables: SqlTable[] }) {
-  if (!tables.length) return <p className="text-sm text-muted">Query berjalan, tetapi tidak mengembalikan baris.</p>;
+  if (!tables.length)
+    return <p className="text-sm text-muted">Query berjalan, tetapi tidak mengembalikan baris.</p>;
   return (
     <div className="grid gap-3">
       {tables.map((table, t) => (
@@ -111,7 +116,10 @@ export function SqlTables({ tables }: { tables: SqlTable[] }) {
             <thead>
               <tr>
                 {table.columns.map((col) => (
-                  <th key={col} className="border-b border-line px-3 py-1.5 text-left font-semibold text-copper">
+                  <th
+                    key={col}
+                    className="border-b border-line px-3 py-1.5 text-left font-semibold text-copper"
+                  >
                     {col}
                   </th>
                 ))}
@@ -148,7 +156,9 @@ export function OutputView({ state }: { state: RunState }) {
   if (state.kind === "busy") {
     return (
       <p className="text-sm text-muted" role="status">
-        {state.status === "loading" ? "Memuat Python di peramban (sekali saja, beberapa MB)…" : "Menjalankan…"}
+        {state.status === "loading"
+          ? "Memuat Python di peramban (sekali saja, beberapa MB)…"
+          : "Menjalankan…"}
       </p>
     );
   }
@@ -166,8 +176,24 @@ export function OutputView({ state }: { state: RunState }) {
 export type { RunState };
 
 /** Editor + tombol Jalankan + keluaran, untuk pelajaran yang bisa dijalankan di peramban. */
-export function RunPanel({ initial, lang, run, label }: { initial: string; lang: LangId; run: "python" | "sql"; label: string }) {
-  const [code, setCode] = useState(initial);
+export function RunPanel({
+  initial,
+  lang,
+  run,
+  label,
+  value,
+  onChange,
+}: {
+  initial: string;
+  lang: LangId;
+  run: "python" | "sql";
+  label: string;
+  value?: string;
+  onChange?: (value: string) => void;
+}) {
+  const [localCode, setLocalCode] = useState(initial);
+  const code = value ?? localCode;
+  const setCode = onChange ?? setLocalCode;
   const [state, setState] = useState<RunState>({ kind: "idle" });
   const busy = state.kind === "busy";
 
@@ -179,7 +205,9 @@ export function RunPanel({ initial, lang, run, label }: { initial: string; lang:
     } else {
       setState({ kind: "busy", status: "sql" });
       const result = await runSql(code);
-      setState(result.ok ? { kind: "sql", tables: result.tables } : { kind: "error", error: result.error });
+      setState(
+        result.ok ? { kind: "sql", tables: result.tables } : { kind: "error", error: result.error },
+      );
     }
   };
 
@@ -190,7 +218,11 @@ export function RunPanel({ initial, lang, run, label }: { initial: string; lang:
         <div className="flex items-center gap-1">
           <CopyButton text={code} />
           {code !== initial ? (
-            <button type="button" className="btn-quiet px-2 py-1 text-xs" onClick={() => setCode(initial)}>
+            <button
+              type="button"
+              className="btn-quiet px-2 py-1 text-xs"
+              onClick={() => setCode(initial)}
+            >
               Kembalikan
             </button>
           ) : null}

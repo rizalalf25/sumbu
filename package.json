@@ -17,6 +17,7 @@
     "build:node": "node scripts/build-node.mjs",
     "start": "node .output/server/index.mjs",
     "test:e2e": "node scripts/learning-e2e.mjs",
+    "test:education": "node --experimental-strip-types scripts/education-e2e.mjs",
     "preview": "node scripts/with-app-env.mjs vite preview",
     "preview:restart": "node scripts/preview.mjs restart",
     "preview:stop": "node scripts/preview.mjs stop",

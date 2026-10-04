@@ -127,22 +127,22 @@ export function useSave() {
   );
 
   const setNote = useCallback(
-    (topicId: string, text: string) => {
+    (topicId: string, text: string, trackTopic = true) => {
       update((s) => ({
         ...s,
         notes: { ...s.notes, [topicId]: text.slice(0, 4000) },
-        lastTopic: topicId,
+        lastTopic: trackTopic ? topicId : s.lastTopic,
       }));
     },
     [update],
   );
 
   const setStep = useCallback(
-    (topicId: string, step: number) => {
+    (topicId: string, step: number, trackTopic = true) => {
       update((s) => ({
         ...s,
         steps: { ...s.steps, [topicId]: step },
-        lastTopic: topicId,
+        lastTopic: trackTopic ? topicId : s.lastTopic,
       }));
     },
     [update],

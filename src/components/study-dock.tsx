@@ -1,5 +1,5 @@
 import { ChevronDown, Pause, Play, RotateCcw, SkipForward, Timer } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import {
   formatClock,
   phaseLabel,
@@ -33,41 +33,76 @@ function writeOpen(value: boolean) {
   }
 }
 
-/**
- * Timer belajar dan lofi. Bawaannya diciutkan menjadi pil kecil di pojok supaya tidak
- * menutupi slider, tombol, atau teks; dibuka hanya saat ingin mengatur.
- */
-export function StudyDock({ focus = false }: { focus?: boolean }) {
-  const [snap, setSnap] = useState<StudySnap | null>(null);
-  const [open, setOpen] = useState(false);
+// Status buka/ciut dipakai bersama oleh pil di header (HP) dan panel/pil mengambang.
+const openListeners = new Set<() => void>();
+let openState: boolean | null = null;
 
+function getOpen(): boolean {
+  if (openState === null) openState = readOpen();
+  return openState;
+}
+
+function setOpen(value: boolean) {
+  openState = value;
+  writeOpen(value);
+  openListeners.forEach((listener) => listener());
+}
+
+function subscribeOpen(listener: () => void) {
+  openListeners.add(listener);
+  return () => {
+    openListeners.delete(listener);
+  };
+}
+
+function useDock() {
+  const [snap, setSnap] = useState<StudySnap | null>(null);
+  const open = useSyncExternalStore(subscribeOpen, getOpen, () => false);
   useEffect(() => {
     setSnap(studySnapshot());
-    setOpen(readOpen());
     return subscribeStudy(setSnap);
   }, []);
+  return { snap, open };
+}
 
+function Pill({ snap, className }: { snap: StudySnap; className: string }) {
+  return (
+    <div className={className} role="group" aria-label="Timer belajar">
+      <button type="button" className="study-pill-btn" onClick={togglePomo} aria-label={snap.running ? "Jeda timer" : "Mulai timer"}>
+        {snap.running ? <Pause size={15} aria-hidden="true" /> : <Play size={15} aria-hidden="true" />}
+      </button>
+      <button type="button" className="study-pill-main" onClick={() => setOpen(true)} aria-expanded={false} aria-label="Buka pengaturan timer dan lofi">
+        <Timer size={14} aria-hidden="true" className="hidden sm:block" />
+        <span className="font-mono tabular-nums">{formatClock(snap.remaining)}</span>
+        <span className="hidden text-xs text-muted sm:inline">{phaseLabel(snap.phase)}</span>
+      </button>
+    </div>
+  );
+}
+
+/**
+ * Pil timer di dalam header untuk layar di bawah 1024 px. Di sana ia duduk di samping tombol akun,
+ * jadi tidak pernah menutupi slider, tombol, atau teks di halaman.
+ */
+export function StudyPillHeader() {
+  const { snap, open } = useDock();
+  if (!snap || open) return null;
+  return <Pill snap={snap} className="study-pill study-pill-inline lg:hidden" />;
+}
+
+/**
+ * Timer belajar dan lofi. Bawaannya diciutkan menjadi pil kecil; dibuka hanya saat ingin mengatur.
+ * Pil mengambang hanya dipakai di desktop dan di mode fokus. Di HP tanpa mode fokus, pilnya ada
+ * di header (StudyPillHeader), dan komponen ini hanya menampilkan panel saat dibuka.
+ */
+export function StudyDock({ focus = false }: { focus?: boolean }) {
+  const { snap, open } = useDock();
   if (!snap) return null;
 
-  const toggleOpen = (value: boolean) => {
-    setOpen(value);
-    writeOpen(value);
-  };
   const round = snap.phase === "kerja" ? (snap.round % 4) + 1 : snap.round % 4 || 4;
 
   if (!open) {
-    return (
-      <div className={`study-pill ${focus ? "study-dock-focus" : ""}`} aria-label="Timer belajar">
-        <button type="button" className="study-pill-btn" onClick={togglePomo} aria-label={snap.running ? "Jeda timer" : "Mulai timer"}>
-          {snap.running ? <Pause size={15} aria-hidden="true" /> : <Play size={15} aria-hidden="true" />}
-        </button>
-        <button type="button" className="study-pill-main" onClick={() => toggleOpen(true)} aria-expanded={false} aria-label="Buka pengaturan timer dan lofi">
-          <Timer size={14} aria-hidden="true" />
-          <span className="font-mono tabular-nums">{formatClock(snap.remaining)}</span>
-          <span className="hidden text-xs text-muted sm:inline">{phaseLabel(snap.phase)}</span>
-        </button>
-      </div>
-    );
+    return <Pill snap={snap} className={`study-pill ${focus ? "study-dock-focus" : "max-lg:hidden"}`} />;
   }
 
   return (
@@ -79,7 +114,7 @@ export function StudyDock({ focus = false }: { focus?: boolean }) {
             {phaseLabel(snap.phase)} · putaran {round}/4
           </p>
         </div>
-        <button type="button" className="btn-quiet study-btn" onClick={() => toggleOpen(false)} aria-expanded={true}>
+        <button type="button" className="btn-quiet study-btn" onClick={() => setOpen(false)} aria-expanded={true}>
           <ChevronDown size={16} aria-hidden="true" />
           Ciutkan
         </button>

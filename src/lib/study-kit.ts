@@ -1,3 +1,5 @@
+import { updateSave } from "./progress-store.ts";
+
 export type Phase = "kerja" | "jeda" | "panjang";
 
 const WORK_KEY = "sumbu-pomo-work";
@@ -52,6 +54,7 @@ function loadWork() {
 
 /** Panjang blok kerja: 12 menit (blok pendek) atau 25 menit (Pomodoro klasik). */
 export function setWorkMinutes(minutes: number) {
+  if (!WORK_CHOICES.includes(minutes as (typeof WORK_CHOICES)[number])) return;
   work = minutes * 60;
   try {
     localStorage.setItem(WORK_KEY, String(minutes));
@@ -82,7 +85,15 @@ function midi(note: number) {
 
 function snap(): StudySnap {
   loadWork();
-  return { music, volume, phase, running, remaining: liveRemaining(), round, workMinutes: work / 60 };
+  return {
+    music,
+    volume,
+    phase,
+    running,
+    remaining: liveRemaining(),
+    round,
+    workMinutes: work / 60,
+  };
 }
 
 function liveRemaining() {
@@ -136,7 +147,14 @@ function ensure() {
   return audio;
 }
 
-function tone(bus: GainNode, freq: number, at: number, dur: number, peak: number, type: OscillatorType) {
+function tone(
+  bus: GainNode,
+  freq: number,
+  at: number,
+  dur: number,
+  peak: number,
+  type: OscillatorType,
+) {
   if (!ctx) return;
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
@@ -229,7 +247,8 @@ function startVinyl() {
 
 export function setStudyVolume(value: number) {
   volume = Math.min(1, Math.max(0, value));
-  if (master) master.gain.setTargetAtTime(music ? volume : 0.0001, master.context.currentTime, 0.03);
+  if (master)
+    master.gain.setTargetAtTime(music ? volume : 0.0001, master.context.currentTime, 0.03);
   emit();
 }
 
@@ -271,9 +290,10 @@ function chime() {
   tone(bus, midi(79), audio.currentTime + 0.16, 0.5, 0.16, "sine");
 }
 
-function finishPhase() {
+function finishPhase(completed = true) {
   running = false;
   if (phase === "kerja") {
+    if (completed) updateSave((save) => ({ ...save, sessions: save.sessions + 1 }));
     round += 1;
     phase = round % 4 === 0 ? "panjang" : "jeda";
   } else {
@@ -310,7 +330,7 @@ export function togglePomo() {
 
 export function skipPomo() {
   running = false;
-  finishPhase();
+  finishPhase(false);
 }
 
 export function resetPomo() {

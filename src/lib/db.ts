@@ -5,10 +5,8 @@ export type DbSource = "neon" | "pglite";
 
 // An empty/whitespace DATABASE_URL (an easy misconfig in deploy UIs) must mean
 // "unset" — otherwise production would silently run on the PGLite fallback.
-const rawDatabaseUrl =
-  typeof process !== "undefined" ? process.env.DATABASE_URL : undefined;
-const databaseUrl =
-  rawDatabaseUrl && rawDatabaseUrl.trim() ? rawDatabaseUrl : undefined;
+const rawDatabaseUrl = typeof process !== "undefined" ? process.env.DATABASE_URL : undefined;
+const databaseUrl = rawDatabaseUrl && rawDatabaseUrl.trim() ? rawDatabaseUrl : undefined;
 
 /**
  * Active backend: real **Neon** when `DATABASE_URL` is set (deployed / configured
@@ -27,14 +25,8 @@ export const dbSource: DbSource = databaseUrl ? "neon" : "pglite";
  *   const rows2 = await sql.query("select * from todos where id = $1", [id]);
  */
 export interface Sql {
-  <T = Record<string, unknown>>(
-    strings: TemplateStringsArray,
-    ...values: unknown[]
-  ): Promise<T[]>;
-  query<T = Record<string, unknown>>(
-    text: string,
-    params?: unknown[],
-  ): Promise<T[]>;
+  <T = Record<string, unknown>>(strings: TemplateStringsArray, ...values: unknown[]): Promise<T[]>;
+  query<T = Record<string, unknown>>(text: string, params?: unknown[]): Promise<T[]>;
 }
 
 /**
@@ -111,7 +103,25 @@ async function createPgliteSql(): Promise<Sql> {
   // data survives source edits (it resets on dev-server restart).
   globalRef.__pgliteInstance__ ??= (async () => {
     const { PGlite } = await import("@electric-sql/pglite");
+    const dataDir = process.env.SUMBU_DATA_DIR?.trim() || ".data/sumbu";
+    const { mkdir, readFile } = await import("node:fs/promises");
+    await mkdir(dataDir, { recursive: true });
+    // Bundlers relocate PGLite's JS, breaking its relative WASM/data URLs.
+    // Resolve assets from the installed package for local development/QA only.
+    // Production with DATABASE_URL never imports or executes this path.
+    const { createRequire } = await import("node:module");
+    const { dirname, join } = await import("node:path");
+    const packageDir = dirname(createRequire(import.meta.url).resolve("@electric-sql/pglite"));
+    const [wasm, initdbWasm, bundle] = await Promise.all([
+      readFile(join(packageDir, "pglite.wasm")),
+      readFile(join(packageDir, "initdb.wasm")),
+      readFile(join(packageDir, "pglite.data")),
+    ]);
     const pg = new PGlite({
+      dataDir,
+      pgliteWasmModule: await WebAssembly.compile(new Uint8Array(wasm)),
+      initdbWasmModule: await WebAssembly.compile(new Uint8Array(initdbWasm)),
+      fsBundle: new Blob([new Uint8Array(bundle)]),
       parsers: {
         [OID_INT8]: Number,
         [OID_DATE]: identity,
@@ -142,9 +152,7 @@ async function createPgliteSql(): Promise<Sql> {
       import: "default",
       eager: true,
     }) as Record<string, string>;
-    const doneRows = await pg.query<{ name: string }>(
-      "select name from _migrations",
-    );
+    const doneRows = await pg.query<{ name: string }>("select name from _migrations");
     const done = doneRows.rows.map((r) => r.name);
     for (const { name, path } of pendingMigrations(Object.keys(migrations), done)) {
       // Apply + record atomically (parity with scripts/migrate.mjs) so a failed
@@ -175,6 +183,13 @@ async function createSql(): Promise<Sql> {
       "@/lib/db is server-only — call getSql() from a createServerFn handler " +
         "or a server route loader, never from client code.",
     );
+  }
+  if (
+    process.env.NODE_ENV === "production" &&
+    !databaseUrl &&
+    (process.env.SUMBU_ALLOW_LOCAL_DB !== "true" || process.env.VERCEL)
+  ) {
+    throw new Error("DATABASE_URL wajib di produksi; database lokal hanya untuk pengembangan.");
   }
   return dbSource === "neon" ? createNeonSql() : createPgliteSql();
 }
@@ -229,7 +244,11 @@ export function ensureDbReady(): Promise<void> {
 const globalBoot = globalThis as typeof globalThis & {
   __pgBootstrapPromise__?: Promise<void>;
 };
-if (typeof window === "undefined" && dbSource === "pglite") {
+if (
+  typeof window === "undefined" &&
+  dbSource === "pglite" &&
+  process.env.NODE_ENV !== "production"
+) {
   globalBoot.__pgBootstrapPromise__ ??= ensureDbReady().catch((err) => {
     globalBoot.__pgBootstrapPromise__ = undefined;
     console.error("[db] PGLite bootstrap failed:", err);

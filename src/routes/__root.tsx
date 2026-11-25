@@ -1,6 +1,7 @@
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
+import { ProgressSync } from "@/components/progress-sync";
 import appCss from "../styles.css?url";
 import "katex/dist/katex.min.css";
 
@@ -40,6 +41,7 @@ export const Route = createRootRoute({
       <body>
         <PreviewHostBridge />
         <AuthProvider>
+          <ProgressSync />
           <Outlet />
         </AuthProvider>
         <Scripts />

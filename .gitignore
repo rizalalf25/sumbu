@@ -1,4 +1,7 @@
 node_modules
+.data
+.output
+package-local.json
 .grok
 .vercel
 .tanstack

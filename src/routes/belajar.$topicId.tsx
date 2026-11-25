@@ -20,7 +20,11 @@ const COACH = [
   "Dua kalimat dengan kata sendiri. Lalu lima soal.",
 ];
 
-const TRACK_LABEL = { math: "Matematika dasar", physics: "Fisika dasar", advanced: "Lanjutan" } as const;
+const TRACK_LABEL = {
+  math: "Matematika dasar",
+  physics: "Fisika dasar",
+  advanced: "Lanjutan",
+} as const;
 
 function LessonRoute() {
   const { topicId } = Route.useParams();
@@ -75,7 +79,8 @@ function Lesson({ topicId }: { topicId: string }) {
         <FocusToggle />
       </div>
       <p className="mt-3 text-sm text-muted">
-        Langkah {step + 1} dari {STEPS.length}: {STEPS[step]} · sekitar {topic.minutes} menit · {bankOf(topic.id).toLocaleString("id-ID")}+ variasi soal
+        Langkah {step + 1} dari {STEPS.length}: {STEPS[step]} · sekitar {topic.minutes} menit ·{" "}
+        {bankOf(topic.id).toLocaleString("id-ID")}+ variasi soal
       </p>
       {/* Bar progres tetap tipis, tetapi area sentuhnya 32 px supaya mudah dipencet di HP. */}
       <div className="mt-1 flex gap-1">
@@ -83,8 +88,9 @@ function Lesson({ topicId }: { topicId: string }) {
           <button
             key={label}
             type="button"
-            aria-label={`Langkah ${index + 1}: ${label}`}
+            aria-label={label}
             aria-current={index === step ? "step" : undefined}
+            disabled={!ready}
             onClick={() => go(index)}
             className="flex-1 py-3"
           >
@@ -127,7 +133,11 @@ function Lesson({ topicId }: { topicId: string }) {
               <article key={formula.name} className="card p-4">
                 <h2 className="text-2xl">{formula.name}</h2>
                 <div className="my-3 min-h-12">
-                  {hideTex ? <p className="text-muted">Coba sebut dulu, baru tampilkan.</p> : <Tex tex={formula.tex} display />}
+                  {hideTex ? (
+                    <p className="text-muted">Coba sebut dulu, baru tampilkan.</p>
+                  ) : (
+                    <Tex tex={formula.tex} display />
+                  )}
                 </div>
                 <p className="text-sm text-muted">{formula.when}</p>
               </article>
@@ -188,6 +198,7 @@ function Lesson({ topicId }: { topicId: string }) {
             <label className="grid gap-2">
               <span className="font-medium">Catatan dua kalimat</span>
               <textarea
+                disabled={!ready}
                 className="field min-h-40 py-3 font-sans text-base"
                 value={note}
                 onChange={(event) => {
@@ -213,7 +224,12 @@ function Lesson({ topicId }: { topicId: string }) {
       </div>
 
       <div className="mt-6 flex items-center justify-between gap-3">
-        <button type="button" className="btn-ghost" onClick={() => go(step - 1)} disabled={step === 0}>
+        <button
+          type="button"
+          className="btn-ghost"
+          onClick={() => go(step - 1)}
+          disabled={step === 0}
+        >
           Kembali
         </button>
         {step < STEPS.length - 1 ? (

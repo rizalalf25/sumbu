@@ -96,8 +96,11 @@ function Backup() {
     const link = document.createElement("a");
     link.href = url;
     link.download = `sumbu-progres-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.append(link);
     link.click();
-    URL.revokeObjectURL(url);
+    link.remove();
+    // Beberapa peramban baru mulai mengunduh setelah click() selesai; cabut URL-nya belakangan.
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
     setMessage("Cadangan diunduh. Simpan di tempat yang aman, misalnya Google Drive.");
   };
 

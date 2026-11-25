@@ -387,11 +387,16 @@
       0 18px 40px color-mix(in oklab, black 28%, transparent);
   }
 
+  /*
+   * Di layar kecil, pil timer duduk di sisi kanan header (yang kosong karena navigasi pindah ke
+   * bawah), supaya tidak menutupi slider atau tombol di tengah halaman. Panel lengkapnya terbuka
+   * tepat di bawah header. Mulai 1024 px, keduanya kembali ke pojok kanan bawah.
+   */
   .study-dock {
     position: fixed;
     z-index: 30;
     right: 0.75rem;
-    bottom: 4.75rem;
+    top: 3.75rem;
     width: min(22rem, calc(100vw - 1.5rem));
     padding: 0.85rem 0.9rem;
   }
@@ -399,8 +404,8 @@
   .study-pill {
     position: fixed;
     z-index: 30;
-    right: 0.75rem;
-    bottom: 4.75rem;
+    right: 1rem;
+    top: 0.25rem;
     display: flex;
     align-items: center;
     gap: 0.25rem;
@@ -433,6 +438,7 @@
   }
 
   .study-dock-focus {
+    top: auto;
     bottom: 0.75rem;
   }
 
@@ -474,6 +480,7 @@
 @media (min-width: 1024px) {
   .study-dock,
   .study-pill {
+    top: auto;
     bottom: 1rem;
   }
 }

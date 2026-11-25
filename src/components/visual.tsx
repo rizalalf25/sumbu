@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { idn } from "@/lib/mathx";
 import type { VisualKind } from "@/lib/topics";
-import { isSceneKind, LabView } from "./lab-view";
+import { LabView } from "./lab-view";
+import { isSceneKind } from "./scene-kinds";
+import { color } from "./theme-color";
 import { ExtraWidget } from "./visual-extra";
-import { Big, color, Plot, Range, Sketch } from "./visual-kit";
+import { Big, Plot, Range, Sketch } from "./visual-kit";
 
 function PercentPlay() {
   const [price, setPrice] = useState(200);

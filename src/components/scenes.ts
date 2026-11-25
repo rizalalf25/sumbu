@@ -288,11 +288,14 @@ export function mountScene(
   }
 
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const clock = new THREE.Clock();
+  // THREE.Clock sudah usang sejak r183. Timer juga berhenti menghitung saat tab tidak terlihat.
+  const timer = new THREE.Timer();
+  timer.connect(document);
   let time = 0;
   let frame = 0;
-  const loop = () => {
-    const dt = Math.min(clock.getDelta(), 0.05);
+  const loop = (now?: number) => {
+    timer.update(now);
+    const dt = Math.min(timer.getDelta(), 0.05);
     // Gerak hanya berjalan setelah pengguna menekan "Putar gerak"; bawaannya diam.
     if (!reduced && isPlaying()) time += dt;
     update(time, getParams());
@@ -315,6 +318,7 @@ export function mountScene(
 
   return () => {
     cancelAnimationFrame(frame);
+    timer.dispose();
     ro.disconnect();
     controls.dispose();
     disposables.forEach((item) => item.dispose());

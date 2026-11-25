@@ -607,9 +607,9 @@ export const EXTRA_TOPICS: Topic[] = [
       { t: "Cross-entropy", d: "Loss klasifikasi = −log peluang yang diberikan model ke jawaban yang benar." },
     ],
     formulas: [
-      { name: "Informasi", tex: "I=-\\log_2 p", when: "Satu kejadian berpeluang p." },
-      { name: "Entropi", tex: "H=-\\sum_i p_i\\log_2 p_i", when: "Rata-rata kejutan." },
-      { name: "Cross-entropy", tex: "H(p,q)=-\\sum_i p_i\\ln q_i", when: "Loss model klasifikasi." },
+      { name: "Informasi", tex: "I=-\\log_2 p", when: "Satu kejadian berpeluang p. Dengan log₂, satuannya bit." },
+      { name: "Entropi", tex: "H=-\\sum_i p_i\\log_2 p_i", when: "Rata-rata kejutan, dalam bit." },
+      { name: "Cross-entropy", tex: "H(p,q)=-\\sum_i p_i\\ln q_i", when: "Loss model klasifikasi. Dengan ln, satuannya nat; 1 bit ≈ 0,693 nat." },
     ],
     visual: "entropy",
     caseTitle: "Loss model yang ragu",

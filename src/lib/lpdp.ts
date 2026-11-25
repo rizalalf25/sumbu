@@ -41,7 +41,7 @@ export const STAGES: { title: string; body: string; items: string[] }[] = [
   },
   {
     title: "Seleksi bakat skolastik",
-    body: "Tes daring yang mengukur kemampuan berpikir, bukan hafalan materi kuliah. Pada beberapa periode terakhir tes ini mencakup kemampuan verbal, kuantitatif, dan penalaran, dan pernah disertai penulisan esai on the spot.",
+    body: "Tes daring yang mengukur kemampuan berpikir, bukan hafalan materi kuliah. Pada beberapa periode terakhir tes ini mencakup kemampuan verbal, kuantitatif, dan penalaran, dan pernah disertai penulisan esai on the spot. Tidak semua pendaftar mengikutinya: pemilik LoA Unconditional yang sesuai ketentuan LPDP, serta pendaftar beasiswa PTUD dan penyandang disabilitas, langsung lanjut dari seleksi administrasi ke seleksi substansi.",
     items: ["Verbal: sinonim, antonim, analogi, bacaan, kalimat efektif", "Kuantitatif: aritmetika, perbandingan, aljabar, statistik dasar, soal cerita", "Penalaran: silogisme, logika proposisi, penalaran analitis, pola"],
   },
   {
@@ -313,7 +313,34 @@ function fromRows(prefix: string, sub: SubId, kind: string, rows: Row[], ask?: (
   return rows.map(([word, correct, a, b, c, why], i) => mc(`${prefix}-${i + 1}`, sub, kind, ask ? ask(word) : word, correct, [a, b, c], why));
 }
 
-export const CURATED: LpdpQuestion[] = [
+/**
+ * Ratakan posisi jawaban benar per jenis soal, supaya A, B, C, dan D muncul hampir sama sering.
+ * Acakan per soal saja bisa berat sebelah di bank kecil (pernah: penalaran 10 dari 26 jawabannya D),
+ * dan peserta yang sering berlatih jadi terbiasa menebak huruf. Urutan posisinya tetap diacak.
+ */
+function balanceAnswers(items: LpdpQuestion[]): LpdpQuestion[] {
+  const out = [...items];
+  const groups = new Map<string, number[]>();
+  items.forEach((q, i) => groups.set(`${q.sub}|${q.kind}`, [...(groups.get(`${q.sub}|${q.kind}`) ?? []), i]));
+  const offset = new Map<SubId, number>();
+  for (const [key, indexes] of groups) {
+    const sub = out[indexes[0]].sub;
+    const start = offset.get(sub) ?? 0;
+    offset.set(sub, start + indexes.length);
+    const seed = [...key].reduce((s, ch) => (s * 31 + ch.charCodeAt(0)) >>> 0, 11);
+    const slots = shuffled(indexes.map((_, i) => (start + i) % 4), seed);
+    indexes.forEach((qi, i) => {
+      const q = out[qi];
+      const target = slots[i];
+      const options = [...q.options];
+      [options[q.answer], options[target]] = [options[target], options[q.answer]];
+      out[qi] = { ...q, options, answer: target };
+    });
+  }
+  return out;
+}
+
+export const CURATED: LpdpQuestion[] = balanceAnswers([
   ...fromRows("sin", "verbal", "sinonim", SINONIM, (w) => `Sinonim ${w} adalah…`),
   ...fromRows("ant", "verbal", "antonim", ANTONIM, (w) => `Antonim ${w} adalah…`),
   ...fromRows("ana", "verbal", "analogi", ANALOGI, (w) => `${w} = …`),
@@ -322,7 +349,7 @@ export const CURATED: LpdpQuestion[] = [
   ...fromRows("sil", "penalaran", "silogisme", SILOGISME),
   ...fromRows("log", "penalaran", "logika", LOGIKA),
   ...ANALITIS.flatMap((p) => p.qs.map(([q, correct, a, b, c, why], i) => mc(`anl-${p.id}-${i + 1}`, "penalaran", "analitis", q, correct, [a, b, c], why, p.setup))),
-];
+]);
 
 // ------------------------------------------------------------------ Generator kuantitatif dan pola
 

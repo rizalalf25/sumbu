@@ -171,7 +171,3 @@ export function LabView({ kind }: { kind: SceneKind }) {
     </div>
   );
 }
-
-export function isSceneKind(kind: string): kind is SceneKind {
-  return kind in UI;
-}

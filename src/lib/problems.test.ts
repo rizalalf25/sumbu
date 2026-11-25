@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { checkAnswer, fmt, readNumbers, type Level } from "./mathx.ts";
+import { checkAnswer, coef, cplx, fmt, minus, par, readNumbers, signed, sq, type Level } from "./mathx.ts";
 import { makeProblem, topicIds } from "./problems.ts";
 import { allTopics } from "./topics.ts";
 import { allRoadmaps, flatSteps } from "./roadmaps.ts";
@@ -26,6 +26,19 @@ describe("readNumbers", () => {
     assert.equal(fmt(3200), "3200");
     assert.equal(fmt(-1.25), "-1,25");
   });
+
+  it("penulisan angka negatif tidak ambigu", () => {
+    assert.equal(sq(-4), "(−4)²");
+    assert.equal(sq(4), "4²");
+    assert.equal(par(-0.5), "(−0,5)");
+    assert.equal(signed(-3), "− 3");
+    assert.equal(coef(-1), "−x");
+    assert.equal(coef(1, "x²y"), "x²y");
+    assert.equal(cplx(3, -4), "3 − 4i");
+    assert.equal(cplx(1, -1), "1 − i");
+    assert.equal(minus("(-2, -1) dan = -3"), "(−2, −1) dan = −3");
+    assert.equal(minus("suku ke-5, segitiga 30-60"), "suku ke-5, segitiga 30-60");
+  });
 });
 
 describe("bank soal", () => {
@@ -46,6 +59,11 @@ describe("bank soal", () => {
           const where = `${id} L${level} seed ${seed}: ${p.prompt}`;
           assert.ok(Number.isFinite(p.value), `nilai tidak hingga — ${where}`);
           assert.ok(!/undefined|NaN|Infinity/.test(p.prompt + p.given + p.steps.join(" ")), `teks rusak — ${where}`);
+          const text = [p.prompt, p.given, p.hint, ...p.steps].join(" | ");
+          // "5² + -12²" dibaca 25 − 144; angka negatif sesudah operator harus dikurung: "5² + (−12)²".
+          assert.ok(!/[+−×·*/]\s*[-−]\d/.test(text), `angka negatif tanpa kurung sesudah operator — ${where}: ${text}`);
+          assert.ok(!/(?<![\w)(])[-−]\d+(?:[.,]\d+)?[²³]/.test(text), `kuadrat bilangan negatif tanpa kurung — ${where}: ${text}`);
+          assert.ok(!/\S {2,}\S/.test(text), `spasi ganda — ${where}: ${text}`);
           assert.ok(checkAnswer(p, p.answer), `kunci ${p.answer} ditolak — ${where}`);
           if (Number.isInteger(p.value) && Math.abs(p.value) >= 1000) {
             assert.ok(checkAnswer(p, p.value.toLocaleString("id-ID")), `format ribuan ditolak — ${where}`);

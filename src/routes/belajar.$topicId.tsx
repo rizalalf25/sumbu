@@ -77,18 +77,22 @@ function Lesson({ topicId }: { topicId: string }) {
       <p className="mt-3 text-sm text-muted">
         Langkah {step + 1} dari {STEPS.length}: {STEPS[step]} · sekitar {topic.minutes} menit · {bankOf(topic.id).toLocaleString("id-ID")}+ variasi soal
       </p>
-      <div className="mt-4 flex gap-1">
+      {/* Bar progres tetap tipis, tetapi area sentuhnya 32 px supaya mudah dipencet di HP. */}
+      <div className="mt-1 flex gap-1">
         {STEPS.map((label, index) => (
           <button
             key={label}
             type="button"
-            aria-label={label}
+            aria-label={`Langkah ${index + 1}: ${label}`}
+            aria-current={index === step ? "step" : undefined}
             onClick={() => go(index)}
-            className={`h-2 flex-1 rounded-full ${index <= step ? "bg-copper" : "bg-line"}`}
-          />
+            className="flex-1 py-3"
+          >
+            <span className={`block h-2 rounded-full ${index <= step ? "bg-copper" : "bg-line"}`} />
+          </button>
         ))}
       </div>
-      <p className="mt-4 text-sm">{COACH[step]}</p>
+      <p className="mt-1 text-sm">{COACH[step]}</p>
 
       <div className="mt-5">
         {step === 0 && (

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { idn } from "@/lib/mathx";
 import type { VisualKind } from "@/lib/topics";
-import { Big, color, Plot, Range, Sketch } from "./visual-kit";
+import { color } from "./theme-color";
+import { Big, Plot, Range, Sketch } from "./visual-kit";
 
 type Paint = { ink: string; copper: string; line: string; signal: string; muted: string };
 

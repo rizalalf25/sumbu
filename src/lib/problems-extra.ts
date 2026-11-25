@@ -1,7 +1,8 @@
-import { fmt, problem, take, type Level, type Problem } from "./mathx.ts";
+import { coef, fmt, par, problem, signed, sq, take, type Level, type Problem } from "./mathx.ts";
 
-function sign(n: number, unit = "") {
-  return n < 0 ? `− ${Math.abs(n)}${unit}` : `+ ${n}${unit}`;
+/** Pangkat yang tidak menulis ^1: (…)^1 cukup ditulis (…). */
+function pw(e: number): string {
+  return e === 1 ? "" : `^${e}`;
 }
 
 function rantai(seed: number, level: Level): Problem {
@@ -13,11 +14,15 @@ function rantai(seed: number, level: Level): Problem {
     const inner = a * x + b;
     const value = n * a * inner ** (n - 1);
     return problem(
-      `f(x) = (${a}x ${sign(b)})^${n}. Berapa f'(${x})?`,
+      `f(x) = (${coef(a)} ${signed(b)})^${n}. Berapa f'(${x})?`,
       "Aturan rantai: turunkan luar, kali turunan dalam.",
       value,
-      `Luar: ${n}(…)^${n - 1}. Dalam: ${a}.`,
-      [`f'(x) = ${n}(${a}x ${sign(b)})^${n - 1} × ${a}.`, `Di x = ${x}: isi kurung = ${inner}.`, `f'(${x}) = ${n} × ${inner}^${n - 1} × ${a} = ${value}.`],
+      `Luar: ${n}(…)${pw(n - 1)}. Dalam: ${a}.`,
+      [
+        `f'(x) = ${n}(${coef(a)} ${signed(b)})${pw(n - 1)} × ${a}.`,
+        `Di x = ${x}: isi kurung = ${inner}.`,
+        `f'(${x}) = ${n} × ${par(inner)}${pw(n - 1)} × ${a} = ${value}.`,
+      ],
     );
   }
   if (level === 2) {
@@ -28,11 +33,11 @@ function rantai(seed: number, level: Level): Problem {
     const x = take(seed, 5, [-2, -1, 0, 1, 2, 3]);
     const value = a * (c * x + d) + c * (a * x + b);
     return problem(
-      `f(x) = (${a}x ${sign(b)})(${c}x ${sign(d)}). Berapa f'(${x})?`,
+      `f(x) = (${coef(a)} ${signed(b)})(${coef(c)} ${signed(d)}). Berapa f'(${x})?`,
       "Aturan kali: (uv)' = u'v + uv'.",
       value,
       "Turunkan satu faktor, biarkan yang lain, lalu tukar.",
-      [`u' = ${a}, v' = ${c}.`, `Di x = ${x}: u = ${a * x + b}, v = ${c * x + d}.`, `f' = ${a}×${c * x + d} + ${a * x + b}×${c} = ${value}.`],
+      [`u' = ${a}, v' = ${c}.`, `Di x = ${x}: u = ${a * x + b}, v = ${c * x + d}.`, `f' = ${a}×${par(c * x + d)} + ${par(a * x + b)}×${par(c)} = ${value}.`],
     );
   }
   const w = take(seed, 1, [0, 1, 2, 3, 4]);
@@ -46,7 +51,7 @@ function rantai(seed: number, level: Level): Problem {
     "dL/dw = 2(wx − t)·x. w baru = w − η · dL/dw.",
     value,
     "Turunan negatif berarti w harus naik.",
-    [`dL/dw = 2(${w * x} − ${t}) × ${x} = ${grad}.`, `w baru = ${w} − ${fmt(eta)} × (${grad}) = ${fmt(value)}.`],
+    [`dL/dw = 2(${w * x} − ${t}) × ${x} = ${grad}.`, `w baru = ${w} − ${fmt(eta)} × ${par(grad)} = ${fmt(value)}.`],
     0.01,
   );
 }
@@ -187,7 +192,7 @@ function regresi(seed: number, level: Level): Problem {
       "Masukkan x ke persamaan garis.",
       value,
       "Kemiringan dikali x, lalu tambah intersep.",
-      [`${fmt(b)} × ${x} = ${fmt(b * x)}.`, `ŷ = ${fmt(a)} + ${fmt(b * x)} = ${fmt(value)}.`],
+      [`${fmt(b)} × ${x} = ${fmt(b * x)}.`, `ŷ = ${fmt(a)} + ${par(b * x)} = ${fmt(value)}.`],
     );
   }
   if (level === 2) {
@@ -211,7 +216,7 @@ function regresi(seed: number, level: Level): Problem {
     "Garis regresi lewat titik rata-rata: a = ȳ − b x̄.",
     value,
     "Kurangi, jangan tambahkan.",
-    [`b x̄ = ${fmt(b * xbar)}.`, `a = ${ybar} − ${fmt(b * xbar)} = ${fmt(value)}.`],
+    [`b x̄ = ${fmt(b * xbar)}.`, `a = ${ybar} − ${par(b * xbar)} = ${fmt(value)}.`],
   );
 }
 
@@ -486,7 +491,7 @@ function linalg(seed: number, level: Level): Problem {
       "Baris kali kolom: komponen ke-i = baris ke-i · vektor.",
       value,
       "Kalikan pasangan, lalu jumlahkan.",
-      [row === 1 ? `${a}×${x} + ${b}×${y} = ${value}.` : `${c}×${x} + ${d}×${y} = ${value}.`],
+      [row === 1 ? `${a}×${par(x)} + ${par(b)}×${par(y)} = ${value}.` : `${c}×${par(x)} + ${par(d)}×${par(y)} = ${value}.`],
     );
   }
   if (level === 2) {
@@ -498,7 +503,7 @@ function linalg(seed: number, level: Level): Problem {
       "Untuk [[p, q], [q, p]] nilai eigennya p + q dan p − q.",
       value,
       "Vektor eigennya (1, 1) dan (1, −1). Coba kalikan.",
-      [`λ = ${p} + (${q}) = ${p + q} dan λ = ${p} − (${q}) = ${p - q}.`, `Terbesar = ${value}.`],
+      [`λ = ${p} + ${par(q)} = ${p + q} dan λ = ${p} − ${par(q)} = ${p - q}.`, `Terbesar = ${value}.`],
     );
   }
   const a = take(seed, 1, [1, 2, 3, 4]);
@@ -512,7 +517,7 @@ function linalg(seed: number, level: Level): Problem {
     "Hasil kali nilai eigen = determinan. Jumlahnya = trace (a + d).",
     value,
     "Tidak perlu mencari nilai eigen satu per satu.",
-    [mode === 0 ? `det = ${a}×${d} − ${b}×${c} = ${value}.` : `tr = ${a} + ${d} = ${value}.`],
+    [mode === 0 ? `det = ${a}×${par(d)} − ${par(b)}×${par(c)} = ${value}.` : `tr = ${a} + ${par(d)} = ${value}.`],
   );
 }
 
@@ -581,14 +586,20 @@ function modular(seed: number, level: Level): Problem {
 
 function entropi(seed: number, level: Level): Problem {
   if (level === 1) {
-    const k = take(seed, 1, [1, 2, 3, 4, 5, 6, 10]);
-    return problem(
-      `Kejadian berpeluang 1/${2 ** k}. Berapa bit informasinya?`,
-      "I = −log₂ p.",
-      k,
-      "Berapa kali dibelah dua sampai ke peluang itu?",
-      [`1/${2 ** k} = 2^−${k}.`, `I = ${k} bit.`],
-    );
+    const k = take(seed, 1, [1, 2, 3, 4, 5, 6, 7, 8, 10]);
+    const mode = take(seed, 2, [0, 1, 2]);
+    const prompt =
+      mode === 0
+        ? `Kejadian berpeluang 1/${2 ** k}. Berapa bit informasinya?`
+        : mode === 1
+          ? `Satu dari ${2 ** k} pilihan yang sama mungkin diambil acak. Berapa bit informasi untuk tahu pilihan mana yang keluar?`
+          : k === 1
+            ? "Sebuah koin adil dilempar dan muncul gambar. Berapa bit informasi kejadian itu?"
+            : `${k} koin adil dilempar dan semuanya muncul gambar. Berapa bit informasi kejadian itu?`;
+    return problem(prompt, "I = −log₂ p.", k, "Berapa kali dibelah dua sampai ke peluang itu?", [
+      mode === 2 ? `p = (1/2)^${k} = 1/${2 ** k}.` : `p = 1/${2 ** k} = 2^−${k}.`,
+      `I = −log₂ p = ${k} bit.`,
+    ]);
   }
   if (level === 2) {
     const [label, h] = take(seed, 1, [
@@ -610,14 +621,34 @@ function entropi(seed: number, level: Level): Problem {
       0.01,
     );
   }
-  const k = take(seed, 1, [0, 1, 2, 3, 4, 5]);
-  const value = k * 0.693;
+  // q = 1/(2^i 3^j), sehingga −ln q = i ln 2 + j ln 3 bisa dihitung tanpa kalkulator.
+  const consts = "Pakai ln 2 ≈ 0,693 dan ln 3 ≈ 1,099.";
+  const frac = (n: number) => (n === 1 ? "1" : `1/${n}`);
+  const i = take(seed, 1, [0, 1, 2, 3]);
+  const j = take(seed, 2, [0, 1, 2]);
+  const n = 2 ** i * 3 ** j;
+  const loss = i * 0.693 + j * 1.099;
+  if (take(seed, 3, [0, 1]) === 0) {
+    return problem(
+      `Model memberi peluang ${frac(n)} pada jawaban benar. Cross-entropy loss (log natural)? ${consts}`,
+      "Loss = −ln q. Untuk q = 1/n, loss = ln n.",
+      loss,
+      "Pecah n jadi faktor 2 dan 3: ln(ab) = ln a + ln b.",
+      [`ln ${n} = ${i} × 0,693 + ${j} × 1,099 = ${fmt(loss, 3)}.`],
+      0.01,
+    );
+  }
+  const i2 = take(seed, 4, [0, 1, 2, 3]);
+  const j2 = take(seed, 5, [0, 1]);
+  const n2 = 2 ** i2 * 3 ** j2;
+  const loss2 = i2 * 0.693 + j2 * 1.099;
+  const value = (loss + loss2) / 2;
   return problem(
-    `Model memberi peluang 1/${2 ** k} pada jawaban benar. Cross-entropy loss (log natural)? Pakai ln 2 ≈ 0,693.`,
-    "Loss = −ln q.",
+    `Dua contoh. Model memberi peluang ${frac(n)} dan ${frac(n2)} pada jawaban benarnya. Rata-rata cross-entropy loss (log natural)? ${consts}`,
+    "Loss per contoh = −ln q. Loss satu batch = rata-ratanya.",
     value,
-    "−ln(1/2^k) = k ln 2.",
-    [`−ln(1/${2 ** k}) = ${k} × 0,693 = ${fmt(value, 3)}.`],
+    "Hitung loss tiap contoh, lalu rata-ratakan.",
+    [`Contoh 1: ln ${n} = ${fmt(loss, 3)}.`, `Contoh 2: ln ${n2} = ${fmt(loss2, 3)}.`, `Rata-rata = ${fmt(value, 3)}.`],
     0.01,
   );
 }
@@ -644,7 +675,7 @@ function stokastik(seed: number, level: Level): Problem {
       "E[langkah] = p − (1 − p). Kalikan n.",
       value,
       "Harapan bisa negatif jika peluang naik di bawah 0,5.",
-      [`E[langkah] = ${fmt(2 * p - 1)}.`, `E[posisi] = ${n} × ${fmt(2 * p - 1)} = ${fmt(value)}.`],
+      [`E[langkah] = ${fmt(2 * p - 1)}.`, `E[posisi] = ${n} × ${par(2 * p - 1)} = ${fmt(value)}.`],
     );
   }
   const a = take(seed, 1, [0.9, 0.8, 0.7, 0.5]);
@@ -696,19 +727,29 @@ function kendali(seed: number, level: Level): Problem {
     "u = Kp·e + Ki·∫e dt.",
     value,
     "Suku P memakai galat sekarang, suku I memakai tumpukannya.",
-    [`P: ${kp} × ${fmt(err)} = ${fmt(kp * err)}.`, `I: ${fmt(ki)} × ${integ} = ${fmt(ki * integ)}.`, `u = ${fmt(value)}.`],
+    [`P: ${kp} × ${par(err)} = ${fmt(kp * err)}.`, `I: ${fmt(ki)} × ${integ} = ${fmt(ki * integ)}.`, `u = ${fmt(value)}.`],
   );
 }
 
 function sinyal(seed: number, level: Level): Problem {
   if (level === 1) {
-    const f = take(seed, 1, [100, 440, 1000, 3400, 4000, 8000, 20000]);
+    if (take(seed, 2, [0, 1]) === 0) {
+      const f = take(seed, 1, [100, 250, 440, 1000, 3400, 4000, 5000, 8000, 10000, 15000, 20000, 24000]);
+      return problem(
+        `Sinyal berfrekuensi maksimum ${f} Hz. Laju sampling harus lebih dari berapa Hz?`,
+        "Nyquist: fs > 2 f_maks.",
+        2 * f,
+        "Dua kali frekuensi tertinggi, dan dalam praktik lebih besar lagi.",
+        [`2 × ${f} = ${2 * f} Hz.`],
+      );
+    }
+    const fs = take(seed, 1, [1000, 2000, 8000, 16000, 22050, 32000, 44100, 48000, 96000]);
     return problem(
-      `Sinyal berfrekuensi maksimum ${f} Hz. Laju sampling harus lebih dari berapa Hz?`,
-      "Nyquist: fs > 2 f_maks.",
-      2 * f,
-      "Dua kali frekuensi tertinggi, dan dalam praktik lebih besar lagi.",
-      [`2 × ${f} = ${2 * f} Hz.`],
+      `Laju sampling ${fs} Hz. Frekuensi tertinggi yang masih bisa direkam tanpa aliasing (Hz)?`,
+      "Frekuensi Nyquist = fs / 2.",
+      fs / 2,
+      "Di atas setengah laju sampling, sinyal menyamar menjadi frekuensi lain.",
+      [`${fs} / 2 = ${fs / 2} Hz.`],
     );
   }
   if (level === 2) {
@@ -744,14 +785,36 @@ function sinyal(seed: number, level: Level): Problem {
 
 function kuantum(seed: number, level: Level): Problem {
   if (level === 1) {
-    const alpha = take(seed, 1, [0.6, 0.8, 0.5, 0.3, 0.9, 0.1]);
-    const value = 1 - alpha * alpha;
+    const amp = take(seed, 1, [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, -0.6, -0.8]);
+    const p = amp * amp;
+    const mode = take(seed, 2, [0, 1, 2]);
+    if (mode === 0) {
+      return problem(
+        `Qubit α|0⟩ + β|1⟩ dengan α = ${fmt(amp)}. Peluang hasil ukur 1?`,
+        "|α|² + |β|² = 1. P(1) = |β|².",
+        1 - p,
+        "Kuadratkan α dulu, lalu kurangkan dari 1.",
+        [`P(0) = ${sq(amp)} = ${fmt(p)}.`, `P(1) = 1 − ${fmt(p)} = ${fmt(1 - p)}.`],
+        0.005,
+      );
+    }
+    if (mode === 1) {
+      return problem(
+        `Qubit α|0⟩ + β|1⟩ dengan β = ${fmt(amp)}. Peluang hasil ukur 0?`,
+        "|α|² + |β|² = 1. P(0) = |α|².",
+        1 - p,
+        "Kuadratkan β dulu, lalu kurangkan dari 1.",
+        [`P(1) = ${sq(amp)} = ${fmt(p)}.`, `P(0) = 1 − ${fmt(p)} = ${fmt(1 - p)}.`],
+        0.005,
+      );
+    }
     return problem(
-      `Qubit α|0⟩ + β|1⟩ dengan α = ${fmt(alpha)}. Peluang hasil ukur 1?`,
-      "|α|² + |β|² = 1. P(1) = |β|².",
-      value,
-      "Kuadratkan α dulu, lalu kurangkan dari 1.",
-      [`P(0) = ${fmt(alpha * alpha)}.`, `P(1) = 1 − ${fmt(alpha * alpha)} = ${fmt(value)}.`],
+      `Qubit α|0⟩ + β|1⟩ dengan α = ${fmt(amp)}. Peluang hasil ukur 0?`,
+      "Peluang hasil ukur = kuadrat besar amplitudonya.",
+      p,
+      "Tanda minus pada amplitudo hilang saat dikuadratkan.",
+      [`P(0) = |α|² = ${sq(amp)} = ${fmt(p)}.`],
+      0.005,
     );
   }
   if (level === 2) {

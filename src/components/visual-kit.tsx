@@ -71,10 +71,6 @@ export function Plot({
   );
 }
 
-export function color(name: string, fallback: string) {
-  if (typeof document === "undefined") return fallback;
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
-}
 
 export function Sketch({
   draw,

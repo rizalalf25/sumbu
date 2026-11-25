@@ -51,7 +51,7 @@ function subscribeFocus(listener: () => void) {
 
 const FocusContext = createContext<FocusApi>({ focus: false, setFocus: () => {} });
 
-export function useFocusMode() {
+function useFocusMode() {
   return useContext(FocusContext);
 }
 

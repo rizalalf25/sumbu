@@ -48,6 +48,8 @@ npm test
 npm run build
 ```
 
+`npm test` menjalankan tes aplikasi, lalu tes bawaan template Grok. Tes template butuh berkas di `.grok/` yang hanya ada di sandbox Grok, jadi di clone biasa bagian itu dilewati otomatis. Paksa dengan `npm run test:platform`.
+
 Setelah menambah atau mengubah generator soal, hitung ulang jumlah variasi:
 
 ```bash

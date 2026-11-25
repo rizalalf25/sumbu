@@ -22,6 +22,14 @@ describe("bank soal LPDP", () => {
     assert.ok(CURATED.filter((q) => q.sub === "penalaran").length >= 20);
   });
 
+  it("posisi jawaban benar soal kurasi merata per subtes", () => {
+    for (const sub of ["verbal", "penalaran"]) {
+      const count = [0, 0, 0, 0];
+      for (const q of CURATED.filter((item) => item.sub === sub)) count[q.answer]++;
+      assert.ok(Math.max(...count) - Math.min(...count) <= 1, `posisi jawaban ${sub} berat sebelah: ${count.join("/")}`);
+    }
+  });
+
   it("soal kuantitatif dan pola buatan valid", () => {
     for (let seed = 1; seed <= 3000; seed++) {
       valid(quantQuestion(seed));

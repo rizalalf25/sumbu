@@ -27,7 +27,13 @@ function Formulas() {
         Bukan untuk dihafal berjejer. Cari yang sedang kamu pakai, sembunyikan rumusnya, coba sebut, baru buka.
       </p>
       <div className="mt-6 flex flex-wrap gap-3">
-        <input className="field max-w-md" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Cari, misalnya momentum" />
+        <input
+          aria-label="Cari rumus"
+          className="field max-w-md"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Cari, misalnya momentum"
+        />
         <button type="button" className="btn-ghost" onClick={() => setHide((value) => !value)}>
           {hide ? "Tampilkan semua" : "Sembunyikan untuk diingat"}
         </button>

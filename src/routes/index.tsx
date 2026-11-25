@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Shell } from "@/components/shell";
+import { ACCOUNTS_ENABLED } from "@/lib/accounts";
 import { useSave } from "@/lib/progress";
 import { doneCount, flatSteps, getRoadmap, isEnough, nextStep, ROADMAPS } from "@/lib/roadmaps";
 import { TRACKS, allTopics, bankTotal, getTopic } from "@/lib/topics";
@@ -101,10 +102,16 @@ function Home() {
       </section>
       <p className="mt-3 text-sm text-muted">
         Belajar bebas tanpa akun.{" "}
-        <Link to="/login" className="text-copper">
-          Masuk
-        </Link>{" "}
-        untuk menyimpan progres lintas perangkat dan belajar bersama teman.
+        {ACCOUNTS_ENABLED ? (
+          <>
+            <Link to="/login" className="text-copper">
+              Masuk
+            </Link>{" "}
+            untuk menyimpan progres lintas perangkat dan belajar bersama teman.
+          </>
+        ) : (
+          "Progresmu tersimpan di peramban ini."
+        )}
       </p>
 
       <Link

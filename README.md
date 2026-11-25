@@ -67,4 +67,4 @@ npm run preview
 
 React, TanStack Start, Vite, TypeScript, Tailwind CSS v4, KaTeX, Three.js, Better Auth, PostgreSQL, dan PGLite untuk pengembangan lokal.
 
-Progres, catatan, dan peta aktif disimpan per akun di PostgreSQL, dengan salinan lokal untuk koneksi terputus. Tamu memakai `localStorage`. Akun tidak wajib untuk membuka materi. Diskusi memerlukan akun dan keanggotaan ruang; siapa pun yang terdaftar bisa langsung bergabung.
+Progres, catatan, dan peta aktif disimpan per akun di PostgreSQL, dengan salinan lokal untuk koneksi terputus. Tamu memakai `localStorage`. Akun tidak wajib untuk membuka materi. Diskusi memerlukan akun dan keanggotaan ruang; siapa pun yang terdaftar bisa langsung bergabung. Bila di-deploy ke Vercel tanpa pengaturan database dan auth, situs tayang tanpa akun dan semua progres memakai `localStorage` (lihat [DEPLOYMENT.md](DEPLOYMENT.md)).

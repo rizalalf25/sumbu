@@ -2,6 +2,16 @@
 
 SUMBU kini memiliki frontend, backend, akun email/password, progres per pengguna, dan ruang diskusi terbuka. Materi tidak memerlukan login. Membuat akun dan bergabung ke ruang tidak memerlukan kode undangan.
 
+## Tanpa akun (paling sederhana)
+
+Kalau `DATABASE_URL`, `BETTER_AUTH_SECRET`, dan `BETTER_AUTH_URL` belum diisi di Vercel, build tetap berhasil dan SUMBU tayang tanpa akun:
+
+- Semua materi, latihan, kode, LPDP, dan dashboard tetap jalan. Progres tersimpan di peramban masing-masing pengunjung, dan cadangan bisa diunduh dari dashboard atau halaman Metode.
+- Tombol Masuk dan ruang diskusi disembunyikan. Halaman `/login` dan `/ruang` menjelaskan bahwa akun belum aktif.
+- Tidak ada panggilan ke `/api/auth` atau database.
+
+Untuk mengaktifkan akun nanti, ikuti langkah di bawah lalu redeploy. Mode akun aktif dengan sendirinya. Mengisi hanya sebagian dari ketiga pengaturan dianggap salah konfigurasi, jadi build sengaja digagalkan dengan pesan yang jelas.
+
 ## Vercel + PostgreSQL
 
 1. Buat akun Vercel menggunakan akun GitHub Anda. Import repository `rizalalf25/sumbu` setelah perubahan ini masuk ke branch yang akan diterbitkan.

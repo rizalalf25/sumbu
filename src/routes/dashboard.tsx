@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Shell } from "@/components/shell";
 import { AccountRequired } from "@/components/account-required";
+import { ACCOUNTS_ENABLED } from "@/lib/accounts";
 import { useCurrentUser } from "@/lib/auth/use-current-user";
 import { signOut } from "@/lib/auth/client";
 import { emptySave, useSave } from "@/lib/progress";
@@ -29,9 +30,14 @@ export const Route = createFileRoute("/dashboard")({ component: Dashboard });
 function Dashboard() {
   return (
     <Shell wide>
-      <AccountRequired>
+      {/* Situs tanpa akun: dashboard tetap jalan dari progres di peramban ini. */}
+      {ACCOUNTS_ENABLED ? (
+        <AccountRequired>
+          <DashboardContent />
+        </AccountRequired>
+      ) : (
         <DashboardContent />
-      </AccountRequired>
+      )}
     </Shell>
   );
 }
@@ -88,50 +94,66 @@ function DashboardContent() {
           </h1>
           <p className="mt-3 text-muted">Satu langkah kecil hari ini juga kemajuan.</p>
         </div>
-        <button type="button" className="btn-ghost" disabled={busy} onClick={() => void logout()}>
-          <LogOut size={16} />
-          {busy ? "Keluar…" : "Keluar"}
-        </button>
+        {ACCOUNTS_ENABLED && (
+          <button type="button" className="btn-ghost" disabled={busy} onClick={() => void logout()}>
+            <LogOut size={16} />
+            {busy ? "Keluar…" : "Keluar"}
+          </button>
+        )}
       </div>
       {error && (
         <p className="form-error mt-4" role="alert">
           {error}
         </p>
       )}
-      <div className="sync-banner mt-6" role="status">
-        <Cloud size={19} />
-        <div>
-          <p className="font-semibold">
-            {status === "saved"
-              ? "Progres tersimpan di akun"
-              : status === "saving"
-                ? "Menyimpan progres…"
-                : status === "conflict"
-                  ? "Ada perubahan dari perangkat lain"
-                  : "Progres aman di perangkat ini; sinkronisasi belum selesai"}
-          </p>
-          <p className="mt-1 text-xs text-muted">
-            {status === "conflict"
-              ? "Unduh cadangan lokal sebelum memuat progres terbaru akun. Salinan pemulihan juga disimpan di perangkat ini."
-              : "Catatan pribadi, esai, dan jawaban Anda tidak ditampilkan di ruang belajar."}
-          </p>
-        </div>
-        {status === "offline" && (
-          <button className="btn-ghost ml-auto" onClick={() => void retryProgress()}>
-            Coba lagi
-          </button>
-        )}
-        {status === "conflict" && (
-          <div className="flex flex-wrap gap-2">
-            <button className="btn-ghost" onClick={download}>
-              Unduh lokal
-            </button>
-            <button className="btn-ghost" onClick={() => void reloadCloudProgress()}>
-              Muat progres akun
-            </button>
+      {!ACCOUNTS_ENABLED && (
+        <div className="sync-banner mt-6" role="status">
+          <Cloud size={19} />
+          <div>
+            <p className="font-semibold">Progres tersimpan di peramban ini</p>
+            <p className="mt-1 text-xs text-muted">
+              Unduh cadangan sesekali. Membersihkan data peramban atau pindah perangkat akan memulai
+              dari nol, kecuali cadangannya dipulihkan di halaman Metode.
+            </p>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+      {ACCOUNTS_ENABLED && (
+        <div className="sync-banner mt-6" role="status">
+          <Cloud size={19} />
+          <div>
+            <p className="font-semibold">
+              {status === "saved"
+                ? "Progres tersimpan di akun"
+                : status === "saving"
+                  ? "Menyimpan progres…"
+                  : status === "conflict"
+                    ? "Ada perubahan dari perangkat lain"
+                    : "Progres aman di perangkat ini; sinkronisasi belum selesai"}
+            </p>
+            <p className="mt-1 text-xs text-muted">
+              {status === "conflict"
+                ? "Unduh cadangan lokal sebelum memuat progres terbaru akun. Salinan pemulihan juga disimpan di perangkat ini."
+                : "Catatan pribadi, esai, dan jawaban Anda tidak ditampilkan di ruang belajar."}
+            </p>
+          </div>
+          {status === "offline" && (
+            <button className="btn-ghost ml-auto" onClick={() => void retryProgress()}>
+              Coba lagi
+            </button>
+          )}
+          {status === "conflict" && (
+            <div className="flex flex-wrap gap-2">
+              <button className="btn-ghost" onClick={download}>
+                Unduh lokal
+              </button>
+              <button className="btn-ghost" onClick={() => void reloadCloudProgress()}>
+                Muat progres akun
+              </button>
+            </div>
+          )}
+        </div>
+      )}
       <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
         {[
           [BookOpen, mastered.length, "Materi dikuasai"],
@@ -149,7 +171,7 @@ function DashboardContent() {
           );
         })}
       </div>
-      <div className="mt-6 grid gap-4 md:grid-cols-[1.4fr_1fr]">
+      <div className={`mt-6 grid gap-4 ${ACCOUNTS_ENABLED ? "md:grid-cols-[1.4fr_1fr]" : ""}`}>
         <section className="card p-6">
           <p className="eyebrow">LANGKAH SELANJUTNYA</p>
           <h2 className="mt-3 text-3xl">{next.title}</h2>
@@ -159,17 +181,19 @@ function DashboardContent() {
           </Link>
           {road && <p className="mt-4 text-xs text-muted">Peta aktif: {road.title}</p>}
         </section>
-        <section className="card p-6">
-          <Users className="text-copper" />
-          <h2 className="mt-4 text-2xl">Lebih seru bersama.</h2>
-          <p className="mt-3 text-sm text-muted">
-            Temukan ruang belajar, tanyakan konsep yang sulit, atau buat ruang untuk teman. Tanpa
-            kode undangan.
-          </p>
-          <Link to="/ruang" className="btn-ghost mt-6">
-            Temukan ruang <ArrowRight size={17} />
-          </Link>
-        </section>
+        {ACCOUNTS_ENABLED && (
+          <section className="card p-6">
+            <Users className="text-copper" />
+            <h2 className="mt-4 text-2xl">Lebih seru bersama.</h2>
+            <p className="mt-3 text-sm text-muted">
+              Temukan ruang belajar, tanyakan konsep yang sulit, atau buat ruang untuk teman. Tanpa
+              kode undangan.
+            </p>
+            <Link to="/ruang" className="btn-ghost mt-6">
+              Temukan ruang <ArrowRight size={17} />
+            </Link>
+          </section>
+        )}
       </div>
       <section className="card mt-6 p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -227,7 +251,7 @@ function DashboardContent() {
         <Link to="/metode" className="btn-quiet">
           Pulihkan dari cadangan
         </Link>
-        {emptyAccount && (
+        {ACCOUNTS_ENABLED && emptyAccount && (
           <button
             className="btn-quiet"
             onClick={() => {

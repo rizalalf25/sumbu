@@ -2,10 +2,21 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { ArrowRight, BookOpen, Cloud, Users, Eye, EyeOff } from "lucide-react";
 import { Shell } from "@/components/shell";
+import { AccountsOff } from "@/components/account-required";
+import { ACCOUNTS_ENABLED } from "@/lib/accounts";
 import { authClient } from "@/lib/auth/client";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 
-export const Route = createFileRoute("/login")({ component: Login });
+export const Route = createFileRoute("/login")({
+  component: ACCOUNTS_ENABLED ? Login : LoginOff,
+});
+function LoginOff() {
+  return (
+    <Shell wide>
+      <AccountsOff title="Masuk belum tersedia." />
+    </Shell>
+  );
+}
 function Login() {
   const { user, isPending } = useCurrentUserState();
   const navigate = useNavigate();

@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Shell } from "@/components/shell";
+import { ACCOUNTS_ENABLED } from "@/lib/accounts";
 import { bankSize, DISCLAIMER, OFFICIAL_URL, PLAN, STAGES, SUBTES } from "@/lib/lpdp";
 import { useSave } from "@/lib/progress";
 
@@ -17,8 +18,10 @@ function LpdpHome() {
       <h1 className="mt-1 text-4xl md:text-5xl">Persiapan seleksi, satu tahap demi satu.</h1>
       <p className="mt-4 max-w-2xl text-lg text-muted">
         Materi dan bank soal tes bakat skolastik (verbal, kuantitatif, penalaran), contoh cara
-        pengerjaan, simulasi bertimer, latihan esai, dan latihan wawancara. Progres akun bisa
-        dilanjutkan lintas perangkat; progres tamu tersimpan di peramban.
+        pengerjaan, simulasi bertimer, latihan esai, dan latihan wawancara.{" "}
+        {ACCOUNTS_ENABLED
+          ? "Progres akun bisa dilanjutkan lintas perangkat; progres tamu tersimpan di peramban."
+          : "Progresmu tersimpan di peramban ini."}
       </p>
 
       <section className="mt-6" aria-label="Alur belajar LPDP">

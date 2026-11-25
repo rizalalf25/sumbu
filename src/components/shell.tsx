@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { createContext, useContext, useSyncExternalStore, type ReactNode } from "react";
 import { StudyDock, StudyPillHeader } from "@/components/study-dock";
+import { ACCOUNTS_ENABLED } from "@/lib/accounts";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { getSaveSnapshot, getServerSaveSnapshot, subscribeSave } from "@/lib/progress-store";
 
@@ -104,23 +105,25 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
             {!focus && (
               <div className="flex shrink-0 items-center gap-2">
                 <StudyPillHeader />
-                <Link
-                  to={user ? "/dashboard" : "/login"}
-                  className="btn-ghost shrink-0 px-3 text-sm"
-                  aria-label={user ? "Buka dashboard akun" : "Masuk atau daftar"}
-                >
-                  {isPending ? (
-                    "Akun"
-                  ) : user ? (
-                    <>
-                      {/* Di HP cukup ikon supaya muat bersama pil timer; teks tampil mulai 640 px. */}
-                      <UserRound size={18} aria-hidden="true" className="sm:hidden" />
-                      <span className="hidden sm:inline">Dashboard</span>
-                    </>
-                  ) : (
-                    "Masuk"
-                  )}
-                </Link>
+                {ACCOUNTS_ENABLED && (
+                  <Link
+                    to={user ? "/dashboard" : "/login"}
+                    className="btn-ghost shrink-0 px-3 text-sm"
+                    aria-label={user ? "Buka dashboard akun" : "Masuk atau daftar"}
+                  >
+                    {isPending ? (
+                      "Akun"
+                    ) : user ? (
+                      <>
+                        {/* Di HP cukup ikon supaya muat bersama pil timer; teks tampil mulai 640 px. */}
+                        <UserRound size={18} aria-hidden="true" className="sm:hidden" />
+                        <span className="hidden sm:inline">Dashboard</span>
+                      </>
+                    ) : (
+                      "Masuk"
+                    )}
+                  </Link>
+                )}
               </div>
             )}
           </div>
@@ -134,9 +137,11 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
               <Link to="/dashboard" className="hover:text-copper">
                 Perjalanan saya
               </Link>
-              <Link to="/ruang" className="hover:text-copper">
-                Ruang belajar
-              </Link>
+              {ACCOUNTS_ENABLED && (
+                <Link to="/ruang" className="hover:text-copper">
+                  Ruang belajar
+                </Link>
+              )}
               <Link to="/rumus" className="lg:hidden">
                 Rumus
               </Link>

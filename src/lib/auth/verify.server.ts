@@ -1,4 +1,5 @@
 import { getRequest } from "@tanstack/react-start/server";
+import { ACCOUNTS_ENABLED } from "../accounts";
 import { getAuth, authConfigured } from "./local.server";
 
 /**
@@ -37,6 +38,8 @@ export type VerifiedUser = { id: string; email: string | null };
  * Sumbu's local auth has no bearer plugin and uses HttpOnly cookies.
  */
 export async function getSessionUser(bearerToken?: string): Promise<VerifiedUser | null> {
+  // Situs tanpa akun: tidak ada sesi, dan auth/database tidak disentuh.
+  if (!ACCOUNTS_ENABLED) return null;
   const request = getRequest();
   if (!request) return null;
   let headers = request.headers;

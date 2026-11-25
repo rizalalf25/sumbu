@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { Shell } from "@/components/shell";
+import { ACCOUNTS_ENABLED } from "@/lib/accounts";
 import { NOTE_FRAME, restoreSave, useSave } from "@/lib/progress";
 
 export const Route = createFileRoute("/metode")({ component: Method });
@@ -158,12 +159,18 @@ function Backup() {
     const text = await file.text();
     if (
       !window.confirm(
-        "Progres aktif akan diganti dengan isi cadangan. Jika masuk, perubahan juga disimpan ke akun Anda. Lanjutkan?",
+        ACCOUNTS_ENABLED
+          ? "Progres aktif akan diganti dengan isi cadangan. Jika masuk, perubahan juga disimpan ke akun Anda. Lanjutkan?"
+          : "Progres aktif akan diganti dengan isi cadangan. Lanjutkan?",
       )
     )
       return;
     if (restoreSave(text))
-      setMessage("Cadangan dipulihkan. Progres akun akan disinkronkan otomatis jika Anda masuk.");
+      setMessage(
+        ACCOUNTS_ENABLED
+          ? "Cadangan dipulihkan. Progres akun akan disinkronkan otomatis jika Anda masuk."
+          : "Cadangan dipulihkan.",
+      );
     else setMessage("File itu bukan cadangan SUMBU yang valid. Progres tidak diubah.");
   };
 
@@ -171,9 +178,9 @@ function Backup() {
     <section className="card mt-8 p-5">
       <h2 className="text-3xl">Cadangan progres</h2>
       <p className="mt-3 max-w-2xl text-muted">
-        Setelah masuk, progres, catatan, kuis kode, dan proyek tersimpan di akun serta bisa
-        dilanjutkan di perangkat lain. Tanpa akun, progres tersimpan di peramban ini. Unduh cadangan
-        untuk menyimpan salinan pribadi.
+        {ACCOUNTS_ENABLED
+          ? "Setelah masuk, progres, catatan, kuis kode, dan proyek tersimpan di akun serta bisa dilanjutkan di perangkat lain. Tanpa akun, progres tersimpan di peramban ini. Unduh cadangan untuk menyimpan salinan pribadi."
+          : "Progres, catatan, kuis kode, dan proyek tersimpan di peramban ini. Unduh cadangan untuk menyimpan salinan pribadi, misalnya sebelum pindah perangkat atau membersihkan data peramban."}
       </p>
       <div className="mt-4 flex flex-wrap gap-2">
         <button type="button" className="btn" onClick={download}>

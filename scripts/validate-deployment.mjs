@@ -1,4 +1,11 @@
-if (process.env.VERCEL) {
+import { accountsMode } from "./accounts-mode.mjs";
+
+if (process.env.VERCEL && accountsMode() === "off") {
+  console.log(
+    "[sumbu] DATABASE_URL, BETTER_AUTH_SECRET, dan BETTER_AUTH_URL belum diisi: situs tayang tanpa akun " +
+      "(progres disimpan di peramban). Isi ketiganya lalu redeploy untuk mengaktifkan akun.",
+  );
+} else if (process.env.VERCEL) {
   const missing = ["DATABASE_URL", "BETTER_AUTH_SECRET", "BETTER_AUTH_URL"].filter(
     (key) => !process.env[key]?.trim(),
   );

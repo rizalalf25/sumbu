@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { ACCOUNTS_ENABLED } from "../accounts";
 import { authClient } from "./client";
 
 const subscribeHydration = () => () => {};
@@ -32,8 +33,13 @@ export type CurrentUserState = {
   isPending: boolean;
 };
 
+/** Situs tanpa akun: selalu tamu, dan tidak pernah memanggil /api/auth. */
+function useGuestState(): CurrentUserState {
+  return { user: null, isPending: false };
+}
+
 /** Real cookie session. Keep the first client render identical to server HTML. */
-export function useCurrentUserState(): CurrentUserState {
+function useSessionState(): CurrentUserState {
   const { data, isPending } = authClient.useSession();
   const hydrated = useSyncExternalStore(subscribeHydration, clientHydration, serverHydration);
   if (!hydrated) return { user: null, isPending: true };
@@ -51,6 +57,11 @@ export function useCurrentUserState(): CurrentUserState {
     isPending,
   };
 }
+
+/** Status pengguna saat ini. ACCOUNTS_ENABLED tetap selama build, jadi pilihan hook tidak berubah. */
+export const useCurrentUserState: () => CurrentUserState = ACCOUNTS_ENABLED
+  ? useSessionState
+  : useGuestState;
 
 /**
  * Convenience view of `useCurrentUserState().user` for display (e.g.

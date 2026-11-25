@@ -54,8 +54,11 @@ function DashboardContent() {
     const a = document.createElement("a");
     a.href = url;
     a.download = `sumbu-progres-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.append(a);
     a.click();
-    URL.revokeObjectURL(url);
+    a.remove();
+    // Beberapa peramban baru mulai mengunduh setelah click() selesai; cabut URL-nya belakangan.
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   async function logout() {
     setBusy(true);

@@ -459,24 +459,58 @@ cek("jumlah tetap 1", abs(sum(s) - 1) < 1e-9)`,
   },
 ];
 
-/** Kerangka penguji Python. Kode pengguna dijalankan, lalu tes, lalu ringkasan bertanda khusus. */
-export function pythonHarness(userCode: string, tests: string): string {
-  return `_hasil = []
-def cek(nama, kondisi):
-    _hasil.append((nama, bool(kondisi)))
-_kode = ${JSON.stringify(userCode)}
-${userCode}
+/** Penanda acak untuk satu kali penilaian. Kode pengguna tidak bisa menebaknya. */
+export function gradeToken(): string {
+  const bytes = new Uint8Array(12);
+  globalThis.crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+}
 
-try:
-${tests
-  .split("\n")
-  .map((line) => `    ${line}`)
-  .join("\n")}
-except Exception as _e:
-    _hasil.append((f"tes berhenti karena galat: {type(_e).__name__}: {_e}", False))
-for _nama, _ok in _hasil:
-    print(("✓ " if _ok else "✗ ") + _nama)
-print("__LULUS__" if _hasil and all(ok for _, ok in _hasil) else "__GAGAL__")`;
+/**
+ * Kerangka penguji Python.
+ *
+ * Kode pengguna dijalankan lewat exec() di namespace sendiri, jadi ia tidak bisa menimpa `cek` atau
+ * daftar hasil milik penguji. Fungsi bawaan yang dipakai penguji (print, bool, exec, …) disalin sebelum
+ * kode pengguna jalan, dan tes dijalankan dengan salinan bawaan yang belum diubah. Ringkasan dicetak
+ * paling akhir bersama `token` acak, sehingga `print("__LULUS__")` di kode pengguna tidak dihitung lulus.
+ * Semua ini berjalan di peramban pengguna, jadi tujuannya mencegah kelulusan palsu yang gampang,
+ * bukan pengamanan mutlak.
+ */
+export function pythonHarness(userCode: string, tests: string, token: string): string {
+  return `def __sumbu_uji():
+    import builtins, sys
+    bawaan = dict(vars(builtins))
+    cetak, keluar = print, sys.stdout
+    jadi_bool, jadi_str, semua = bool, str, all
+    jalankan, susun = exec, compile
+    hasil = []
+
+    def cek(nama, kondisi):
+        hasil.append((jadi_str(nama), jadi_bool(kondisi)))
+
+    kode = ${JSON.stringify(userCode)}
+    ruang = {"__name__": "__main__", "cek": cek}
+    jalankan(susun(kode, "<kode kamu>", "exec"), ruang)
+
+    ruang.update({"__builtins__": bawaan, "cek": cek, "_kode": kode})
+    try:
+        jalankan(susun(${JSON.stringify(tests)}, "<tes>", "exec"), ruang)
+    except Exception as galat:
+        hasil.append((f"tes berhenti karena galat: {type(galat).__name__}: {galat}", False))
+
+    cetak(file=keluar)
+    for nama, ok in hasil:
+        cetak(("✓ " if ok else "✗ ") + nama, file=keluar)
+    lulus = jadi_bool(hasil) and semua(ok for _, ok in hasil)
+    cetak(("__LULUS__" if lulus else "__GAGAL__") + ${JSON.stringify(token)}, file=keluar, flush=True)
+
+__sumbu_uji()
+`;
+}
+
+/** Lulus hanya jika keluaran diakhiri penanda lulus dengan token milik penilaian ini. */
+export function harnessPassed(out: string, token: string): boolean {
+  return out.trimEnd().endsWith(`__LULUS__${token}`);
 }
 
 const byId = new Map(CHALLENGES.map((c) => [c.id, c]));

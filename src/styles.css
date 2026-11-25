@@ -473,11 +473,16 @@
       0 18px 40px color-mix(in oklab, black 28%, transparent);
   }
 
+  /*
+   * Di layar kecil, pil timer ikut di header di samping tombol akun (StudyPillHeader), supaya tidak
+   * menutupi slider atau tombol di tengah halaman, dan panel lengkapnya terbuka tepat di bawah
+   * header. Pil mengambang di pojok kanan bawah hanya dipakai di desktop dan di mode fokus.
+   */
   .study-dock {
     position: fixed;
     z-index: 30;
     right: 0.75rem;
-    bottom: 4.75rem;
+    top: 4.75rem;
     width: min(22rem, calc(100vw - 1.5rem));
     padding: 0.85rem 0.9rem;
   }
@@ -486,7 +491,7 @@
     position: fixed;
     z-index: 30;
     right: 0.75rem;
-    bottom: 4.75rem;
+    bottom: 1rem;
     display: flex;
     align-items: center;
     gap: 0.25rem;
@@ -496,6 +501,11 @@
     background: color-mix(in oklab, var(--color-card) 92%, transparent);
     backdrop-filter: blur(8px);
     box-shadow: 0 8px 24px color-mix(in oklab, black 35%, transparent);
+  }
+
+  .study-pill-inline {
+    position: static;
+    box-shadow: none;
   }
 
   .study-pill-btn {
@@ -519,6 +529,7 @@
   }
 
   .study-dock-focus {
+    top: auto;
     bottom: 0.75rem;
   }
 
@@ -559,6 +570,7 @@
 @media (min-width: 1024px) {
   .study-dock,
   .study-pill {
+    top: auto;
     bottom: 1rem;
   }
 }

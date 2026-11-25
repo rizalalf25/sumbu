@@ -86,7 +86,7 @@ describe("daftar belanja dan panduan rakit", async () => {
 
 describe("pelajaran dan tantangan kode", async () => {
   const { LESSONS, lessonsOf } = await import("./code.ts");
-  const { CHALLENGES, pythonHarness } = await import("./challenges.ts");
+  const { CHALLENGES, gradeToken, harnessPassed, pythonHarness } = await import("./challenges.ts");
 
   it("setiap pelajaran punya tingkat, dan SQL selalu bisa dijalankan", () => {
     for (const lesson of LESSONS) {
@@ -99,11 +99,19 @@ describe("pelajaran dan tantangan kode", async () => {
     assert.equal(py.at(-1)?.level, "lanjut");
   });
 
-  it("tantangan unik dan kerangka penguji Python berisi kode pengguna dan penanda", () => {
+  it("tantangan unik dan kerangka penguji Python memakai token per penilaian", () => {
     assert.equal(new Set(CHALLENGES.map((c) => c.id)).size, CHALLENGES.length);
-    const harness = pythonHarness("def f():\n    return 1", 'cek("satu", f() == 1)');
-    assert.match(harness, /def f\(\):/);
-    assert.match(harness, /__LULUS__/);
-    assert.match(harness, / {4}cek\("satu", f\(\) == 1\)/);
+    const token = gradeToken();
+    assert.match(token, /^[0-9a-f]{24}$/);
+    assert.notEqual(token, gradeToken());
+    const code = "def f():\n    return 1";
+    const tests = 'cek("satu", f() == 1)';
+    const harness = pythonHarness(code, tests, token);
+    assert.ok(harness.includes(JSON.stringify(code)), "kode pengguna dibungkus sebagai string untuk exec()");
+    assert.ok(harness.includes(JSON.stringify(tests)), "tes ikut dibungkus");
+    assert.ok(harness.includes(JSON.stringify(token)), "token ada di ringkasan");
+    assert.ok(harnessPassed(`\n✓ satu\n__LULUS__${token}\n`, token));
+    assert.ok(!harnessPassed(`__LULUS__\n\n✓ satu\n__GAGAL__${token}\n`, token), "penanda tanpa token tidak dihitung");
+    assert.ok(!harnessPassed(`__LULUS__${token}\n\n✗ satu\n__GAGAL__${token}\n`, token), "hanya ringkasan terakhir yang berlaku");
   });
 });

@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { CodeBlock, CodeEditor, OutputView, SqlTables, type RunState } from "@/components/code-view";
 import { FocusToggle, Shell } from "@/components/shell";
-import { CHALLENGES, getChallenge, pythonHarness, SQL_TABLES } from "@/lib/challenges";
+import { CHALLENGES, getChallenge, gradeToken, harnessPassed, pythonHarness, SQL_TABLES } from "@/lib/challenges";
 import { useSave } from "@/lib/progress";
 import { runPython, runSql, sameRows, type SqlTable } from "@/lib/runner";
 import { getTopic } from "@/lib/topics";
@@ -78,9 +78,10 @@ function ChallengePage({ id }: { id: string }) {
     setVerdict({ kind: "busy" });
     let pass = false;
     if (challenge.lang === "python") {
-      const result = await runPython(pythonHarness(code, challenge.tests));
+      const token = gradeToken();
+      const result = await runPython(pythonHarness(code, challenge.tests, token), undefined, code);
       const lines = result.out.split("\n").filter((line) => line && !line.startsWith("__"));
-      pass = result.ok && result.out.includes("__LULUS__");
+      pass = result.ok && harnessPassed(result.out, token);
       setVerdict({ kind: "py", pass, lines, error: result.error });
     } else {
       const [mine, expected] = await Promise.all([runSql(code), runSql(challenge.tests)]);

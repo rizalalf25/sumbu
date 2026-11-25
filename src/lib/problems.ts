@@ -1,4 +1,4 @@
-import { fmt, problem, take, type Level, type Problem } from "./mathx.ts";
+import { coef, cplx, fmt, par, problem, signed, sq, take, type Level, type Problem } from "./mathx.ts";
 import { EXTRA_GENS } from "./problems-extra.ts";
 
 const G = 10;
@@ -79,7 +79,7 @@ function aljabar(seed: number, level: Level): Problem {
       "Lakukan operasi yang sama di kedua ruas.",
       x,
       "Pindahkan bilangan tanpa x dulu, baru bagi koefisien x.",
-      [`${a}x = ${c} − (${b}) = ${c - b}.`, `x = ${c - b}/${a} = ${x}.`],
+      [`${a}x = ${c} − ${par(b)} = ${c - b}.`, `x = ${c - b}/${a} = ${x}.`],
     );
   }
   if (level === 2) {
@@ -93,7 +93,7 @@ function aljabar(seed: number, level: Level): Problem {
       "Bagi dulu dengan koefisien di luar kurung, atau uraikan.",
       x,
       "Bagi kedua ruas dengan angka di depan kurung.",
-      [`x ${sign} = ${c}/${a} = ${c / a}.`, `x = ${c / a} − (${inside}) = ${x}.`],
+      [`x ${sign} = ${c}/${a} = ${c / a}.`, `x = ${c / a} − ${par(inside)} = ${x}.`],
     );
   }
   const x = take(seed, 1, [1, 2, 3, 4, 5, 6, 7, 8, 9, -2, -3]);
@@ -105,7 +105,7 @@ function aljabar(seed: number, level: Level): Problem {
     "Jumlahkan kedua persamaan supaya y hilang.",
     x,
     "x = (jumlah + selisih) / 2.",
-    [`(x+y) + (x−y) = ${s} + (${d}) = ${s + d}.`, `2x = ${s + d}, jadi x = ${x}.`, `Cek: y = ${y}.`],
+    [`(x + y) + (x − y) = ${s} + ${par(d)} = ${s + d}.`, `2x = ${s + d}, jadi x = ${x}.`, `Cek: y = ${y}.`],
   );
 }
 
@@ -115,14 +115,14 @@ function fungsi(seed: number, level: Level): Problem {
     const c = take(seed, 2, [-6, -3, -1, 0, 2, 4, 5, 8]);
     const k = take(seed, 3, [-2, -1, 0, 1, 2, 3, 4, 5, 6]);
     const value = m * k + c;
-    const ctext = c < 0 ? `− ${Math.abs(c)}` : `+ ${c}`;
+    const ctext = c === 0 ? "" : ` ${signed(c)}`;
     if (level === 1) {
       return problem(
-        `f(x) = ${m}x ${ctext}. Berapa f(${k})?`,
+        `f(x) = ${coef(m)}${ctext}. Berapa f(${k})?`,
         "Masukkan x, jangan berhenti di rumus.",
         value,
         "Ganti x dengan angka, lalu hitung.",
-        [`f(${k}) = ${m}×${k} ${ctext} = ${value}.`],
+        [`f(${k}) = ${m}×${par(k)}${ctext} = ${value}.`],
       );
     }
     const x1 = take(seed, 4, [0, 1, 2, -2]);
@@ -135,18 +135,18 @@ function fungsi(seed: number, level: Level): Problem {
       "Gradien = perubahan y / perubahan x.",
       m,
       "m = (y2 − y1) / (x2 − x1).",
-      [`Δy = ${y2} − (${y1}) = ${y2 - y1}.`, `Δx = ${x2} − (${x1}) = ${dx}.`, `m = ${y2 - y1}/${dx} = ${m}.`],
+      [`Δy = ${y2} − ${par(y1)} = ${y2 - y1}.`, `Δx = ${x2} − ${par(x1)} = ${dx}.`, `m = ${y2 - y1}/${dx} = ${m}.`],
     );
   }
   const a = take(seed, 1, [1, 2, 3, 4, -1, -2]);
   const k = take(seed, 2, [-3, -2, -1, 2, 3, 4, 5]);
   const value = a * k * k;
   return problem(
-    `f(x) = ${a}x². Berapa f(${k})?`,
+    `f(x) = ${coef(a, "x²")}. Berapa f(${k})?`,
     "Kuadrat dulu, baru kali koefisien.",
     value,
     "x² artinya x dikali x, bukan x dikali 2.",
-    [`(${k})² = ${k * k}.`, `${a} × ${k * k} = ${value}.`],
+    [`${sq(k)} = ${k * k}.`, `${a} × ${k * k} = ${value}.`],
   );
 }
 
@@ -314,7 +314,7 @@ function barisan(seed: number, level: Level): Problem {
       "U_n = a + (n−1)d.",
       value,
       "Beda ditambah sebanyak (n−1), bukan n.",
-      [`(n−1)d = ${n - 1} × ${d} = ${(n - 1) * d}.`, `U_${n} = ${a} + (${(n - 1) * d}) = ${value}.`],
+      [`(n−1)d = ${n - 1} × ${par(d)} = ${(n - 1) * d}.`, `U_${n} = ${a} + ${par((n - 1) * d)} = ${value}.`],
     );
   }
   if (level === 2) {
@@ -346,13 +346,13 @@ function limit(seed: number, level: Level): Problem {
     const c = take(seed, 2, [-5, -1, 0, 2, 4, 7]);
     const a = take(seed, 3, [-2, -1, 0, 1, 2, 3, 4]);
     const value = m * a + c;
-    const ctext = c < 0 ? `− ${Math.abs(c)}` : `+ ${c}`;
+    const ctext = c === 0 ? "" : ` ${signed(c)}`;
     return problem(
-      `Berapa limit x → ${a} dari ${m}x ${ctext}?`,
+      `Berapa limit x → ${a} dari ${coef(m)}${ctext}?`,
       "Polinom boleh langsung disubstitusi.",
       value,
       "Ganti x dengan angka yang didekati.",
-      [`${m}×${a} ${ctext} = ${value}.`],
+      [`${m}×${par(a)}${ctext} = ${value}.`],
     );
   }
   const a = take(seed, 1, [1, 2, 3, 4, 5, 6, 8, -2, -3]);
@@ -362,15 +362,15 @@ function limit(seed: number, level: Level): Problem {
       "Bentuk 0/0. Faktorkan dulu.",
       2 * a,
       "x² − a² = (x−a)(x+a). Coret faktor yang membuat nol.",
-      [`Setelah dicoret tinggal x ${a > 0 ? "+" : "−"} ${Math.abs(a)}.`, `Di x = ${a}: ${a} + (${a}) = ${2 * a}.`],
+      [`Setelah dicoret tinggal x ${signed(a)}.`, `Di x = ${a}: ${a} + ${par(a)} = ${2 * a}.`],
     );
   }
   return problem(
-    `Berapa limit h → 0 dari ((${a}+h)² − ${a * a}) / h?`,
+    `Berapa limit h → 0 dari ((${a} + h)² − ${a * a}) / h?`,
     "Ini definisi turunan x² di x = a.",
     2 * a,
     "Uraikan (a+h)² = a² + 2ah + h².",
-    [`Pembilang = 2·${a}·h + h².`, `Bagi h: 2·${a} + h → ${2 * a}.`],
+    [`Pembilang = 2·${par(a)}·h + h².`, `Bagi h: 2·${par(a)} + h → ${2 * a}.`],
   );
 }
 
@@ -381,11 +381,11 @@ function turunan(seed: number, level: Level): Problem {
     const x = take(seed, 3, [1, 2, 3, -1, -2]);
     const value = a * n * x ** (n - 1);
     return problem(
-      `f(x) = ${a}x^${n}. Berapa f'(${x})?`,
+      `f(x) = ${coef(a, `x^${n}`)}. Berapa f'(${x})?`,
       "Aturan pangkat: koefisien kali pangkat, pangkat turun 1.",
       value,
       "Turunkan dulu, baru masukkan angka.",
-      [`f'(x) = ${a * n} x^${n - 1}.`, `Di x = ${x}: ${fmt(value)}.`],
+      [`f'(x) = ${coef(a * n, n - 1 === 1 ? "x" : `x^${n - 1}`)}.`, `Di x = ${x}: ${fmt(value)}.`],
     );
   }
   if (level === 2) {
@@ -395,22 +395,22 @@ function turunan(seed: number, level: Level): Problem {
     const value = 2 * a * x + b;
     const btxt = b < 0 ? `− ${Math.abs(b)}x` : `+ ${b}x`;
     return problem(
-      `f(x) = ${a}x² ${btxt}. Berapa f'(${x})?`,
+      `f(x) = ${coef(a, "x²")} ${btxt}. Berapa f'(${x})?`,
       "Turunan jumlah = jumlah turunan.",
       value,
       "Turunan x² adalah 2x. Turunan cx adalah c.",
-      [`f'(x) = ${2 * a}x ${b < 0 ? "−" : "+"} ${Math.abs(b)}.`, `Di x=${x}: ${fmt(value)}.`],
+      [`f'(x) = ${2 * a}x ${signed(b)}.`, `Di x = ${x}: ${fmt(value)}.`],
     );
   }
   const t = take(seed, 1, [1, 2, 3, 4, 5, 6]);
   const a = take(seed, 2, [1, 2, 3]);
   const value = 2 * a * t;
   return problem(
-    `Posisi s(t) = ${a} t² meter, t dalam detik. Berapa kecepatan di t = ${t} sekon?`,
+    `Posisi s(t) = ${coef(a, "t²")} meter, t dalam detik. Berapa kecepatan di t = ${t} sekon?`,
     "Kecepatan adalah turunan posisi.",
     value,
     "v = ds/dt = 2 a t.",
-    [`v(t) = ${2 * a} t.`, `v(${t}) = ${value} m/s.`],
+    [`v(t) = ${2 * a}t.`, `v(${t}) = ${value} m/s.`],
   );
 }
 
@@ -517,7 +517,7 @@ function vektor(seed: number, level: Level): Problem {
       "Panjang = akar(x² + y²). Tanda minus tidak mengubah kuadrat.",
       m,
       "Kuadratkan tiap komponen, jumlahkan, akar.",
-      [`${s * x}² + ${y}² = ${x * x + y * y}.`, `Akar = ${m}.`],
+      [`${sq(s * x)} + ${sq(y)} = ${x * x + y * y}.`, `Akar = ${m}.`],
     );
   }
   if (level === 2) {
@@ -531,7 +531,7 @@ function vektor(seed: number, level: Level): Problem {
       "x1 x2 + y1 y2. Bukan panjang.",
       value,
       "Kalikan komponen sepasang, lalu jumlahkan.",
-      [`${x1}×${x2} + ${y1}×${y2} = ${value}.`],
+      [`${x1}×${par(x2)} + ${par(y1)}×${par(y2)} = ${value}.`],
     );
   }
   const five = [
@@ -552,7 +552,7 @@ function vektor(seed: number, level: Level): Problem {
     "cos θ = (a·b) / (|a| |b|). Kedua vektor panjangnya 5.",
     value,
     "1 berarti searah, 0 tegak lurus, −1 berlawanan. Embedding dibandingkan dengan cara ini.",
-    [`a·b = ${x1}×${x2} + ${y1}×${y2} = ${dot}.`, "|a||b| = 5 × 5 = 25.", `cos θ = ${dot}/25 = ${fmt(value)}.`],
+    [`a·b = ${x1}×${par(x2)} + ${par(y1)}×${par(y2)} = ${dot}.`, "|a||b| = 5 × 5 = 25.", `cos θ = ${dot}/25 = ${fmt(value)}.`],
   );
 }
 
@@ -584,7 +584,7 @@ function kinematika(seed: number, level: Level): Problem {
       `g tidak dipakai. v = v0 + a t.`,
       value,
       "Percepatan boleh negatif: itu perlambatan.",
-      [`v = ${v0} + (${a})×${t} = ${value}.`],
+      [`v = ${v0} + ${par(a)}×${t} = ${value}.`],
     );
   }
   if (level === 2) {
@@ -772,27 +772,56 @@ function gelombang(seed: number, level: Level): Problem {
   );
 }
 
+const FLUIDS = [
+  ["air tawar", 1000],
+  ["air laut", 1030],
+  ["minyak", 800],
+] as const;
+
 function fluida(seed: number, level: Level): Problem {
   if (level === 1) {
-    const h = take(seed, 1, [1, 2, 3, 4, 5, 8, 10]);
-    const value = (1000 * G * h) / 1000;
+    const h = take(seed, 1, [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 15, 20]);
+    const [name, rho] = take(seed, 2, FLUIDS);
+    const pa = rho * G * h;
+    const value = pa / 1000;
     return problem(
-      `Kedalaman air ${h} m. ρ = 1000 kg/m³, g = ${G}. Berapa tekanan gauge (kPa), tanpa tekanan udara?`,
+      `Kedalaman ${fmt(h)} m di dalam ${name}. ρ = ${rho} kg/m³, g = ${G}. Berapa tekanan gauge (kPa), tanpa tekanan udara?`,
       "P = ρ g h. 1000 Pa = 1 kPa.",
       value,
-      "Jangan lupa ρ air 1000, lalu ubah ke kPa dengan bagi 1000.",
-      [`P = 1000×${G}×${h} = ${1000 * G * h} Pa = ${fmt(value)} kPa.`],
+      "Pakai ρ zat cairnya, lalu ubah Pa ke kPa dengan membagi 1000.",
+      [`P = ${rho}×${G}×${fmt(h)} = ${fmt(pa)} Pa = ${fmt(value)} kPa.`],
     );
   }
   if (level === 2) {
-    const V = take(seed, 1, [0.001, 0.002, 0.005, 0.01, 0.02]);
-    const value = 1000 * G * V;
+    const V = take(seed, 1, [0.0005, 0.001, 0.002, 0.003, 0.004, 0.005, 0.008, 0.01, 0.02, 0.05]);
+    const [name, rho] = take(seed, 2, FLUIDS);
+    const buoy = rho * G * V;
+    if (take(seed, 3, [0, 1]) === 0) {
+      return problem(
+        `Benda tercelup dan mendesak ${name} sebanyak ${fmt(V, 4)} m³. ρ = ${rho} kg/m³, g = ${G}. Gaya apung (N)?`,
+        "Archimedes: F = ρ fluida × g × volume yang terdesak.",
+        buoy,
+        "Pakai volume terdesak, bukan selalu volume benda utuh.",
+        [`F = ${rho} × ${G} × ${fmt(V, 4)} = ${fmt(buoy)}.`],
+      );
+    }
+    const [solid, rhoSolid] = take(seed, 4, [
+      ["aluminium", 2700],
+      ["besi", 7800],
+      ["batu", 2500],
+    ] as const);
+    const m = rhoSolid * V;
+    const value = m * G - buoy;
     return problem(
-      `Benda mendesak air tawar bervolume ${fmt(V, 3)} m³. ρ = 1000, g = ${G}. Gaya apung (N)?`,
-      "Archimedes: F = ρ fluida × g × volume yang terdesak.",
+      `Bongkah ${solid} ${fmt(m, 3)} kg bervolume ${fmt(V, 4)} m³ tercelup penuh di ${name} (ρ = ${rho} kg/m³), g = ${G}. Berapa berat semunya (N)?`,
+      "Berat semu = berat − gaya apung. Gaya apung = ρ fluida × g × V.",
       value,
-      "Pakai volume terdesak, bukan selalu volume benda utuh.",
-      [`F = 1000 × ${G} × ${fmt(V, 3)} = ${fmt(value)}.`],
+      "Hitung berat dan gaya apung terpisah, baru kurangkan.",
+      [
+        `Berat = ${fmt(m, 3)} × ${G} = ${fmt(m * G)} N.`,
+        `Apung = ${rho} × ${G} × ${fmt(V, 4)} = ${fmt(buoy)} N.`,
+        `Semu = ${fmt(m * G)} − ${fmt(buoy)} = ${fmt(value)} N.`,
+      ],
     );
   }
   const A1 = take(seed, 1, [2, 4, 5, 6, 8]);
@@ -883,28 +912,34 @@ function optik(seed: number, level: Level): Problem {
 }
 
 function foton(seed: number, level: Level): Problem {
-  const rows = [
-    [1240, 1],
-    [620, 2],
-    [496, 2.5],
-    [400, 3.1],
-    [310, 4],
-    [248, 5],
-  ] as const;
-  const [lam, e] = take(seed, 1, rows);
   if (level === 1) {
+    if (take(seed, 4, [0, 1]) === 0) {
+      const lam = take(seed, 5, [200, 248, 310, 400, 413, 450, 496, 500, 532, 550, 589, 620, 650, 700, 1000, 1240]);
+      const value = 1240 / lam;
+      return problem(
+        `Panjang gelombang foton ${lam} nm. Berapa energinya dalam eV?`,
+        "Pakai E (eV) ≈ 1240 / λ(nm).",
+        value,
+        "Makin pendek gelombang, makin besar energi.",
+        [`E = 1240/${lam} = ${fmt(value)} eV.`],
+        0.05,
+      );
+    }
+    const E = take(seed, 5, [1, 1.5, 2, 2.5, 3, 4, 5, 6.2]);
+    const value = 1240 / E;
     return problem(
-      `Panjang gelombang foton ${lam} nm. Berapa energinya dalam eV?`,
-      "Pakai E (eV) ≈ 1240 / λ(nm).",
-      e,
-      "Makin pendek gelombang, makin besar energi.",
-      [`E = 1240/${lam} = ${fmt(e)} eV.`],
-      0.05,
+      `Foton berenergi ${fmt(E)} eV. Berapa panjang gelombangnya (nm)?`,
+      "Pakai λ (nm) ≈ 1240 / E(eV).",
+      value,
+      "Energi besar berarti gelombang pendek.",
+      [`λ = 1240/${fmt(E)} = ${fmt(value)} nm.`],
+      2,
     );
   }
-  const phi = take(seed, 2, [0.5, 1, 1.5, 2]);
-  const k = Math.max(0, e - phi);
   if (level === 2) {
+    const e = take(seed, 1, [1, 2, 2.5, 3.1, 4, 5]);
+    const phi = take(seed, 2, [0.5, 1, 1.5, 2]);
+    const k = Math.max(0, e - phi);
     return problem(
       `Foton ${fmt(e)} eV mengenai logam fungsi kerja ${fmt(phi)} eV. Energi kinetik maksimum elektron (eV)?`,
       "K = E − φ jika E > φ, selain itu 0.",
@@ -913,22 +948,29 @@ function foton(seed: number, level: Level): Problem {
       [`K = ${fmt(e)} − ${fmt(phi)} = ${fmt(k)}.`],
     );
   }
-  const [work, lamCut] = take(seed, 3, [
-    [1, 1240],
-    [1.24, 1000],
-    [2, 620],
-    [2.48, 500],
-    [3.1, 400],
-    [4, 310],
-    [5, 248],
-  ] as const);
+  if (take(seed, 4, [0, 1]) === 0) {
+    const work = take(seed, 3, [1, 1.24, 1.5, 2, 2.3, 2.48, 2.75, 3.1, 4, 4.3, 4.7, 5]);
+    const lamCut = 1240 / work;
+    return problem(
+      `Logam dengan fungsi kerja ${fmt(work)} eV. Berapa panjang gelombang ambang (nm), yaitu λ terpanjang yang masih melepas elektron?`,
+      "λ₀ (nm) ≈ 1240 / φ (eV).",
+      lamCut,
+      "Gelombang yang lebih panjang dari ambang membawa foton yang terlalu lemah.",
+      [`λ₀ = 1240 / ${fmt(work)} = ${fmt(lamCut)} nm.`],
+      2,
+    );
+  }
+  const lam = take(seed, 5, [200, 248, 310, 400, 413, 496]);
+  const phi = take(seed, 6, [1.5, 2, 2.3]);
+  const E = 1240 / lam;
+  const value = E - phi;
   return problem(
-    `Logam dengan fungsi kerja ${fmt(work)} eV. Berapa panjang gelombang ambang (nm), yaitu λ terpanjang yang masih melepas elektron?`,
-    "λ₀ (nm) ≈ 1240 / φ (eV).",
-    lamCut,
-    "Gelombang yang lebih panjang dari ambang membawa foton yang terlalu lemah.",
-    [`λ₀ = 1240 / ${fmt(work)} = ${lamCut} nm.`],
-    2,
+    `Cahaya ${lam} nm menyinari logam berfungsi kerja ${fmt(phi)} eV. Energi kinetik maksimum elektron (eV)?`,
+    "E foton (eV) ≈ 1240 / λ(nm), lalu K = E − φ.",
+    value,
+    "Dua langkah: ubah λ ke energi dulu, baru kurangi fungsi kerja.",
+    [`E = 1240/${lam} = ${fmt(E)} eV.`, `K = ${fmt(E)} − ${fmt(phi)} = ${fmt(value)} eV.`],
+    0.05,
   );
 }
 
@@ -945,8 +987,8 @@ function kompleks(seed: number, level: Level): Problem {
   if (level === 1) {
     const [x, y, m] = take(seed, 1, pairs);
     const sy = take(seed, 2, [1, -1]);
-    return problem(`Modulus bilangan kompleks ${x} + (${sy * y})i ?`, "|z| = √(x²+y²).", m, "Sama seperti panjang vektor.", [
-      `${x}² + ${sy * y}² = ${m * m}.`, `|z| = ${m}.`,
+    return problem(`Modulus bilangan kompleks ${cplx(x, sy * y)}?`, "|z| = √(x² + y²).", m, "Sama seperti panjang vektor.", [
+      `${sq(x)} + ${sq(sy * y)} = ${m * m}.`, `|z| = ${m}.`,
     ]);
   }
   if (level === 2) {
@@ -956,28 +998,49 @@ function kompleks(seed: number, level: Level): Problem {
     const d = take(seed, 4, [1, 2, 4, -2]);
     const value = a * c - b * d;
     return problem(
-      `Bagian real dari (${a} + (${b})i)(${c} + (${d})i)?`,
+      `Bagian real dari (${cplx(a, b)})(${cplx(c, d)})?`,
       "(a+bi)(c+di) bagian real = ac − bd.",
       value,
       "i² = −1, itu yang membuat minus.",
-      [`ac = ${a * c}, bd = ${b * d}.`, `real = ${a * c} − (${b * d}) = ${value}.`],
+      [`ac = ${a * c}, bd = ${b * d}.`, `real = ${a * c} − ${par(b * d)} = ${value}.`],
     );
   }
-  const kind = take(seed, 1, [
-    [3, 0, 0],
-    [0, 4, 90],
-    [0, -2, -90],
-    [-5, 0, 180],
-    [2, 2, 45],
-    [2, -2, -45],
-    [-2, 2, 135],
+  if (take(seed, 3, [0, 1, 2]) < 2) {
+    const [ux, uy, deg] = take(seed, 1, [
+      [1, 0, 0],
+      [0, 1, 90],
+      [0, -1, -90],
+      [-1, 0, 180],
+      [1, 1, 45],
+      [1, -1, -45],
+      [-1, 1, 135],
+      [-1, -1, -135],
+    ] as const);
+    const r = take(seed, 2, [1, 2, 3, 4, 5]);
+    const x = ux * r;
+    const y = uy * r;
+    return problem(
+      `Argumen (dalam derajat, antara −180 dan 180) dari ${cplx(x, y)}?`,
+      "Argumen adalah sudut terhadap sumbu real positif.",
+      deg,
+      "Gambar dulu di bidang Argand, baru baca sudut.",
+      [`Titik (${x}, ${y}) di bidang Argand.`, `Sudutnya ${deg}°.`],
+    );
+  }
+  const [text, x, y, deg] = take(seed, 4, [
+    ["√3 + i", "√3", "1", 30],
+    ["1 + √3i", "1", "√3", 60],
+    ["−1 + √3i", "−1", "√3", 120],
+    ["−√3 + i", "−√3", "1", 150],
+    ["−√3 − i", "−√3", "−1", -150],
+    ["1 − √3i", "1", "−√3", -60],
   ] as const);
   return problem(
-    `Argumen (dalam derajat, antara −180 dan 180) dari ${kind[0]} + (${kind[1]})i ?`,
-    "Argumen adalah sudut terhadap sumbu real positif.",
-    kind[2],
-    "Gambar dulu di bidang Argand, baru baca sudut.",
-    [`Titik (${kind[0]}, ${kind[1]}) bersudut ${kind[2]}°.`],
+    `Argumen (dalam derajat, antara −180 dan 180) dari ${text}?`,
+    "Argumen adalah sudut terhadap sumbu real positif. tan 30° = 1/√3, tan 60° = √3.",
+    deg,
+    "Cari sudut acuan dari |y|/|x|, lalu sesuaikan dengan kuadran titiknya.",
+    [`Titik (${x}, ${y}).`, `Sudut acuan dari |y|/|x|, lalu kuadran: ${deg}°.`],
   );
 }
 
@@ -995,13 +1058,22 @@ function deret(seed: number, level: Level): Problem {
     );
   }
   if (level === 2) {
-    const a = take(seed, 1, [3, 4, 5, 6, 8, 10, 12]);
+    const a = take(seed, 1, [2, 3, 4, 5, 6, 8, 9, 10, 12]);
+    const [rText, r, restText] = take(seed, 2, [
+      ["1/2", 1 / 2, "1/2"],
+      ["1/3", 1 / 3, "2/3"],
+      ["1/4", 1 / 4, "3/4"],
+      ["2/3", 2 / 3, "1/3"],
+      ["3/4", 3 / 4, "1/4"],
+      ["−1/2", -1 / 2, "3/2"],
+    ] as const);
+    const value = a / (1 - r);
     return problem(
-      `Deret geometri tak hingga, suku pertama ${a}, rasio 1/2. Jumlahnya?`,
-      "Hanya boleh jika |r| < 1. S = a / (1−r).",
-      a / 0.5,
-      "1 − 1/2 = 1/2, jadi jumlah = a dibagi 1/2.",
-      [`S = ${a} / (1/2) = ${fmt(a / 0.5)}.`],
+      `Deret geometri tak hingga, suku pertama ${a}, rasio ${rText}. Jumlahnya?`,
+      "Hanya boleh jika |r| < 1. S = a / (1 − r).",
+      value,
+      "Hitung 1 − r dulu, lalu bagi suku pertama dengan hasil itu.",
+      [`1 − ${r < 0 ? `(${rText})` : rText} = ${restText}.`, `S = ${a} / (${restText}) = ${fmt(value)}.`],
     );
   }
   const x = take(seed, 1, [0.1, 0.2, 0.5, 1, 1.5, 2, -0.5, -1]);
@@ -1026,21 +1098,21 @@ function parsial(seed: number, level: Level): Problem {
   if (level === 1) {
     const value = 2 * a * x * y;
     return problem(
-      `f(x,y) = ${a} x² y. Berapa ∂f/∂x di (${x}, ${y})?`,
+      `f(x,y) = ${coef(a, "x²y")}. Berapa ∂f/∂x di (${x}, ${y})?`,
       "Saat turunan ke x, y dianggap konstanta.",
       value,
       "∂/∂x (x² y) = 2 x y.",
-      [`∂f/∂x = ${2 * a} x y.`, `Di titik: ${2 * a}×${x}×${y} = ${value}.`],
+      [`∂f/∂x = ${2 * a}xy.`, `Di titik: ${2 * a}×${par(x)}×${par(y)} = ${value}.`],
     );
   }
   if (level === 2) {
     const value = a * x * x;
     return problem(
-      `f(x,y) = ${a} x² y. Berapa ∂f/∂y di (${x}, ${y})?`,
+      `f(x,y) = ${coef(a, "x²y")}. Berapa ∂f/∂y di (${x}, ${y})?`,
       "Turunan ke y: x dibekukan.",
       value,
       "y muncul sekali, jadi turunannya menghilangkan y.",
-      [`∂f/∂y = ${a} x² = ${value} di x=${x}. y tidak tersisa.`],
+      [`∂f/∂y = ${coef(a, "x²")} = ${value} di x = ${x}. y tidak tersisa.`],
     );
   }
   const b = take(seed, 4, [1, 2, 3]);
@@ -1050,11 +1122,11 @@ function parsial(seed: number, level: Level): Problem {
   const dy = take(seed, 6, [0.1, -0.2, 0.2]);
   const value = fx * dx + fy * dy;
   return problem(
-    `f = ${a} x² y + ${b} y². Di (${x}, ${y}), hampiri Δf untuk dx=${fmt(dx)}, dy=${fmt(dy)}.`,
+    `f = ${coef(a, "x²y")} + ${coef(b, "y²")}. Di (${x}, ${y}), hampiri Δf untuk dx = ${fmt(dx)}, dy = ${fmt(dy)}.`,
     "df ≈ fx dx + fy dy.",
     value,
     "Hitung dua turunan parsial, kali perubahan masing-masing, jumlahkan.",
-    [`fx = ${fx}, fy = ${fy}.`, `Δf ≈ ${fx}×${fmt(dx)} + ${fy}×${fmt(dy)} = ${fmt(value)}.`],
+    [`fx = ${fx}, fy = ${fy}.`, `Δf ≈ ${fx}×${par(dx)} + ${par(fy)}×${par(dy)} = ${fmt(value)}.`],
     0.05,
   );
 }
@@ -1100,7 +1172,7 @@ function matriks(seed: number, level: Level): Problem {
     const c = take(seed, 3, [1, -2, 2, 4]);
     const d = take(seed, 4, [1, 2, 3, -3, 5]);
     return problem(`det [[${a}, ${b}], [${c}, ${d}]] = ?`, "ad − bc.", a * d - b * c, "Urutan pengurangan sering terbalik.", [
-      `${a}×${d} − (${b}×${c}) = ${a * d - b * c}.`,
+      `${a}×${par(d)} − ${par(b)}×${par(c)} = ${a * d - b * c}.`,
     ]);
   }
   const ax = take(seed, 1, [1, 2, 0, -1]);
@@ -1118,7 +1190,7 @@ function matriks(seed: number, level: Level): Problem {
       "k · (a×b) = ax by − ay bx.",
       cz,
       "Komponen z tidak memakai az atau bz.",
-      [`${ax}×${by} − ${ay}×${bx} = ${cz}.`],
+      [`${ax}×${par(by)} − ${par(ay)}×${par(bx)} = ${cz}.`],
     );
   }
   const mag = Math.sqrt(cx * cx + cy * cy + cz * cz);
@@ -1138,46 +1210,59 @@ function medan(seed: number, level: Level): Problem {
     const b = take(seed, 2, [-3, -1, 1, 2, 5]);
     const c = take(seed, 3, [0, 1, -2, 3, 4]);
     return problem(
-      `F = (${a} x, ${b} y, ${c} z). Berapa divergensi ∇·F?`,
+      `F = (${coef(a, "x")}, ${coef(b, "y")}, ${coef(c, "z")}). Berapa divergensi ∇·F?`,
       "Jumlahkan turunan tiap komponen terhadap variabelnya sendiri.",
       a + b + c,
       "∂(a x)/∂x = a, bukan a x.",
-      [`∇·F = ${a} + (${b}) + (${c}) = ${a + b + c}.`],
+      [`∇·F = ${a} + ${par(b)} + ${par(c)} = ${a + b + c}.`],
     );
   }
   if (level === 2) {
     const c = take(seed, 1, [1, 2, 3, 4, 5, -2]);
     const d = take(seed, 2, [1, 2, 3, 4, 5, -1]);
     return problem(
-      `F = (${-c} y, ${d} x, 0). Komponen z dari curl F?`,
+      `F = (${coef(-c, "y")}, ${coef(d, "x")}, 0). Komponen z dari curl F?`,
       "∇×F komponen z = ∂Fy/∂x − ∂Fx/∂y.",
       d + c,
       "Turunkan Fx terhadap y dengan tandanya. Minus ketemu minus.",
-      [`∂Fy/∂x = ${d}.`, `∂Fx/∂y = ${-c}.`, `Selisih = ${d} − (${-c}) = ${d + c}.`],
+      [`∂Fy/∂x = ${d}.`, `∂Fx/∂y = ${-c}.`, `Selisih = ${d} − ${par(-c)} = ${d + c}.`],
     );
   }
   const a = take(seed, 1, [1, 2, 3, 4]);
   const x = take(seed, 2, [-2, 1, 2, 3, 5]);
   return problem(
-    `f = ${a} x² + y². Komponen x dari gradien di x = ${x}?`,
+    `f = ${coef(a, "x²")} + y². Komponen x dari gradien di x = ${x}?`,
     "∇f = (∂f/∂x, ∂f/∂y, ∂f/∂z).",
     2 * a * x,
     "Gradien menunjuk arah naiknya f paling curam.",
-    [`∂f/∂x = ${2 * a} x = ${2 * a * x} di x=${x}.`],
+    [`∂f/∂x = ${2 * a}x = ${2 * a * x} di x = ${x}.`],
   );
 }
 
 function fluks(seed: number, level: Level): Problem {
   const L = take(seed, 1, [1, 2, 3]);
   if (level === 1) {
-    const side = take(seed, 5, [0.5, 1, 2, 3, 4, 5, 10]);
-    const value = 3 * side ** 3;
+    if (take(seed, 6, [0, 1]) === 0) {
+      const side = take(seed, 5, [0.5, 1, 2, 3, 4, 5, 10]);
+      const value = 3 * side ** 3;
+      return problem(
+        `F = (x, y, z). Fluks keluar melalui permukaan kubus sisi ${fmt(side)} yang pusatnya di titik asal?`,
+        "Divergensi Gauss: fluks tertutup = ∭ ∇·F dV.",
+        value,
+        "∇·F = 3, volume kubus L³.",
+        ["∇·F = 1 + 1 + 1 = 3.", `Volume = ${fmt(side ** 3, 3)}.`, `Fluks = ${fmt(value, 3)}.`],
+      );
+    }
+    const p = take(seed, 7, [1, 2, 3, 4, 5]);
+    const q = take(seed, 8, [1, 2, 3, 4]);
+    const r = take(seed, 9, [1, 2, 3, 6]);
+    const volume = p * q * r;
     return problem(
-      `F = (x, y, z). Fluks keluar melalui permukaan kubus sisi ${fmt(side)} yang pusatnya di titik asal?`,
+      `F = (x, y, z). Fluks keluar melalui permukaan tertutup balok ${p} × ${q} × ${r}?`,
       "Divergensi Gauss: fluks tertutup = ∭ ∇·F dV.",
-      value,
-      "∇·F = 3, volume kubus L³.",
-      ["∇·F = 1+1+1 = 3.", `Volume = ${fmt(side ** 3, 3)}.`, `Fluks = ${fmt(value, 3)}.`],
+      3 * volume,
+      "∇·F = 3 di mana-mana, jadi fluks = 3 × volume balok.",
+      ["∇·F = 1 + 1 + 1 = 3.", `Volume = ${p} × ${q} × ${r} = ${volume}.`, `Fluks = 3 × ${volume} = ${3 * volume}.`],
     );
   }
   const a = take(seed, 2, [1, 2, 0]);
@@ -1185,7 +1270,7 @@ function fluks(seed: number, level: Level): Problem {
   const c = take(seed, 4, [1, 3]);
   const div = a + b + c;
   return problem(
-    `F = (${a} x, ${b} y, ${c} z) melalui permukaan tertutup kubus sisi ${L}. Fluks keluar?`,
+    `F = (${coef(a, "x")}, ${coef(b, "y")}, ${coef(c, "z")}) melalui permukaan tertutup kubus sisi ${L}. Fluks keluar?`,
     "Kalau divergensi konstan, fluks = divergensi × volume.",
     div * L ** 3,
     "Jangan hitung enam muka satu per satu kalau Gauss berlaku.",
@@ -1230,6 +1315,8 @@ function fourier(seed: number, level: Level): Problem {
   );
 }
 
+const SUP: Record<number, string> = { 2: "²", 3: "³", 4: "⁴" };
+
 function laplace(seed: number, level: Level): Problem {
   if (level === 1) {
     const a = take(seed, 1, [1, 2, 3, 4]);
@@ -1250,10 +1337,52 @@ function laplace(seed: number, level: Level): Problem {
       `penyebut = ${s}² + ${w}² = ${s * s + w * w}.`, `hasil = ${w}/itu = ${fmt(value)}.`,
     ]);
   }
-  const s = take(seed, 1, [1, 2, 4, 5]);
-  return problem(`L{t} di s = ${s}?`, "L{t} = 1/s².", 1 / (s * s), "Bukan 1/s. Itu untuk L{1}.", [
-    `1/${s}² = ${fmt(1 / (s * s))}.`,
-  ]);
+  // Level 3 menggabungkan aturan: pangkat t, geser frekuensi, dan sinus/kosinus tergeser.
+  const mode = take(seed, 3, [0, 1, 2]);
+  if (mode === 0) {
+    const n = take(seed, 1, [1, 2, 3]);
+    const s = take(seed, 2, [1, 2, 3, 4]);
+    const fact = [1, 1, 2, 6][n] ?? 1;
+    const value = fact / s ** (n + 1);
+    return problem(
+      `Berapa L{t${SUP[n] ?? ""}} di s = ${s}? Boleh dijawab pecahan.`,
+      "L{tⁿ} = n! / sⁿ⁺¹.",
+      value,
+      "Pangkat s di penyebut satu lebih tinggi dari pangkat t.",
+      [`${n}! = ${fact}.`, `${fact} / ${s}${SUP[n + 1]} = ${fact}/${s ** (n + 1)} = ${fmt(value, 4)}.`],
+      Math.max(0.0005, value * 0.01),
+    );
+  }
+  if (mode === 1) {
+    const a = take(seed, 1, [1, 2, 3]);
+    const d = take(seed, 2, [1, 2, 3, 4]);
+    const s = a + d;
+    const value = 1 / (d * d);
+    return problem(
+      `Berapa L{t·e^{${coef(a, "t")}}} di s = ${s}? Boleh dijawab pecahan.`,
+      "Geser frekuensi: L{e^{at} f(t)} = F(s − a). Di sini F(s) = L{t} = 1/s².",
+      value,
+      "Hitung L{t} dulu, lalu ganti s dengan s − a.",
+      [`L{t·e^{${coef(a, "t")}}} = 1/(s − ${a})².`, `s − ${a} = ${d}.`, `1/${d}² = ${fmt(value, 4)}.`],
+      Math.max(0.0005, value * 0.01),
+    );
+  }
+  const a = take(seed, 1, [1, 2]);
+  const b = take(seed, 2, [1, 2, 3]);
+  const d = take(seed, 4, [1, 2, 3]);
+  const s = a + d;
+  const useSin = take(seed, 5, [0, 1]) === 0;
+  const top = useSin ? b : d;
+  const bottom = d * d + b * b;
+  const value = top / bottom;
+  return problem(
+    `Berapa L{e^{${coef(a, "t")}} ${useSin ? "sin" : "cos"}(${coef(b, "t")})} di s = ${s}? Boleh dijawab pecahan.`,
+    useSin ? "L{sin bt} = b/(s² + b²). Kalikan e^{at}: ganti s dengan s − a." : "L{cos bt} = s/(s² + b²). Kalikan e^{at}: ganti s dengan s − a.",
+    value,
+    "Ganti setiap s pada rumus dasar dengan s − a.",
+    [`s − a = ${s} − ${a} = ${d}.`, `${top} / (${d}² + ${b}²) = ${top}/${bottom} = ${fmt(value, 4)}.`],
+    Math.max(0.0005, value * 0.01),
+  );
 }
 
 function ode(seed: number, level: Level): Problem {
@@ -1278,7 +1407,7 @@ function ode(seed: number, level: Level): Problem {
       "Integralkan: y = x² + C. C dari syarat awal.",
       x * x + c,
       "Konstanta tidak hilang. Ia diikat oleh y(0).",
-      [`y = x² + ${c}.`, `y(${x}) = ${x * x} + (${c}) = ${x * x + c}.`],
+      [`y = x²${c === 0 ? "" : ` ${signed(c)}`}.`, c === 0 ? `y(${x}) = ${x}² = ${x * x}.` : `y(${x}) = ${x * x} ${signed(c)} = ${x * x + c}.`],
     );
   }
   const m = take(seed, 1, [1, 4]);
@@ -1334,20 +1463,33 @@ function pde(seed: number, level: Level): Problem {
 
 function variasi(seed: number, level: Level): Problem {
   if (level === 1) {
-    const triples = [
+    const [tx, ty, d] = take(seed, 1, [
       [3, 4, 5],
       [6, 8, 10],
       [5, 12, 13],
       [8, 15, 17],
       [9, 12, 15],
-    ] as const;
-    const [x, y, d] = take(seed, 1, triples);
+      [12, 16, 20],
+      [7, 24, 25],
+    ] as const);
+    const [x1, y1] = take(seed, 2, [
+      [0, 0],
+      [1, 2],
+      [-2, 1],
+      [3, -1],
+      [-1, -3],
+    ] as const);
+    const swap = take(seed, 5, [0, 1]) === 1;
+    const dx = take(seed, 3, [1, -1]) * (swap ? ty : tx);
+    const dy = take(seed, 4, [1, -1]) * (swap ? tx : ty);
+    const x2 = x1 + dx;
+    const y2 = y1 + dy;
     return problem(
-      `Lintasan terpendek dari (0,0) ke (${x}, ${y}). Panjangnya?`,
+      `Lintasan terpendek di bidang datar dari (${x1}, ${y1}) ke (${x2}, ${y2}). Panjangnya?`,
       "Fungsional panjang diminimalkan oleh garis lurus. Ini Pythagoras.",
       d,
       "Kalkulus variasi di kasus datar mengembalikan garis lurus.",
-      [`√(${x}²+${y}²) = ${d}.`],
+      [`Δx = ${x2} − ${par(x1)} = ${dx}, Δy = ${y2} − ${par(y1)} = ${dy}.`, `√(${sq(dx)} + ${sq(dy)}) = ${d}.`],
     );
   }
   if (level === 2) {
@@ -1361,7 +1503,7 @@ function variasi(seed: number, level: Level): Problem {
       "EL untuk ∫ √(1+y'²) dx memberi y'' = 0, jadi gradien tetap.",
       m,
       "Gradien = Δy/Δx.",
-      [`(${y2} − (${y1})) / (${x2} − ${x1}) = ${fmt(m)}.`],
+      [`(${y2} − ${par(y1)}) / (${x2} − ${x1}) = ${fmt(m)}.`],
     );
   }
   const m = take(seed, 1, [1, 2, 4]);
@@ -1378,24 +1520,36 @@ function variasi(seed: number, level: Level): Problem {
 
 function residu(seed: number, level: Level): Problem {
   if (level === 1) {
-    const c = take(seed, 1, [1, 2, 3, 4, 5, -2, -3]);
+    const a = take(seed, 2, [2, -1, 3, 1, -2, 4]);
+    if (take(seed, 3, [0, 1, 2]) < 2) {
+      const c = take(seed, 1, [1, 2, 3, 4, 5, -2, -3, 7]);
+      return problem(
+        `Residu fungsi ${c}/(z ${signed(-a)}) di kutub z = ${a}?`,
+        "Kutub sederhana c/(z − a) punya residu c.",
+        c,
+        "Residu adalah koefisien 1/(z − a), bukan nilai fungsi.",
+        [`Bentuknya sudah c/(z − a) dengan a = ${a}.`, `Res = ${c}.`],
+      );
+    }
+    const k = take(seed, 4, [2, 3]);
+    const m = take(seed, 5, [1, 2, 3, -1, -2]);
     return problem(
-      `Residu fungsi ${c}/(z − 2) di kutub z = 2?`,
-      "Kutub sederhana  c/(z−a) punya residu c.",
-      c,
-      "Residu adalah koefisien 1/(z−a), bukan nilai fungsi.",
-      [`Res = ${c}.`],
+      `Residu fungsi ${k * m}/(${k}z ${signed(-k * a)}) di kutub z = ${a}?`,
+      "Kutub sederhana c/(z − a) punya residu c. Pastikan koefisien z sama dengan 1.",
+      m,
+      "Keluarkan dulu faktor di depan z dari penyebut.",
+      [`${k * m}/(${k}z ${signed(-k * a)}) = ${m}/(z ${signed(-a)}).`, `Res = ${m}.`],
     );
   }
   if (level === 2) {
     const a = take(seed, 1, [1, 2, 3, 4]);
     const b = take(seed, 2, [0, 1, 2, 5, -5, 7]);
     return problem(
-      `Residu (z + (${b})) / (z − ${a}) di z = ${a}?`,
+      `Residu ${b === 0 ? "z" : `(z ${signed(b)})`} / (z − ${a}) di z = ${a}?`,
       "Kalikan (z−a), lalu masukkan z=a.",
       a + b,
       "Yang tersisa pembilang di titik kutub.",
-      [`Res = ${a} + (${b}) = ${a + b}.`],
+      [`Res = ${a} + ${par(b)} = ${a + b}.`],
     );
   }
   const r1 = take(seed, 1, [1, 2, 3, 4, 5, -2]);
@@ -1428,7 +1582,7 @@ function numerik(seed: number, level: Level): Problem {
       "x1 = x0 − f(x0)/f'(x0). f'=2x.",
       value,
       "Satu langkah saja.",
-      [`f(${x0})=${fx}, f'=${df}.`, `x1 = ${x0} − (${fx})/${df} = ${fmt(value)}.`],
+      [`f(${x0}) = ${fx}, f' = ${df}.`, `x1 = ${x0} − ${par(fx)}/${df} = ${fmt(value)}.`],
     );
   }
   if (level === 2) {
@@ -1484,7 +1638,7 @@ function khusus(seed: number, level: Level): Problem {
     "Muncul pada bagian sudut atom hidrogen.",
     value,
     "Jangan buang suku linear.",
-    [`5×${fmt(x ** 3)} − 3×${fmt(x)} = ${fmt(5 * x ** 3 - 3 * x)}.`, `Bagi 2 = ${fmt(value)}.`],
+    [`5×${par(x ** 3, 3)} − 3×${par(x)} = ${fmt(5 * x ** 3 - 3 * x, 3)}.`, `Bagi 2 = ${fmt(value, 3)}.`],
   );
 }
 

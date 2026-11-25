@@ -17,8 +17,9 @@ function getWorker(): Worker {
 /**
  * Jalankan Python di web worker. Panggilan pertama mengunduh Pyodide (beberapa MB, lalu tersimpan di cache peramban).
  * Waktu eksekusi dibatasi; worker dimatikan bila melewati batas, misalnya karena perulangan tanpa akhir.
+ * `scan` berisi kode tambahan yang impornya perlu dimuat, misalnya kode pengguna yang dibungkus penguji.
  */
-export function runPython(code: string, onStatus?: (status: PyStatus) => void): Promise<PyResult> {
+export function runPython(code: string, onStatus?: (status: PyStatus) => void, scan?: string): Promise<PyResult> {
   const w = getWorker();
   const id = ++seq;
   onStatus?.(ready ? "running" : "loading");
@@ -54,7 +55,7 @@ export function runPython(code: string, onStatus?: (status: PyStatus) => void): 
     };
     w.addEventListener("message", onMessage);
     w.addEventListener("error", onError);
-    w.postMessage({ id, code });
+    w.postMessage({ id, code, scan });
   });
 }
 

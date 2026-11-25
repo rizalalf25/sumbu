@@ -1076,9 +1076,9 @@ hasil$conf.int`,
       "Jika interval itu tidak memuat 0, selisihnya sulit dijelaskan sebagai kebetulan sampel.",
     ],
     quiz: {
-      q: "Interval 95% selisih rata-rata adalah 0,3 sampai 0,9. Apa artinya?",
+      q: "Kode di atas mencetak conf.int sekitar 0,29 sampai 0,97. Apa artinya?",
       options: [
-        "Ada 95% peluang selisih sebenarnya tepat 0,6",
+        "Ada 95% peluang selisih sebenarnya tepat 0,63",
         "Selisihnya kemungkinan nyata, karena 0 tidak ada di interval",
         "Mesin baru 95% lebih cepat",
         "Data pasti berdistribusi normal",
@@ -1245,7 +1245,7 @@ ls -l kunci_rahasia.pem
     lang: "bash",
     title: "Hash dan integritas file",
     minutes: 10,
-    idea: "Hash kriptografis meringkas file menjadi sidik jari pendek. Satu bit file berubah, sidik jarinya berubah total. Dipakai untuk memeriksa unduhan dan menyimpan kata sandi.",
+    idea: "Hash kriptografis meringkas file menjadi sidik jari pendek. Satu bit file berubah, sidik jarinya berubah total. Dipakai untuk memeriksa keaslian unduhan dan mendeteksi file yang diubah.",
     code: `sha256sum installer.iso
 # 9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08  installer.iso
 
@@ -1255,6 +1255,7 @@ echo -n "Halo" | sha256sum   # hasil sama sekali berbeda`,
       "SHA-256 menghasilkan 256 bit, ditulis sebagai heksadesimal.",
       "Satu digit heksadesimal = 4 bit.",
       "Bandingkan hash unduhan dengan yang diumumkan situs resmi sebelum menjalankan installer.",
+      "Jangan simpan kata sandi dengan SHA-256 biasa. Hash ini sengaja dibuat cepat, jadi penyerang bisa mencoba miliaran tebakan per detik. Kata sandi disimpan dengan hash yang sengaja lambat dan diberi salt unik, seperti Argon2id, bcrypt, atau scrypt.",
     ],
     quiz: {
       q: "Berapa karakter heksadesimal dalam satu hash SHA-256?",

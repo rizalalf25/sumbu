@@ -15,6 +15,48 @@ export function idn(text: string): string {
   return text.replace(/(\d)\.(\d)/g, "$1,$2");
 }
 
+/**
+ * Tanda minus ASCII di depan angka diganti tanda minus matematika (−), supaya sama dengan
+ * operator kurang di teks: "(-2, -1)" → "(−2, −1)". Tanda hubung pada kata ("ke-5", "30-60") tidak disentuh.
+ */
+export function minus(text: string): string {
+  return text.replace(/(^|[\s([{,;:=+−×·*/^|])-(?=\d)/g, "$1−");
+}
+
+/** Seperti fmt, tetapi bilangan negatif memakai tanda minus matematika: −1,25. */
+export function num(n: number, d = 2): string {
+  return minus(fmt(n, d));
+}
+
+/** Angka negatif dibungkus kurung supaya aman ditulis sesudah operator: 3 → "3", −3 → "(−3)". */
+export function par(n: number, d = 2): string {
+  return n < 0 ? `(${num(n, d)})` : num(n, d);
+}
+
+/** Kuadrat yang tidak ambigu: 4 → "4²", −4 → "(−4)²". Tanpa kurung, −4² berarti −16. */
+export function sq(n: number, d = 2): string {
+  return `${par(n, d)}²`;
+}
+
+/** Suku bertanda untuk disambung ke suku sebelumnya: 3 → "+ 3", −3 → "− 3". */
+export function signed(n: number, d = 2, unit = ""): string {
+  return n < 0 ? `− ${fmt(-n, d)}${unit}` : `+ ${fmt(n, d)}${unit}`;
+}
+
+/** Koefisien di depan variabel: (1, "x") → "x", (−1, "x") → "−x", (0, "x") → "0", (3, "x²") → "3x²". */
+export function coef(n: number, v = "x"): string {
+  if (n === 0) return "0";
+  if (n === 1) return v;
+  if (n === -1) return `−${v}`;
+  return `${num(n)}${v}`;
+}
+
+/** Bilangan kompleks a + bi dengan tanda rapi: (3, −4) → "3 − 4i", (0, 2) → "0 + 2i", (1, −1) → "1 − i". */
+export function cplx(a: number, b: number): string {
+  const im = Math.abs(b) === 1 ? "i" : `${fmt(Math.abs(b))}i`;
+  return `${num(a)} ${b < 0 ? "−" : "+"} ${im}`;
+}
+
 export function hash(seed: number, salt: number): number {
   let x = (Math.imul(seed | 0, 0x9e3779b1) ^ Math.imul(salt | 0, 0x85ebca6b)) >>> 0;
   x = Math.imul(x ^ (x >>> 16), 0x7feb352d);
@@ -52,13 +94,14 @@ export function problem(
   steps: string[],
   tol?: number,
 ): Problem {
+  const tidy = (text: string) => minus(idn(text));
   return {
-    prompt: idn(prompt),
-    given: idn(given),
-    answer: fmt(value, answerDigits(value, tol)),
+    prompt: tidy(prompt),
+    given: tidy(given),
+    answer: minus(fmt(value, answerDigits(value, tol))),
     value,
-    hint: idn(hint),
-    steps: steps.map(idn),
+    hint: tidy(hint),
+    steps: steps.map(tidy),
     tol,
   };
 }

@@ -8,9 +8,10 @@ import {
   Route,
   Sigma,
   Timer,
+  UserRound,
 } from "lucide-react";
 import { createContext, useContext, useSyncExternalStore, type ReactNode } from "react";
-import { StudyDock } from "@/components/study-dock";
+import { StudyDock, StudyPillHeader } from "@/components/study-dock";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { getSaveSnapshot, getServerSaveSnapshot, subscribeSave } from "@/lib/progress-store";
 
@@ -62,7 +63,7 @@ function subscribeFocus(listener: () => void) {
 
 const FocusContext = createContext<FocusApi>({ focus: false, setFocus: () => {} });
 
-export function useFocusMode() {
+function useFocusMode() {
   return useContext(FocusContext);
 }
 
@@ -101,13 +102,26 @@ export function Shell({ children, wide = false }: { children: ReactNode; wide?: 
               </nav>
             )}
             {!focus && (
-              <Link
-                to={user ? "/dashboard" : "/login"}
-                className="btn-ghost shrink-0 px-3 text-sm"
-                aria-label={user ? "Buka dashboard akun" : "Masuk atau daftar"}
-              >
-                {isPending ? "Akun" : user ? "Dashboard" : "Masuk"}
-              </Link>
+              <div className="flex shrink-0 items-center gap-2">
+                <StudyPillHeader />
+                <Link
+                  to={user ? "/dashboard" : "/login"}
+                  className="btn-ghost shrink-0 px-3 text-sm"
+                  aria-label={user ? "Buka dashboard akun" : "Masuk atau daftar"}
+                >
+                  {isPending ? (
+                    "Akun"
+                  ) : user ? (
+                    <>
+                      {/* Di HP cukup ikon supaya muat bersama pil timer; teks tampil mulai 640 px. */}
+                      <UserRound size={18} aria-hidden="true" className="sm:hidden" />
+                      <span className="hidden sm:inline">Dashboard</span>
+                    </>
+                  ) : (
+                    "Masuk"
+                  )}
+                </Link>
+              </div>
             )}
           </div>
         </header>

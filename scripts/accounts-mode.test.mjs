@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { accountsMode } from "./accounts-mode.mjs";
+import { accountsMode, missingAccountEnv } from "./accounts-mode.mjs";
 
 test("di luar Vercel akun selalu aktif", () => {
   assert.equal(accountsMode({}), "on");
@@ -12,7 +12,7 @@ test("Vercel tanpa satu pun pengaturan akun tayang tanpa akun", () => {
   assert.equal(accountsMode({ VERCEL: "1", DATABASE_URL: "  ", BETTER_AUTH_SECRET: "" }), "off");
 });
 
-test("Vercel dengan pengaturan akun (lengkap atau sebagian) memakai mode akun", () => {
+test("Vercel dengan ketiga pengaturan akun memakai mode akun; sebagian saja tetap tanpa akun", () => {
   assert.equal(
     accountsMode({
       VERCEL: "1",
@@ -22,6 +22,10 @@ test("Vercel dengan pengaturan akun (lengkap atau sebagian) memakai mode akun", 
     }),
     "on",
   );
-  // Sebagian terisi tetap "on", supaya validate-deployment menggagalkan build dengan pesan jelas.
-  assert.equal(accountsMode({ VERCEL: "1", DATABASE_URL: "postgres://x" }), "on");
+  // Integrasi database sering mengisi DATABASE_URL lebih dulu; tanpa dua pengaturan auth, tetap tanpa akun.
+  assert.equal(accountsMode({ VERCEL: "1", DATABASE_URL: "postgres://x" }), "off");
+  assert.deepEqual(missingAccountEnv({ VERCEL: "1", DATABASE_URL: "postgres://x" }), [
+    "BETTER_AUTH_SECRET",
+    "BETTER_AUTH_URL",
+  ]);
 });

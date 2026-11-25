@@ -16,6 +16,14 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import pg from "pg";
 import { pendingMigrations } from "./migration-plan.mjs";
+import { accountsMode } from "./accounts-mode.mjs";
+
+// Deployment tanpa akun tidak memakai database sama sekali, jadi jangan menyentuhnya,
+// walaupun DATABASE_URL kebetulan sudah diisi oleh integrasi (lihat accounts-mode.mjs).
+if (accountsMode() === "off") {
+  console.log("[migrate] Akun tidak aktif di deployment ini — migrasi database dilewati.");
+  process.exit(0);
+}
 
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) {

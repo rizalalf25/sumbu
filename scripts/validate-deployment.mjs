@@ -1,9 +1,13 @@
-import { accountsMode } from "./accounts-mode.mjs";
+import { ACCOUNT_ENV_KEYS, accountsMode, missingAccountEnv } from "./accounts-mode.mjs";
 
 if (process.env.VERCEL && accountsMode() === "off") {
+  const missing = missingAccountEnv();
   console.log(
-    "[sumbu] DATABASE_URL, BETTER_AUTH_SECRET, dan BETTER_AUTH_URL belum diisi: situs tayang tanpa akun " +
-      "(progres disimpan di peramban). Isi ketiganya lalu redeploy untuk mengaktifkan akun.",
+    missing.length === ACCOUNT_ENV_KEYS.length
+      ? "[sumbu] DATABASE_URL, BETTER_AUTH_SECRET, dan BETTER_AUTH_URL belum diisi: situs tayang tanpa akun " +
+          "(progres disimpan di peramban). Isi ketiganya lalu redeploy untuk mengaktifkan akun."
+      : `[sumbu] Pengaturan akun belum lengkap (kurang: ${missing.join(", ")}): situs tayang tanpa akun ` +
+          "(progres disimpan di peramban). Lengkapi ketiganya lalu redeploy untuk mengaktifkan akun.",
   );
 } else if (process.env.VERCEL) {
   const missing = ["DATABASE_URL", "BETTER_AUTH_SECRET", "BETTER_AUTH_URL"].filter(

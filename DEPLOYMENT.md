@@ -10,7 +10,7 @@ Kalau `DATABASE_URL`, `BETTER_AUTH_SECRET`, dan `BETTER_AUTH_URL` belum diisi di
 - Tombol Masuk dan ruang diskusi disembunyikan. Halaman `/login` dan `/ruang` menjelaskan bahwa akun belum aktif.
 - Tidak ada panggilan ke `/api/auth` atau database.
 
-Untuk mengaktifkan akun nanti, ikuti langkah di bawah lalu redeploy. Mode akun aktif dengan sendirinya. Mengisi hanya sebagian dari ketiga pengaturan dianggap salah konfigurasi, jadi build sengaja digagalkan dengan pesan yang jelas.
+Untuk mengaktifkan akun nanti, ikuti langkah di bawah lalu redeploy. Mode akun aktif dengan sendirinya setelah ketiga pengaturan terisi. Selama baru sebagian yang terisi (misalnya integrasi Neon sudah mengisi `DATABASE_URL` tetapi dua pengaturan auth belum), situs tetap tayang tanpa akun, migrasi database dilewati, dan log build menyebut pengaturan yang masih kurang.
 
 ## Vercel + PostgreSQL
 
